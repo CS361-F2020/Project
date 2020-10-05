@@ -77,6 +77,7 @@ app.get('/login', function (req, res, next) {
 app.get('/logout', function (req, res, next) {
     req.session.destroy()
     res.redirect('/login')
+<<<<<<< HEAD
 })
 
 app.use(function (req, res) {
@@ -92,4 +93,6 @@ app.use(function (err, req, res, next) {
 
 app.listen(app.get("port"), function () {
     console.log("Express started on http://flipX.engr.oregonstate.edu:" + app.get("port") + " press Ctrl-C to terminate.")
+=======
+>>>>>>> master
 })
