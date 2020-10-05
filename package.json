@@ -1,0 +1,22 @@
+{
+    "name": "cs361-first-bookswap",
+    "version": "1.0.0",
+    "description": "OSU CS361 BookSwap",
+    "main": "app.js",
+    "scripts":{
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "Melissa Koeplin",
+    "license": "ISC",
+    "dependencies":{
+        "body-parser": "^1.13.3",
+        "express": "^4.13.2",
+        "express-handlebars": "^2.0.1",
+        "express-session":"^1.17.1",
+        "express-flash": "^0.0.2",
+        "mysql": "^2.8.0",
+        "jquery": "^3.5.1",
+        "bcryptjs": "^2.4.3",
+        "nodemailer": "^6.4.13"
+        }
+}
