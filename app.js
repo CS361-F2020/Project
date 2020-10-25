@@ -80,7 +80,7 @@ app.get('/logout', function (req, res, next) {
 })
 
 // route for my library
-app.use('./routes/mylibrary', require('./routes/mylibrary'));
+app.use('/mylibrary', require('./routes/mylibrary.js'));
 
 app.use(function (req, res) {
     res.status(404)
