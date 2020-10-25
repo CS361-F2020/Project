@@ -1,3 +1,4 @@
+-- Book Swap Tables
 -- Table structure for table `Books`
 --
 DROP TABLE IF EXISTS Books;
