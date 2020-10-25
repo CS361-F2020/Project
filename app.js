@@ -79,6 +79,9 @@ app.get('/logout', function (req, res, next) {
     res.redirect('/login')
 })
 
+// route for my library
+app.use('/mylibrary', require('./routes/mylibrary.js'));
+
 app.use(function (req, res) {
     res.status(404)
     res.render('404')
@@ -91,5 +94,5 @@ app.use(function (err, req, res, next) {
 })
 
 app.listen(app.get("port"), function () {
-    console.log("Express started on http://flipX.engr.oregonstate.edu:" + app.get("port") + " press Ctrl-C to terminate.")
+    console.log(`Express started on http://${process.env.HOSTNAME}:${app.get('port')}; press Ctrl-C to terminate.`);
 })
