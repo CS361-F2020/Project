@@ -6,5 +6,6 @@ Repository for project work for OSU CS361 Fall 2020
 
 - Melissa Koeplin
 - Andrew Jung
-- Glenn Frutiz
+- Glenn F
 - Kylee Hale 
+- Tom Rowland
