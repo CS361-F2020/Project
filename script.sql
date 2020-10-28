@@ -50,12 +50,13 @@ CREATE TABLE `Users` (
     `lastName` varchar(255) NOT NULL,
     `email` varchar(255) NOT NULL UNIQUE,
     `password` varchar(255) NOT NULL,
+    `tempPassword` bit NOT NULL,
     `address` varchar(255) DEFAULT NULL,
     `city` varchar(255) DEFAULT NULL,
     `state` varchar(255) DEFAULT NULL,
     `postalCode` varchar(255) DEFAULT NULL,
     `country` varchar(4) NOT NULL,
-    `worldwide` tinyint(1) NOT NULL,
+    `worldwide` bit NOT NULL,
     `points` int(11) DEFAULT 0
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8;
 -- --------------------------------------------------------
