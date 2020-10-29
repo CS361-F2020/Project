@@ -1,17 +1,50 @@
 <h1>This is the My Library page</h1><br><br>
 
-<div class="card-deck">
-    {{#each library}}
-    <div class="card">
-        <img src=" {{imgUrl}}" class="card-img-top" alt="...">
-        {{!-- <div class="card-body"> --}}
-        {{!-- <h5 class="card-title">{{title}}</h5> --}}
-        {{!-- <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional
-                content. This content is a little bit longer.</p> --}}
-        {{!-- </div> --}}
-        <div class="card-footer">
-            <small class="text-muted">Last updated xxxx-xx-xx</small>
+<p class="shelf">
+    <span class="shelf-title">Books Available to Swap</span>
+    <button class="btn btn-outline-primary library-toggle" type="button" data-toggle="collapse"
+        data-target="#collapsSwapShelf" aria-expanded="true" aria-controls="collapsSwapShelf">
+        Show Books &#x25BD;
+    </button>
+</p><br>
+<div class="collapse show" id="collapsSwapShelf">
+    <div class="row row-cols-2 row-cols-md-4">
+        {{#each library}}
+        {{#unless swap}}
+        <div class="col-6 col-sm-4 col-md-3 col-lg-3 col-xl-2">
+            <div class="card">
+                <img src="{{imgUrl}}" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <p class="card-text">{{title}}</p>
+                </div>
+            </div>
         </div>
+        {{/unless}}
+        {{/each}}
     </div>
-    {{/each}}
+</div>
+<br><br>
+
+<p class="shelf">
+    <span class="shelf-title">Books Received From Swaps</span>
+    <button class="btn btn-outline-primary library-toggle" type="button" data-toggle="collapse"
+        data-target="#collapsRCVDShelf" aria-expanded="true" aria-controls="collapsRCVDShelf">
+        Show Books &#x25BD;
+    </button>
+</p><br>
+<div class="collapse show" id="collapsRCVDShelf">
+    <div class="row row-cols-2 row-cols-md-4">
+        {{#each library}}
+        {{#if swap}}
+        <div class="col-6 col-sm-4 col-md-3 col-lg-3 col-xl-2">
+            <div class="card">
+                <img src="{{imgUrl}}" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <p class="card-text">{{title}}</p>
+                </div>
+            </div>
+        </div>
+        {{/if}}
+        {{/each}}
+    </div>
 </div>
