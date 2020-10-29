@@ -1,7 +1,20 @@
 .library-toggle{
-    float: right;
+    float:right;
+    border: none;
+    background: none;
+}
+.shelf{
+    font-size: 25px;
+    font-weight: bold;
+    border: 1px solid black;
+    border-radius: 7px;
+    padding: 5px 15px 5px;
+    
 }
 /* .shelf-title{
-    font-size: 30px;
-    font-weight: bold;
+    display: inline;
 } */
+
+.cards{
+    border: none;
+}
