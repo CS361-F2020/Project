@@ -125,9 +125,9 @@ app.post('/register', function(req, res, next) {
                         req.flash('error', err)
                         res.render('auth/register', data)
                     } else {
-                        sql.pool.query('INSERT INTO Users (firstName, lastName, email, password, tempPassword, address, city, state, postalCode, country, worldwide, points)\
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [data.firstName, data.lastName, data.email, hash, 0, data.address, data.city, data.state,
-                        data.postalCode, data.country, Number(data.worldwide), 0], 
+                        sql.pool.query('INSERT INTO Users (firstName, lastName, email, password, address, city, state, postalCode, country, worldwide)\
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [data.firstName, data.lastName, data.email, hash, data.address, data.city, data.state,
+                        data.postalCode, data.country, data.worldwide], 
                         function (err, results) {
                             if (err) {
                                 req.flash('error', err)
