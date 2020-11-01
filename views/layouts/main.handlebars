@@ -16,12 +16,12 @@
             {{!-- Brand/Logo --}}
             <a class="navbar-brand" href="/home">BookSwap</a>
             {{#if session.user }}
-            <div class="col order-lg-3">
+            <div class="col-2 ml-auto order-lg-3">
                 <div class="row justify-content-end">
                     {{!-- User dropdown --}}
                     <div class="nav-item dropdown">
-                        <a class="btn dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <a class="btn dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
+                            aria-haspopup="true" aria-expanded="false">
                             {{ session.user }}
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
@@ -43,7 +43,6 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
-                    
                     <li class="nav-item active">
                         <a class="nav-link" href="/home">Home <span class="sr-only">(current)</span></a>
                     </li>
@@ -55,8 +54,12 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#">Wishlist</a>
-                    </li>                    
+                    </li>
                 </ul>
+                <form class="form-inline my-2 my-lg-0 ml-auto">
+                    <input class="form-control form-control-sm small mr-sm-2" type="search" placeholder="Search"
+                        aria-label="Search">
+                </form>
             </div>
             {{/if}}
             {{!-- End toggle page navigation --}}
@@ -79,7 +82,7 @@
         <div class="alert alert-info" role="alert">{{messages.info}}</div>
         {{/if}}
         {{!-- End flash messages --}}
-        
+
         {{{body}}}
     </main>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
