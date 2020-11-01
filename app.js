@@ -80,6 +80,85 @@ app.get('/resetpassword', isAuthenticated, function (req, res, next) {
     res.render('auth/resetpassword', data)
 })
 
+app.get('/register', function(req, res, next) {
+    res.render('auth/register')
+})
+
+app.post('/register', function(req, res, next) {
+    var data = {
+        title: 'Register',
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
+        email: req.body.email,
+        password: req.body.password,
+        confirmPassword: req.body.confirmPassword,
+        address: req.body.address,
+        city: req.body.city,
+        state: req.body.state,
+        postalCode: req.body.postalCode,
+        country: req.body.country,
+        worldwide: req.body.worldwide
+    }
+
+    if (data.password != data.confirmPassword)
+    {
+        req.flash('error', 'Password and confirm password must match')
+        data.password = ''
+        data.confirmPassword = ''
+        res.render('auth/register', data)
+    }
+    else {
+        sql.pool.query('SELECT * FROM Users WHERE email=?', [data.email],
+        function (err, results) {
+            if (err) {
+                req.flash('error', err)
+                res.render('auth/register', data)
+            } else if (results.length > 0) {
+                req.flash('error', 'There is already an account linked to this email address.')
+                data.email = ''
+                data.password = ''
+                data.confirmPassword = ''
+                res.render('auth/register', data)
+            } else {
+                bcrypt.hash(data.password, 10, function (err, hash) {
+                    if (err) {
+                        req.flash('error', err)
+                        res.render('auth/register', data)
+                    } else {
+                        sql.pool.query('INSERT INTO Users (firstName, lastName, email, password, address, city, state, postalCode, country, worldwide)\
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [data.firstName, data.lastName, data.email, hash, data.address, data.city, data.state,
+                        data.postalCode, data.country, data.worldwide], 
+                        function (err, results) {
+                            if (err) {
+                                req.flash('error', err)
+                                res.render('auth/register', data)
+                            } else {
+                                sql.pool.query('SELECT * FROM Users WHERE email=?', [data.email],
+                                function(err, results){
+                                    if (err) {
+                                        req.flash('error', err)
+                                        res.render('auth/register', data)
+                                    } else if (results.length == 0) {
+                                        req.flash('error', 'There was a problem with your registration')
+                                        res.render('auth/register', data)
+                                    } else {
+                                        req.session.user = results[0].firstName + " " + results[0].lastName
+                                        req.session.email = results[0].email
+                                        req.session.userId = results[0].id
+                                        res.redirect('/home')
+                                        
+                                    }
+                                })
+                            }
+                        })
+                
+                    }
+        
+                })
+            }
+        })
+    }
+})
 app.post('/resetpassword', isAuthenticated, function (req, res, next) {
     var data = {
         title: 'Reset Password',
@@ -199,7 +278,7 @@ app.post('/login', function (req, res, next) {
                 req.flash('error', 'Email is incorrect. Please try again.')
                 res.render('auth/login')
             } else {
-                bcrypt.compare(req.body.password, results[0].psword, function (err, isMatch) {
+                bcrypt.compare(req.body.password, results[0].password, function (err, isMatch) {
                     if (err) {
                         req.flash('error', err)
                         res.render('auth/login', data)
@@ -212,7 +291,7 @@ app.post('/login', function (req, res, next) {
                         req.session.email = results[0].email
                         req.session.tempPassword = results[0].tempPassword
                         req.session.userId = results[0].id
-                        if (results[0].tempPass) {
+                        if (results[0].tempPassword) {
                             res.redirect('/resetpassword')
                         } else {
                             res.redirect('/home')

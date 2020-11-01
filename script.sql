@@ -50,7 +50,7 @@ CREATE TABLE `Users` (
     `lastName` varchar(255) NOT NULL,
     `email` varchar(255) NOT NULL UNIQUE,
     `password` varchar(255) NOT NULL,
-    `tempPassword` bit NOT NULL,
+    `tempPassword` bit DEFAULT 0,
     `address` varchar(255) DEFAULT NULL,
     `city` varchar(255) DEFAULT NULL,
     `state` varchar(255) DEFAULT NULL,
