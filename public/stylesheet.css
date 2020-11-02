@@ -18,3 +18,11 @@
 .cards{
     border: none;
 }
+
+.delete-btn{
+    position: absolute;
+    top: 0%;
+    right: 0%;
+    padding: 0px 5px 3px;
+    border: none;
+}

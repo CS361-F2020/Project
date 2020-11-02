@@ -4,25 +4,26 @@ const router = express.Router();
 const db = require('../dbcon.js');
 
 // Book object
-function Book(id, swap, title, imgUrl) {
-    this.id = id;
+function Book(userBookId, bookId, swap, title, imgUrl) {
+    this.userBookId = userBookId;
+    this.bookId = bookId;
     this.swap = swap
     this.title = title;
     this.imgUrl = imgUrl;
 }
 
 // Queries
-const selectAllBooks = `SELECT Books.id AS id, available AS swap, listingDate AS date, Books.title AS title, Books.imgUrl AS imgUrl
+const selectAllBooks = `SELECT UserBooks.id AS userBookId, Books.id AS bookId, available AS swap, listingDate AS date, Books.title AS title, Books.imgUrl AS imgUrl
                         FROM UserBooks
                         INNER JOIN Books ON Books.id = UserBooks.bookId
                         WHERE UserBooks.userId = ?`;
+const deleteUserBook = 'DELETE FROM UserBooks WHERE id = ?';
 
 // @route   GET /mylibrary
 // @desc    Get current users mylibrary
 // @access  Private
 router.get('/', (req, res, next) => {
-    // still needs user auth/id either as a :param or token
-    const userId = 1; // for testing
+    const userId = req.session.userId;
     var payload = {};
     var library = [];
     db.pool.query(selectAllBooks, [userId], (err, result) => {
@@ -31,18 +32,23 @@ router.get('/', (req, res, next) => {
             return;
         }
         for (let i = 0; i < result.length; i++) {
-            library.push(new Book(result[i].id, result[i].swap, result[i].title, result[i].imgUrl));
+            library.push(new Book(result[i].userBookId, result[i].bookId, result[i].swap, result[i].title, result[i].imgUrl));
         }
         payload.library = library;
-        // console.log(payload.library);
         res.render('mylibrary', payload);
     })
 });
 
-// Route for adding a book
-router.post('/', (req, res, next) => {
-    var book = {};
-    res.send(book);
+// Route for removing a book from a user library
+router.delete('/', (req, res, next) => {
+    var { userBookId } = req.body;
+    db.pool.query(deleteUserBook, [userBookId], (err, result) => {
+        if (err) {
+            next(err);
+            return;
+        }
+        res.json({ 'delete': true });
+    });
 });
 
 module.exports = router;
