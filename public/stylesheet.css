@@ -3,18 +3,37 @@
     border: none;
     background: none;
 }
+
+.library-toggle:focus{
+    outline: 0 !important;
+}
+
+.library-toggle:hover{
+    color: lightskyblue;
+}
+
 .shelf{
     font-size: 25px;
     font-weight: bold;
     border: 1px solid black;
     border-radius: 7px;
     padding: 5px 15px 5px;
-    
 }
-/* .shelf-title{
-    display: inline;
-} */
 
 .cards{
     border: none;
+}
+
+.delete-btn{
+    position: absolute;
+    top: 0%;
+    right: 0%;
+    padding: 0px 5px 3px;
+    border: none;
+    color: grey;
+}
+
+.delete-btn:hover{
+    color: red;
+    background: transparent;
 }
