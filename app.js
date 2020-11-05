@@ -314,6 +314,12 @@ app.get('/addbook', isAuthenticated, function (req, res, next) {
     res.render('addbook', data)
 })
 
+//route for books
+app.use('/allbooks', require('./routes/search.js'));
+
+//route for calling google books api
+app.use('/searchByISBN/:id', require('./routes/googlebooks.js'));
+
 app.use(function (req, res) {
     res.status(404)
     res.render('errors/404')

@@ -1,0 +1,25 @@
+<body>
+<h1>These are all books that are available on BookSwap</h1>
+
+<table>
+    <thead>
+        <th>id</th>
+        <th>title</th>
+        <th>author</th>
+        <th>genre</th>
+        <th>isbn</th>
+        <th>imgUrl</th>
+    </thead>
+    <tbody>
+        {{#each books}}
+        <tr>
+            <td>{{bookId}}</td>
+            <td>{{title}}</td>
+            <td>{{author}}</td>
+            <td>{{genre}}</td>
+            <td>{{isbn}}</td>
+            <td>{{imgUrl}}</td>
+        </tr>
+        {{/each}}
+    </tbody>
+</table>
