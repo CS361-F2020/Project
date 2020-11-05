@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/konpa/devicon@master/devicon.min.css">
+    <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="/stylesheet.css">
+    <script src="https://kit.fontawesome.com/2d23217ccb.js" crossorigin="anonymous"></script>
+    <title>BookSwap {{title}}</title>
+</head>
+
+<body>
+    <header id='header'>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            {{!-- Brand/Logo --}}
+            <a class="navbar-brand" href="/home">BookSwap</a>
+            {{#if session.user }}
+            <div class="col-2 ml-auto order-lg-3">
+                <div class="row justify-content-end">
+                    {{!-- User dropdown --}}
+                    <div class="nav-item dropdown">
+                        <a class="btn dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
+                            aria-haspopup="true" aria-expanded="false">
+                            {{ session.user }}
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="#">My Profile</a>
+                            <a class="dropdown-item" href="/resetPassword">Reset Password</a>
+                            <a class="dropdown-item" href="/logout">Logout</a>
+                        </div>
+                    </div>
+                    {{!-- End User dropdown --}}
+                </div>
+            </div>
+
+            {{/if}}
+            {{!-- Toggle page navigation --}}
+            {{#if session.user}}
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="/home">Home <span class="sr-only">(current)</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/mylibrary">My Library</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">My Swaps</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Wishlist</a>
+                    </li>
+                </ul>
+                <form class="form-inline my-2 my-lg-0 ml-auto">
+                    <input class="form-control form-control-sm small mr-sm-2" type="search" placeholder="Search"
+                        aria-label="Search">
+                </form>
+            </div>
+            {{/if}}
+            {{!-- End toggle page navigation --}}
+        </nav>
+        </div>
+        </div>
+    </header>
+    <script src="https://code.jquery.com/jquery-3.3.1.js" crossorigin="anonymous"></script>
+    <main class="container-fluid pt-5 col-xl-10 col-lg-11 col-md-12 col-sm-12 col-12">
+        {{!-- Flash messages --}}
+        {{#if messages.success}}
+        <div class="alert alert-success" role="alert">{{messages.success}}</div>
+        {{/if}}
+
+        {{#if messages.error}}
+        <div class="alert alert-danger" role="alert">{{messages.error}}</div>
+        {{/if}}
+
+        {{#if messages.info}}
+        <div class="alert alert-info" role="alert">{{messages.info}}</div>
+        {{/if}}
+        {{!-- End flash messages --}}
+
+        {{{body}}}
+    </main>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+    <script>
+        $(document).ready(function () {
+            $('li.active').removeClass('active');
+            $('a[href="' + location.pathname + '"]').closest('li').addClass('active');
+        });
+    </script>
+</body>
+
+</html>

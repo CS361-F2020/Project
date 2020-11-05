@@ -1,0 +1,19 @@
+<div class="col-xl-6 col-lg-8 col-md-10 col-sm-12 col-12">
+  <h3 class="pb-3">{{title}}</h3>
+  <div class="pb-3">
+    <div>New to BookSwap? <a href="/register">Register Now</a></div>
+    <div>Forgot Password? <a href="/ForgotPassword">Click here</a></div>
+  </div>
+
+  <form action="/login" method="POST">
+    <div class="form-group">
+      <label>Email address</label>
+      <input type="email" class="form-control" name="email" value="{{email}}" placeholder="Email" required>
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" class="form-control" name="password" value="{{password}}" placeholder="Password" required>
+    </div>
+    <input type="submit" class="btn btn-primary" value="Submit" />
+  </form>
+</div>
