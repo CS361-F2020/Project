@@ -308,6 +308,12 @@ app.post('/forgotPassword', function (req, res, next) {
 // route for my library
 app.use('/mylibrary', require('./routes/mylibrary.js'));
 
+// add book 
+app.get('/addbook', isAuthenticated, function (req, res, next) {
+    var data = { title: 'Add Book' }
+    res.render('addbook', data)
+})
+
 app.use(function (req, res) {
     res.status(404)
     res.render('errors/404')
