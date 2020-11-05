@@ -305,8 +305,9 @@ app.post('/forgotPassword', function (req, res, next) {
         })
 })
 
-// route for my library
+// Routes
 app.use('/mylibrary', require('./routes/mylibrary.js'));
+app.use('/googleapi', require('/routes/googleapi.js'));
 
 // add book 
 app.get('/addbook', isAuthenticated, function (req, res, next) {
@@ -316,9 +317,6 @@ app.get('/addbook', isAuthenticated, function (req, res, next) {
 
 //route for books
 app.use('/allbooks', require('./routes/search.js'));
-
-//route for calling google books api
-app.use('/searchByISBN/:id', require('./routes/googlebooks.js'));
 
 app.use(function (req, res) {
     res.status(404)
