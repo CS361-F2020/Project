@@ -17,12 +17,10 @@ function Book(bookId, title, author, genre, isbn, imgUrl) {
 
 // Queries
 
-const selectAllAvailableBooks = `SELECT Books.id AS bookId, title AS title, author AS author, genre AS genre, isbn AS isbn, imgUrl AS imgUrl
+const selectAllAvailableBooks = `SELECT Books.id AS bookId, title AS title, author AS author, genre AS genre, isbn13 AS isbn, imgUrl AS imgUrl
                                  FROM UserBooks
-                                 LEFT JOIN Books ON Books.id = UserBooks.bookId
-                                 LEFT JOIN Transactions ON Transactions.userBookId = UserBooks.id
-                                 WHERE NOT UserBooks.userId = ?
-                                 AND Transactions.userBookId IS NULL`;
+                                 INNER JOIN Books ON Books.id = UserBooks.bookId
+                                 WHERE UserBooks.userId != ? AND UserBooks.available = 1`;
                                  
 
 // @route   GET /allBooks
@@ -32,18 +30,22 @@ router.get('/', (req, res, next) => {
     var payload = {};
     var books = [];
     
+
     db.pool.query(selectAllAvailableBooks, [userId], (err, result) => {
         if (err) {
             
             next(err);
             return;
         }
-        for (let i = 0; i < result.length; i++) {
+        var number = result.length;
+        
+        for (let i = 0; i < number; i++) {
             books.push(new Book(result[i].bookId, result[i].title, result[i].author, result[i].genre, result[i].isbn, result[i].imgUrl));
             
         }
         payload.books = books;
-        
+        payload.number = number;
+        console.log(payload);
         res.render('allbooks', payload);
     })
 });

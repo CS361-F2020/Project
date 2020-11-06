@@ -74,7 +74,7 @@ CREATE TABLE UserBooks (
     bookId int(11) NOT NULL,
     conditionId int(11) NOT NULL,
     listingDate date NOT NULL,
-    available tinyint(1) NOT NULL,
+    available bit NOT NULL,
     FOREIGN KEY (userId) REFERENCES Users (id),
     FOREIGN KEY (bookId) REFERENCES Books (id),
     FOREIGN KEY (conditionId) REFERENCES Conditions (id)
