@@ -307,7 +307,7 @@ app.post('/forgotPassword', function (req, res, next) {
 
 // Routes
 app.use('/mylibrary', require('./routes/mylibrary.js'));
-app.use('/googleapi', require('/routes/googleapi.js'));
+app.use('/googleapi', require('./routes/googleapi.js'));
 
 // add book 
 app.get('/addbook', isAuthenticated, function (req, res, next) {
