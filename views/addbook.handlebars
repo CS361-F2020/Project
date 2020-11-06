@@ -8,7 +8,7 @@
         <div class="form-row">
             <div class="form-group col-6">
                 <label for="isbn">ISBN</label>
-                <input type="text" class="form-control" id="inputid" pattern="[0-9]+" maxlength="13" onchange="javascript:getBookDetaislByISBN" placeholder="ISBN please enter numbers only"
+                <input type="text" class="form-control" id="inputid" pattern="[0-9]+" maxlength="13" onchange="javascript:getBookDetailsByISBN" placeholder="ISBN please enter numbers only"
                     required>
             </div>
         </div>
@@ -62,9 +62,10 @@
 </div>
 
 <script>
-function getBookDetaislByISBN() {
-
+    function getBookDetailsByISBN{
+        var inputId = $('#inputid').val()
 }
+
     var inputId = $('#inputId').val();
     {$.ajax({
          url:"mylibrary/seachbyISBN/", 
