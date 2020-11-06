@@ -17,6 +17,7 @@
         "mysql": "^2.8.0",
         "jquery": "^3.5.1",
         "bcryptjs": "^2.4.3",
-        "nodemailer": "^6.4.13"
+        "nodemailer": "^6.4.13",
+        "google-books-search": "^0.3.1"
         }
 }
