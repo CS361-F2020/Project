@@ -49,7 +49,6 @@
         </div>
 
         <div class="form-row">
-
             <div class="form-group col-12">
                 <input type="hidden" class="form-control" name="imgUrl" readonly>
             </div>
@@ -64,19 +63,26 @@
 <script>
     function getBookDetailsByISBN{
         var inputId = $('#inputid').val()
-}
-
-    var inputId = $('#inputId').val();
-    {$.ajax({
-         url:"mylibrary/seachbyISBN/", 
-         type: 'GET', 
-         dataType: 'json',
-         success: function(res){
-             console.log
-             ('input[name="genre"]').val('res.genre'), 
-             ('input[name="title"]').val('res.title'), 
-             ('input[name="author"').val('res.author'), 
-             ('input[name="language"]').val('res.language'), 
-             ('input[name="isbn"]').val('res.isbn')}; alert(res); } });
+        console.log(inputId)
+        {$.ajax({
+            url: '/googleapi/isbn/' + inputId,
+            method: 'GET', 
+            dataType: 'json', 
+            success: function(res){
+                $('title').val(res.title)
+                $('author').val(res.author)
+                $('genre').val(res.genre)
+                $('language').val(res.language)
+                $('rating').val(res.rating)
+                $('pageCount').val(res.pagecount)
+                $('pubDate').val(res.pubDate)
+                $('imgUrl').val(res.imgUrl)
+                console.log(res.title)
+            },
+            error: function(jqXHR, textstatus, errorThrown){
+                console.log(textstatus)
+                alert('Error occured while retrieving book')
+            }
+        })
+    }        
 </script>
-
