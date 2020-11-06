@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const books = require('google-books-search');
 
-app.get('/isbn/(:isbn)', function(req, res, next){
+router.get('/isbn/(:isbn)', function(req, res, next){
     var options = { field: 'isbn', type: 'books', order: 'newest' }
     books.search(req.params.isbn, options, function(err, results, resp){
         if (err) {

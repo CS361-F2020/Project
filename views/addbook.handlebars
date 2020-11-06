@@ -8,19 +8,19 @@
         <div class="form-row">
             <div class="form-group col-6">
                 <label for="isbn">ISBN</label>
-                <input type="text" class="form-control" id="inputid" pattern="[0-9]+" maxlength="13" value="{{isbn}}" onchange="getBookDetaislByISBN()" placeholder="ISBN please enter numbers only"
+                <input type="text" class="form-control" id="inputid" pattern="[0-9]+" maxlength="13" onchange="javascript:getBookDetaislByISBN" placeholder="ISBN please enter numbers only"
                     required>
             </div>
         </div>
         <div class="form-row">
             <div class="form-group col-6">
                 <label for="title">Title</label>
-                <input type="hidden" class="form-control" value="" name="title" id="title" >
+                <input type="text" class="form-control" name="title" id="title" readonly >
             </div>
             <div class="form-group col">
                 <label for="author">Author</label>
-                <input type="hidden" class="form-control" name="author" value="{{author}}"
-                    placeholder="Author" required>
+                <input type="readonly" class="form-control" name="author" "
+                    placeholder="Author" readonly>
             </div>
         </div>
                 <div class="form-row">
@@ -50,8 +50,20 @@
 </div>
 
 <script>
-function getBookDetaislByISBN() 
+function getBookDetaislByISBN() {
+
+}
     var inputId = $('#inputId').val();
-    {$ajax({ url:"mylibrary/seachbyISBN/inputId", type: 'GET' success: function(res){('input[name="genre"]').val('res.genre'), ('input[name="title"]').val('res.title'), ('input[name="author"').val('res.author'), ('input[name="language"]').val('res.language'), ('input[name="isbn"]').val('res.isbn')}; alert(res); } });
+    {$.ajax({
+         url:"mylibrary/seachbyISBN/", 
+         type: 'GET', 
+         dataType: 'json',
+         success: function(res){
+             console.log
+             ('input[name="genre"]').val('res.genre'), 
+             ('input[name="title"]').val('res.title'), 
+             ('input[name="author"').val('res.author'), 
+             ('input[name="language"]').val('res.language'), 
+             ('input[name="isbn"]').val('res.isbn')}; alert(res); } });
 </script>
 
