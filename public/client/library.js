@@ -53,3 +53,39 @@ function remove(userBookId) {
         }
     });
 };
+
+function addBook(){
+    var formArray = $('#addBookForm').serializeArray()
+    var formData = {}
+
+    $.each(formArray,
+        function(i, v) {
+            if (v.name != "isbn"){
+                formData[v.name] = v.value
+            }
+    })
+
+    $.ajax({
+        url: '/mylibrary/add',
+        method: 'POST',
+        dataType: 'json',
+        data: JSON.stringify(formData),
+        contentType: "application/json",
+        success: function (res) {
+            // if response contains an error, display in error alert
+            if (res.error) {
+                $('#modal-alert-error').removeClass('d-none').text(res.error)
+            } 
+            // if success, hide the modal, redirect and display message
+            else
+            {
+                $('#addBookModal').modal('hide')
+                location.reload()
+            } 
+        },
+        error: function (jqXHR, textstatus, errorThrown) {
+            console.log(textstatus)
+            alert('Error occured while adding book')
+        }
+    })
+}
