@@ -166,7 +166,6 @@ router.post('/forgotPassword', (req, res, next) =>{
                                         text: 'Your new temporary password is: ' + tempPass
                                     }
                                     common.transport.sendMail(message)
-                                    //transport.sendMail(message)
                                 }
                             })
                     })
