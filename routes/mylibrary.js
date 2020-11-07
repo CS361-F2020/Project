@@ -43,6 +43,7 @@ router.get('/', (req, res, next) => {
         payload.library = library;
         payload.avail = avail;
         payload.rcvd = rcvd;
+        payload.title = 'My Library'
         res.render('mylibrary', payload);
     })
 });
@@ -60,5 +61,115 @@ router.delete('/', (req, res, next) => {
         res.json({ 'delete': true });
     });
 });
+
+app.post('/add', function (req, res, next) {
+    
+    console.log('adding book to books table:');
+    
+    //see if the book already exists in our table based on isbn10
+    sql.pool.query('SELECT * FROM Books WHERE isbn10=?', [data.isbn10],
+    function (err, results) {
+        if (err) {
+            req.flash('error', err)
+            res.render('auth/errors/500', data)
+        } else if (results.length > 0) {
+            //if it already exists then enter into user books
+            console.log("Book already exits in Books table. Adding association to UserBooks");
+
+            var queryStr = 
+                "INSERT INTO UserBooks" +
+                " (`userId`,`bookId`,`conditionId`,`listingDate`,`available`)" +
+                " VALUES (?)";
+
+            var date = new Date().toISOString().slice(0, 19).replace('T', ' ');
+
+            values = [[req.session.userId, results.id, 5, date, 1]];
+
+            sql.pool.query(queryStr, values, function(err, result){
+
+                if(err){
+                    if (err.code == 'ER_DUP_ENTRY') {
+                    console.log('DONE: Userbooks entry already exists');
+                    
+                    }
+                    else {
+                        console.log(err.code);
+                        console.log("ERROR INSERT !!!!");
+                        console.log(err);
+                        return;
+                    }
+                }
+                else {
+                    console.log('entry successfully inserted into UserBooks');
+                
+                }
+            })
+        } else if(results.length == 0) {
+        //if the book doesnt exist in the books table then add it into books and userbooks
+            var values = [[req.body.title, req.body.author, req.body.genre, req.body.language, req.body.isbn13, req.body.isbn10, req.body.imgUrl, req.body.rating, req.body.pubDate, req.body.pageCount]];
+
+            var queryStr = 
+            "INSERT INTO Books" +
+            " (`title`,`author`,`genre`,`language`,`isbn13`, `isbn10`, `imgUrl`, `rating`, `pubDate`, `pageCount`)" +
+            " VALUES (?)";
+    
+            //show values that will be entered into query
+            console.log(queryStr);
+            console.log("values:");
+            console.log(values);
+
+            sql.pool.query(queryStr, values, function(err, result){
+
+                if(err){
+                    if (err.code == 'ER_DUP_ENTRY') {
+                        console.log('DONE: book already exists in table');
+        
+                    }
+                    else {
+                        console.log(err.code);
+                        console.log("ERROR INSERT !!!!");
+                        console.log(err);
+                        return;
+                    }
+                }
+                else {
+                    console.log('book successfully inserted into Books');
+                    console.log("Adding association to UserBooks");
+
+                    var queryStr = 
+                        "INSERT INTO UserBooks" +
+                        " (`userId`,`bookId`,`conditionId`,`listingDate`,`available`)" +
+                        " VALUES (?)";
+
+                    var date = new Date().toISOString().slice(0, 19).replace('T', ' ');
+
+                    values = [[req.session.userId, result.insertId, 5, date, 1]];
+
+                    sql.pool.query(queryStr, values, function(err, result){
+
+                        if(err){
+                            if (err.code == 'ER_DUP_ENTRY') {
+                                console.log('DONE: Userbooks entry already exists');
+                    
+                            }
+                            else {
+                                console.log(err.code);
+                                console.log("ERROR INSERT !!!!");
+                                console.log(err);
+                                return;
+                            }
+                        }
+                        else {
+                            console.log('entry successfully inserted into UserBooks');
+                
+                        }
+                    })
+        
+                }
+            })
+        } 
+                   
+    })
+})
 
 module.exports = router;
