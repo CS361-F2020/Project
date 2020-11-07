@@ -61,7 +61,18 @@ router.get('/', (req, res, next) => {
     })
 });
 
-module.exports = router;
-//router.update('/', (req, res, next) => {
+// @route   PUT /myprofile
+// @desc    updates about me
+router.post('/', (req, res, next) => {
+    var { aboutMe } = req.body;
+    db.pool.query(updateAboutMe, [aboutMe, req.session.userId], (err, result) => {
+        if (err) {
+            next(err);
+            return;
+        } else { 
+            res.json({ 'update': true }); 
+        }    
+    });
+});
 
-//});
+module.exports = router;
