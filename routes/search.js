@@ -20,7 +20,7 @@ router.get('/', (req, res, next) => {
                                  INNER JOIN Books ON Books.id = UserBooks.bookId
                                  WHERE UserBooks.userId != ? AND UserBooks.available = 1`;
     const userId = req.session.userId;
-    var payload = {};
+    var payload = { title: 'Available Books'};
     var books = [];
     
 
@@ -42,7 +42,7 @@ router.get('/', (req, res, next) => {
         payload.books = books;
         payload.number = number;
         console.log(payload);
-        res.render('allbooks', payload);
+        res.render('search', payload);
     })
 });
 

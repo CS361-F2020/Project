@@ -1,6 +1,7 @@
-const express = require('express');
-const router = express.Router();
-const db = require('../dbcon.js');
+const express = require('express')
+const router = express.Router()
+const db = require('../dbcon.js')
+const common = require ('../common')
 
 // Book object
 function Book(userBookId, bookId, swap, title, imgUrl) {
@@ -20,17 +21,16 @@ const deleteUserBook = 'DELETE FROM UserBooks WHERE id = ?';
 
 // @route   GET /mylibrary
 // @desc    Get current users mylibrary
-router.get('/', (req, res, next) => {
+router.get('/', common.isAuthenticated, (req, res, next) => {
     const userId = req.session.userId;
-    var payload = {};
+    var payload = { title: 'My Library' };
     var library = [];
     var avail = 0;
     var rcvd = 0;
     db.pool.query(selectAllBooks, [userId], (err, result) => {
         if (err) {
-            // fix error handeling with flash response?
-            next(err);
-            return;
+            req.flash('error', 'Error retrieving all books. Try refreshing your page.')
+            res.render('myLibrary')
         }
         for (let i = 0; i < result.length; i++) {
             library.push(new Book(result[i].userBookId, result[i].bookId, result[i].swap, result[i].title, result[i].imgUrl));
@@ -43,7 +43,6 @@ router.get('/', (req, res, next) => {
         payload.library = library;
         payload.avail = avail;
         payload.rcvd = rcvd;
-        payload.title = 'My Library'
         res.render('mylibrary', payload);
     })
 });
@@ -62,113 +61,77 @@ router.delete('/', (req, res, next) => {
     });
 });
 
-app.post('/add', function (req, res, next) {
-    
-    console.log('adding book to books table:');
-    
-    //see if the book already exists in our table based on isbn10
-    sql.pool.query('SELECT * FROM Books WHERE isbn10=?', [data.isbn10],
-    function (err, results) {
-        if (err) {
-            req.flash('error', err)
-            res.render('auth/errors/500', data)
-        } else if (results.length > 0) {
-            //if it already exists then enter into user books
-            console.log("Book already exits in Books table. Adding association to UserBooks");
+router.post('/add', (req, res, next) => {
+    var formData = req.body
+    var isbn = formData.isbn13
+    var defaultErrorMessage = 'Error in adding book. Please try again later.'
 
-            var queryStr = 
-                "INSERT INTO UserBooks" +
-                " (`userId`,`bookId`,`conditionId`,`listingDate`,`available`)" +
-                " VALUES (?)";
+    var userBook = {
+        userId: req.session.userId,
+        bookId: 0,
+        conditionId: null,
+        listingDate: new Date(),
+        available: true
+    }
 
-            var date = new Date().toISOString().slice(0, 19).replace('T', ' ');
-
-            values = [[req.session.userId, results.id, 5, date, 1]];
-
-            sql.pool.query(queryStr, values, function(err, result){
-
-                if(err){
-                    if (err.code == 'ER_DUP_ENTRY') {
-                    console.log('DONE: Userbooks entry already exists');
-                    
-                    }
-                    else {
-                        console.log(err.code);
-                        console.log("ERROR INSERT !!!!");
-                        console.log(err);
-                        return;
-                    }
+    // Check if book already exists
+    sql.pool.query('SELECT * FROM Books WHERE isbn10 = ? OR isbn13 = ?', [isbn, isbn],
+    function(err, rows){
+        if (err){
+            console.log(err)
+            res.send({ error: defaultErrorMessage })
+        } 
+        else if (rows.length == 0) {
+            // if does not exist, insert book
+            sql.pool.query('INSERT INTO Books SET ?', [formData],
+            function(err, result){
+                if (err) {
+                    console.log(err)
+                    res.send({ error: defaultErrorMessage })
                 }
                 else {
-                    console.log('entry successfully inserted into UserBooks');
-                
-                }
-            })
-        } else if(results.length == 0) {
-        //if the book doesnt exist in the books table then add it into books and userbooks
-            var values = [[req.body.title, req.body.author, req.body.genre, req.body.language, req.body.isbn13, req.body.isbn10, req.body.imgUrl, req.body.rating, req.body.pubDate, req.body.pageCount]];
-
-            var queryStr = 
-            "INSERT INTO Books" +
-            " (`title`,`author`,`genre`,`language`,`isbn13`, `isbn10`, `imgUrl`, `rating`, `pubDate`, `pageCount`)" +
-            " VALUES (?)";
-    
-            //show values that will be entered into query
-            console.log(queryStr);
-            console.log("values:");
-            console.log(values);
-
-            sql.pool.query(queryStr, values, function(err, result){
-
-                if(err){
-                    if (err.code == 'ER_DUP_ENTRY') {
-                        console.log('DONE: book already exists in table');
-        
-                    }
-                    else {
-                        console.log(err.code);
-                        console.log("ERROR INSERT !!!!");
-                        console.log(err);
-                        return;
-                    }
-                }
-                else {
-                    console.log('book successfully inserted into Books');
-                    console.log("Adding association to UserBooks");
-
-                    var queryStr = 
-                        "INSERT INTO UserBooks" +
-                        " (`userId`,`bookId`,`conditionId`,`listingDate`,`available`)" +
-                        " VALUES (?)";
-
-                    var date = new Date().toISOString().slice(0, 19).replace('T', ' ');
-
-                    values = [[req.session.userId, result.insertId, 5, date, 1]];
-
-                    sql.pool.query(queryStr, values, function(err, result){
-
-                        if(err){
-                            if (err.code == 'ER_DUP_ENTRY') {
-                                console.log('DONE: Userbooks entry already exists');
-                    
-                            }
-                            else {
-                                console.log(err.code);
-                                console.log("ERROR INSERT !!!!");
-                                console.log(err);
-                                return;
-                            }
+                    // insert record into user book using insert id
+                    userBook.bookId = result.insertId
+                    sql.pool.query('INSERT INTO UserBooks SET ?', [userBook],
+                    function(err, rows){
+                        if (err) {
+                            console.log(err)
+                            res.send({ error: defaultErrorMessage })
                         }
                         else {
-                            console.log('entry successfully inserted into UserBooks');
-                
+                            req.flash('success', req.body.title + ' has been added to your library!')
+                            res.send()
                         }
                     })
-        
                 }
             })
-        } 
-                   
+        } else {
+            // if exists, get book id from table
+            sql.pool.query('SELECT id FROM Books WHERE isbn10 = ? OR isbn13 = ?', [isbn, isbn],
+            function(err, rows){
+                if (err) {
+                    console.log(err)
+                    res.send({ error: defaultErrorMessage })
+                }
+                else {
+                    // insert record for user books using existing book id
+                    console.log(rows[0].id)
+                    userBook.bookId = rows[0].id
+                    sql.pool.query('INSERT INTO UserBooks SET ?', [userBook],
+                    function(err, rows){
+                        if (err) {
+                            console.log(err)
+                            res.send({ error: defaultErrorMessage })
+                        }
+                        else {
+                            // send success message after insert
+                            req.flash('success', req.body.title + ' has been added to your library!')
+                            res.send()
+                        }
+                    })
+                }
+            })
+        }
     })
 })
 
