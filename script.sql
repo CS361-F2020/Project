@@ -76,12 +76,7 @@ CREATE TABLE UserBooks (
     listingDate date NOT NULL,
     available tinyint(1) NOT NULL,
     FOREIGN KEY (userId) REFERENCES Users (id),
-<<<<<<< HEAD
-    FOREIGN KEY (bookId) REFERENCES Books (id),
-    FOREIGN KEY (conditionId) REFERENCES Conditions (id)
-=======
     FOREIGN KEY (bookId) REFERENCES Books (id)
->>>>>>> master
 );
 -- --------------------------------------------------------
 --
