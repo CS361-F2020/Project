@@ -1,31 +1,24 @@
 const express = require('express');
 const router = express.Router();
-const axios = require("axios")
-const jquery = require("jquery")
 const db = require('../dbcon.js');
 
 // Book object
-function Book(bookId, title, author, genre, isbn, imgUrl) {
-    
-    this.bookId = bookId;
+function Book(title, author, imgUrl, pointcost) {
     this.title = title;
     this.author = author;
-    this.genre = genre;
-    this.isbn = isbn;
     this.imgUrl = imgUrl;
+    this.pointcost = pointcost
 }
 
-// Queries
 
-const selectAllAvailableBooks = `SELECT Books.id AS bookId, title AS title, author AS author, genre AS genre, isbn13 AS isbn, imgUrl AS imgUrl
-                                 FROM UserBooks
-                                 INNER JOIN Books ON Books.id = UserBooks.bookId
-                                 WHERE UserBooks.userId != ? AND UserBooks.available = 1`;
                                  
-
 // @route   GET /allBooks
 // @desc    Get all available books that don't belong to the user and are not undergoing transactions
 router.get('/', (req, res, next) => {
+    var selectAllAvailableBooks = `SELECT title AS title, author AS author, imgUrl AS imgUrl
+                                 FROM UserBooks
+                                 INNER JOIN Books ON Books.id = UserBooks.bookId
+                                 WHERE UserBooks.userId != ? AND UserBooks.available = 1`;
     const userId = req.session.userId;
     var payload = {};
     var books = [];
@@ -38,9 +31,12 @@ router.get('/', (req, res, next) => {
             return;
         }
         var number = result.length;
-        
+
+        //entering 5 as the point cost for now.
+        //I think we discussed in a meeting to keep the point cost constant for all books in the beginning.
         for (let i = 0; i < number; i++) {
-            books.push(new Book(result[i].bookId, result[i].title, result[i].author, result[i].genre, result[i].isbn, result[i].imgUrl));
+            books.push(new Book(result[i].title, result[i].author, result[i].imgUrl, 5));
+
             
         }
         payload.books = books;
