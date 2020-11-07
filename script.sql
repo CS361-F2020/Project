@@ -61,7 +61,8 @@ CREATE TABLE Users (
     postalCode varchar(255) DEFAULT NULL,
     country varchar(4) NOT NULL,
     worldwide bit NOT NULL,
-    points int(11) DEFAULT 0
+    points int(11) DEFAULT 0,
+    aboutMe text DEFAULT NULL
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8;
 -- --------------------------------------------------------
 --
