@@ -2,31 +2,13 @@ const express = require('express')
 const router = express.Router()
 const sql = require('../dbcon.js')
 const bcrypt = require('bcryptjs')
-const nodemailer = require('nodemailer')
-
-var transport = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 465,
-    secure: true,
-    auth: {
-        user: 'bookswaphelpdesk@gmail.com',
-        pass: 'bookSwapFirst!361'
-    }
-})
-
-function isAuthenticated(req, res, next) {
-    if (!req.session.user) {
-        res.redirect('/login')
-    } else {
-        next()
-    }
-}
+const common = require('../common')
 
 router.get('/', (req, res, next) =>{
     res.redirect('/home')
 })
 
-router.get('/home', isAuthenticated, (req, res, next) =>{
+router.get('/home', common.isAuthenticated, (req, res, next) =>{
     var data = { title: 'Home' }
     res.render('home', data)
 })
@@ -85,7 +67,7 @@ router.get('/logout', (req, res, next) =>{
     res.redirect('/login')
 })
 
-router.get('/resetpassword', isAuthenticated, (req, res, next) =>{
+router.get('/resetpassword', common.isAuthenticated, (req, res, next) =>{
     var data = { title: 'Reset Password' }
     if (req.session.tempPassword) {
         req.flash('info', 'You logged in using a temporary password, please reset your password now.')
@@ -93,7 +75,7 @@ router.get('/resetpassword', isAuthenticated, (req, res, next) =>{
     res.render('auth/resetpassword', data)
 })
 
-router.post('/resetpassword', isAuthenticated, (req, res, next) =>{
+router.post('/resetpassword', common.isAuthenticated, (req, res, next) =>{
     var data = {
         title: 'Reset Password',
         password: req.body.password,
@@ -183,7 +165,8 @@ router.post('/forgotPassword', (req, res, next) =>{
                                         subject: 'BookSwap: Request for temporary password',
                                         text: 'Your new temporary password is: ' + tempPass
                                     }
-                                    transport.sendMail(message)
+                                    common.transport.sendMail(message)
+                                    //transport.sendMail(message)
                                 }
                             })
                     })
@@ -278,4 +261,4 @@ router.post('/register', (req, res, next) =>{
     }
 })
 
-module.exports = router;
+module.exports = router
