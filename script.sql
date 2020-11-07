@@ -6,8 +6,8 @@ CREATE TABLE Books (
     id int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
     title varchar(255) NOT NULL,
     author varchar(255) NOT NULL,
-    genre varchar(255) NOT NULL,
-    language varchar(255) NOT NULL,
+    genre varchar(255) NULL,
+    language varchar(255) NULL,
     isbn13 varchar(255) NULL,
     isbn10 varchar(255) NULL,
     imgUrl varchar(255) DEFAULT NULL,
@@ -76,8 +76,12 @@ CREATE TABLE UserBooks (
     listingDate date NOT NULL,
     available tinyint(1) NOT NULL,
     FOREIGN KEY (userId) REFERENCES Users (id),
+<<<<<<< HEAD
     FOREIGN KEY (bookId) REFERENCES Books (id),
     FOREIGN KEY (conditionId) REFERENCES Conditions (id)
+=======
+    FOREIGN KEY (bookId) REFERENCES Books (id)
+>>>>>>> master
 );
 -- --------------------------------------------------------
 --
