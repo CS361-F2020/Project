@@ -1,0 +1,94 @@
+{{#each user}}
+<div class="container pb-3">
+    <div class="row">
+      <div class="col-sm">
+        <h1>{{firstName}} {{lastName}}</h1><br>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm">
+        <h3>{{city}}, {{state}}</h3><br>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm">
+        <h4>{{country}}</h4><br>
+      </div>
+    </div>
+    </div>
+</div>
+
+<div class="container pb-1">
+  <div class="row">
+    <div class="col-sm">
+      <h6>Books Shipped</h6>
+    </div>
+    <div class="col-sm">
+      <h6>Books Received</h6>
+    </div>
+    <div class="col-sm">
+      <h6>Point Balance</h6>
+    </div>
+  </div>
+</div>
+{{/each}}
+<div class="container pb-2">
+  <div class="row">
+    <div class="col-sm">
+      {{sentBooks}}
+    </div>
+    <div class="col-sm">
+      {{receivedBooks}}
+    </div>
+    <div class="col-sm">
+      {{#each user}}
+      {{points}}
+    </div>
+  </div>
+</div>
+
+<div class="container pb-1">
+    <div class="row">    
+        <div class="col-sm">
+            <h6>About Me</h6>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            {{aboutMe}}
+        </div>
+    </div>
+</div>
+<div class="container pb-1">
+    <div class="row">
+        <div class="col-sm">
+            <button type="button" class="btn btn-secondary btn-sm"data-toggle="modal" data-target="#updateAboutMe">Update About Me</button> 
+        </div>
+    </div>
+</div>
+
+
+<!-- update form -->
+<div class="modal fade" id="updateAboutMe" tabindex="-1" role="dialog" aria-labelledby="modaltitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modaltitle">Update About Me</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <div class="md-form">
+                  <i class="fas fa-pencil prefix grey-text"></i>
+                  <textarea type="text" name="newAboutMe" id="newAboutMe" class="md-textarea form-control" rows="4" value="{{aboutMe}}"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="newupdateAboutMe()">Confirm Changes</button>
+            </div>
+    </div>
+</div>
+{{/each}}
+<script src="/client/profile.js"></script>

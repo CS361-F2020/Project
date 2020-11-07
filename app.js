@@ -200,7 +200,6 @@ app.post('/register', function(req, res, next) {
         })
     }
 })
-
 app.post('/resetpassword', isAuthenticated, function (req, res, next) {
     var data = {
         title: 'Reset Password',
@@ -307,6 +306,7 @@ app.post('/forgotPassword', function (req, res, next) {
 
 // Routes
 app.use('/mylibrary', require('./routes/mylibrary.js'));
+app.use('/myprofile', require('./routes/myprofile.js'));
 app.use('/googleapi', require('./routes/googleapi.js'));
 app.use('/allbooks', require('./routes/search.js'));
 
