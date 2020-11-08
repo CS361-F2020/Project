@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const db = require('../dbcon.js')
+const sql = require('../dbcon.js')
 const common = require ('../common')
 
 // Book object
@@ -27,7 +27,7 @@ router.get('/', common.isAuthenticated, (req, res, next) => {
     var library = [];
     var avail = 0;
     var rcvd = 0;
-    db.pool.query(selectAllBooks, [userId], (err, result) => {
+    sql.pool.query(selectAllBooks, [userId], (err, result) => {
         if (err) {
             req.flash('error', 'Error retrieving all books. Try refreshing your page.')
             res.render('myLibrary')
@@ -43,6 +43,7 @@ router.get('/', common.isAuthenticated, (req, res, next) => {
         payload.library = library;
         payload.avail = avail;
         payload.rcvd = rcvd;
+        payload.title = 'My Library'
         res.render('mylibrary', payload);
     })
 });
@@ -51,7 +52,7 @@ router.get('/', common.isAuthenticated, (req, res, next) => {
 // @desc    Removing a book from a user library
 router.delete('/', (req, res, next) => {
     var { userBookId } = req.body;
-    db.pool.query(deleteUserBook, [userBookId], (err, result) => {
+    sql.pool.query(deleteUserBook, [userBookId], (err, result) => {
         if (err) {
             // fix error handeling with flash response?
             next(err);
@@ -115,7 +116,6 @@ router.post('/add', (req, res, next) => {
                 }
                 else {
                     // insert record for user books using existing book id
-                    console.log(rows[0].id)
                     userBook.bookId = rows[0].id
                     sql.pool.query('INSERT INTO UserBooks SET ?', [userBook],
                     function(err, rows){
