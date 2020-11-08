@@ -61,7 +61,7 @@ CREATE TABLE Users (
     postalCode varchar(255) DEFAULT NULL,
     country varchar(4) NOT NULL,
     worldwide bit NOT NULL,
-    aboutMe text DEFAULT NULL
+    aboutMe text DEFAULT NULL,
     points int(11) DEFAULT 0
 );
 -- --------------------------------------------------------
