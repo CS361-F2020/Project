@@ -1,28 +1,35 @@
-const express = require('express');
-const router = express.Router();
-const books = require('google-books-search');
+const express = require('express')
+const router = express.Router()
+const books = require('google-books-search')
 
-app.get('/isbn/(:isbn)', function(req, res, next){
+router.get('/isbn/(:isbn)', (req, res, next) =>{
     var options = { field: 'isbn', type: 'books', order: 'newest' }
-    books.search(req.params.isbn, options, function(err, results, resp){
+    books.search(req.params.isbn, options, function(err, resp){
         if (err) {
             console.log(err)
+            res.send({ error: 'Error in finding book by ISBN. Please try again.'}) 
         }
-        else {
-            var response = resp.items[0].volumeInfo
+        else if (resp.length > 0) {
+            var response = resp[0]
             var book = {
                 title: response.title,
-                author: response.authors[0],
-                genre: response.categories[0],
+                author: response.authors ? response.authors[0] : "",
+                genre: response.categories ? response.categories[0] : "",
                 language: response.language,
-                isbn13: response.industryIdentifiers[0].identifier,
-                isbn10: response.industryIdentifiers[1].identifier,
-                imgUrl: response.imageLinks.thumbnail,
+                isbn10: response.industryIdentifiers[0].identifier,
+                isbn13: response.industryIdentifiers[1].identifier,
+                imgUrl: response.thumbnail,
                 rating: response.averageRating,
+                publisher: response.publisher,
                 pubDate: response.publishedDate,
-                pageCount: response.pageCount
+                pageCount: response.pageCount,
+                description: response.description,
+                googleLink: response.link
             }
-            res.send(book);
+            res.send(book)
+        }
+        else {
+            res.send({ message: 'No book found with isbn: ' + req.params.isbn})
         }
     })
 })

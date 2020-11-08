@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../dbcon.js');
+const common = require('../common')
 
 //User
 function User(firstName, lastName, city, state, country, aboutMe, points, booksReceived) {
@@ -26,7 +27,7 @@ const updateAboutMe = `UPDATE Users SET aboutMe=? WHERE id=?`;
 
 // @route   GET /myprofile
 // @desc    Get current users profile
-router.get('/', (req, res, next) => {
+router.get('/', common.isAuthenticated, (req, res, next) => {
     const userId = req.session.userId;
     var payload = {};
     var user = [];
@@ -63,7 +64,7 @@ router.get('/', (req, res, next) => {
 
 // @route   PUT /myprofile
 // @desc    updates about me
-router.post('/', (req, res, next) => {
+router.post('/', common.isAuthenticated, (req, res, next) => {
     var { aboutMe } = req.body;
     db.pool.query(updateAboutMe, [aboutMe, req.session.userId], (err, result) => {
         if (err) {
