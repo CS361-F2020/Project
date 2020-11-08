@@ -53,7 +53,6 @@ router.get('/', common.isAuthenticated, (req, res, next) => {
             }
             payload.sentBooks = sentBooks;
             payload.receivedBooks = receivedBooks;
-            console.log(payload);
             res.render('myprofile', payload);
         }
     })
