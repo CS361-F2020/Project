@@ -101,7 +101,7 @@ router.post('/add', (req, res, next) => {
                         }
                         else {
                             req.flash('success', req.body.title + ' has been added to your library!')
-                            res.send()
+                            res.send({ success: 'success' })
                         }
                     })
                 }
@@ -126,7 +126,7 @@ router.post('/add', (req, res, next) => {
                         else {
                             // send success message after insert
                             req.flash('success', req.body.title + ' has been added to your library!')
-                            res.send()
+                            res.send({success: 'success'})
                         }
                     })
                 }
