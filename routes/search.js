@@ -29,7 +29,7 @@ const selectAllAvailableBooks = `SELECT Books.id AS bookId, title AS title, auth
 // @desc    Get all available books that don't belong to the user and are not undergoing transactions
 router.get('/', (req, res, next) => {
     const userId = req.session.userId;
-    var payload = {};
+    var payload = { title: 'Available Books'};
     var books = [];
     
     db.pool.query(selectAllAvailableBooks, [userId], (err, result) => {
@@ -43,8 +43,14 @@ router.get('/', (req, res, next) => {
             
         }
         payload.books = books;
+<<<<<<< HEAD
         
         res.render('allbooks', payload);
+=======
+        payload.number = number;
+        console.log(payload);
+        res.render('search', payload);
+>>>>>>> origin/melissa
     })
 });
 

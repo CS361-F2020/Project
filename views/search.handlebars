@@ -1,0 +1,56 @@
+<<<<<<< HEAD:views/allbooks.handlebars
+<body>
+<h1>These are all books that are available on BookSwap</h1>
+
+<table>
+    <thead>
+        <th>id</th>
+        <th>title</th>
+        <th>author</th>
+        <th>genre</th>
+        <th>isbn</th>
+        <th>imgUrl</th>
+    </thead>
+    <tbody>
+        {{#each books}}
+        <tr>
+            <td>{{bookId}}</td>
+            <td>{{title}}</td>
+            <td>{{author}}</td>
+            <td>{{genre}}</td>
+            <td>{{isbn}}</td>
+            <td>{{imgUrl}}</td>
+        </tr>
+        {{/each}}
+    </tbody>
+</table>
+=======
+<h3 class="pb-3">{{title}}</h3>
+<div class="shelf">
+    <span class="shelf-title">{{number}} books are available to you.</span>
+    
+</div>
+
+<div class="card-columns"></div>
+        <br>
+        <div class="row row-cols-2 row-cols-md-4">
+            {{#each books}}
+        
+                <div class="col-6 col-sm-4 col-md-3 col-lg-2 col-xl-2">
+                    <div class="card h-100 cards">
+                        <img src="{{imgUrl}}" class="card-img-top" alt="...">
+                        <br>
+                        <div class="card-body">
+                            <p class="card-text">{{title}}</p>
+                            <br>
+                            <p class = "card-text">{{author}}</p>
+                            <br>
+                            <p class = "card-text">{{pointcost}}</p> 
+                        </div>
+                    </div>
+                </div>
+        
+            {{/each}}
+        </div>
+</div>
+>>>>>>> origin/melissa:views/search.handlebars
