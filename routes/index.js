@@ -4,6 +4,21 @@ const sql = require('../dbcon.js')
 const bcrypt = require('bcryptjs')
 const common = require('../common')
 
+
+function Account(firstName, lastName, email, address, city, state, postalCode, country, worldwide, aboutMe) {
+    this.firstName = firstName;
+    this.lastName = lastName;
+    this.email = email;
+    this.address = address;
+    this.city = city;
+    this.state = state;
+    this.postalCode = postalCode;
+    this.country = country;
+    this.worldwide = worldwide;
+    this.aboutMe = aboutMe
+}
+
+
 router.get('/', (req, res, next) =>{
     res.redirect('/home')
 })
@@ -258,6 +273,72 @@ router.post('/register', (req, res, next) =>{
             }
         })
     }
+})
+
+router.get('/preferences', common.isAuthenticated, (req, res, next) => {
+    var data = { title : 'Preferences'}
+    res.render('preferences', data);
+})
+
+router.get('/gettingstarted', common.isAuthenticated, (req, res, next) => {
+    var data = { title: 'Getting Started'}
+    res.render('gettingstarted', data);
+})
+
+router.get('/faq', common.isAuthenticated, (req, res, next) => {
+    var data = { title: 'Frequently Asked Questions'}
+    res.render('faq', data);
+})
+
+router.get('/updateaccount', common.isAuthenticated, (req, res, next) => {
+    var payload = { title : 'Update Account Settings' }
+    var data = [];
+    //Select all information from database. Render form with values all as the existing information in users table.
+    sql.pool.query('SELECT * FROM Users WHERE id=?', [req.session.userId],
+    (err, results) => {
+        if (err) {
+            if (err) {
+                req.flash('error', err)
+                res.render('/auth/updateaccount', data)
+            }
+        } else {
+            data.push(new Account(results[0].firstName, results[0].lastName, results[0].email, results[0].address, results[0].city, results[0].state, results[0].postalCode, results[0].country, results[0].worldwide, results[0].aboutMe));
+        }
+        payload.data = data;
+        res.render('auth/updateaccount', payload);
+    });
+})
+
+router.post('/updateaccount', common.isAuthenticated, (req, res, next) => {
+    var data = {
+        title: 'Update Account Settings',
+        userId: req.session.userId,
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
+        email: req.body.email,
+        address: req.body.address,
+        city: req.body.city,
+        state: req.body.state,
+        postalCode: req.body.postalCode,
+        country: req.body.country,
+        worldwide: req.body.worldwide,
+        aboutMe: req.body.aboutMe
+    }
+    sql.pool.query('UPDATE Users SET firstName=?, lastName=?, email=?, address=?, city=?, state=?, postalCode=?, country=?, worldwide=?, aboutMe=? WHERE id=?',
+    [data.firstName, data.lastName, data.email, data.address, data.city, data.state, data.postalCode, data.country, data.worldwide, data.aboutMe, data.userId],
+    (err, results) => {
+        if (err) {
+            req.flash('error', err)
+            res.render('auth/updateaccount', data)
+        } else {
+            //put alert on screen saying that the information was successfully updated. Reset session data in case anything changed
+            req.session.user = data.firstName + " " + data.lastName
+            req.session.email = data.email
+            req.session.userId = data.id
+            req.flash('Details Successfully Updated');
+            res.render('auth/updateaccount', data);
+        }
+    })
 })
 
 module.exports = router
