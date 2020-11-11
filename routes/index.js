@@ -334,9 +334,9 @@ router.post('/updateaccount', common.isAuthenticated, (req, res, next) => {
             //put alert on screen saying that the information was successfully updated. Reset session data in case anything changed
             req.session.user = data.firstName + " " + data.lastName
             req.session.email = data.email
-            req.session.userId = data.id
-            req.flash('Details Successfully Updated');
-            res.render('auth/updateaccount', data);
+            req.session.userId = data.userId
+            req.flash('success', 'Account Details Successfully Updated');
+            res.redirect('/preferences');
         }
     })
 })
