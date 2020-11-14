@@ -118,6 +118,15 @@
                             <input type="text" class="form-control" id="inputid" pattern="[0-9]+" maxlength="13"
                                 onchange="javascript:getBookDetailsByISBN()" name="isbn" placeholder="ISBN-10 or ISBN-13"
                                 autocomplete="off" required>
+                                <br>
+                             <!--Search by Title-->   
+                            <label for="isbn">Or select a title that already exists in our system.</label>
+                            <select class="form-control" name="title" onchange="javascript:getBookDetailsByISBN()"  
+                                autocomplete="off" required placeholder="Select a Book Title">
+                                {{#each titles}}
+                                <option value="{{this.id}}">{{this.label}}</option>
+                                {{/each}}
+                            </select> 
                         </div>
                     </div>
 
@@ -140,6 +149,15 @@
                         <div class="form-group col-6">
                             <label for="language">Language</label>
                             <input type="text" class="form-control" name="language" readonly>
+                        </div>
+                        <div class="form-group col-6">
+                            <label for="language">Book Condition</label>
+                            <select class="form-control" name="conditionId"
+                            autocomplete="off" required>
+                                {{#each title}}
+                                <option value="{{this.id}}" {{this.selected}}>{{this.label}}</option>
+                                {{/each}}
+                            </select> 
                         </div>
                     </div>
                     <!-- hidded fields will populate from api-->
