@@ -18,9 +18,7 @@ const selectAllBooks = `SELECT UserBooks.id AS userBookId, Books.id AS bookId, a
                         INNER JOIN Books ON Books.id = UserBooks.bookId
                         WHERE UserBooks.userId = ?`;
 const deleteUserBook = 'DELETE FROM UserBooks WHERE id = ?';
-const selectAllTitles = `SELECT title AS title, isbn13 as isbn13
-                        FROM Books
-                        WHERE title = ?`;
+var selectAllTitles = 'SELECT isbn13, title FROM Books ORDER BY title'
 
 // @route   GET /mylibrary
 // @desc    Get current users mylibrary
@@ -47,21 +45,18 @@ router.get('/', common.isAuthenticated, (req, res, next) => {
         payload.library = library;
         payload.avail = avail;
         payload.rcvd = rcvd;
-        payload.title = 'My Library'
-        
-    })
-})
-    sql.pool.query((selectAllTitles, [userId], (err, result) => {
+        payload.title = 'My Library'     
+    sql.pool.query(selectAllTitles, [], (err, result) => {
         if (err) {
-            req.flash('error', 'Error retrieving book by title. Try refreshing your page.')
-            res.render('myLibrary')
+            req.flash('error', 'Error retrieving book by title.')
+            res.render('myLibrary', payload)
         }
         for (let i = 0; i < result.length; i++) {
-            titles.push(new Book(result[i].title));
-            payload.titles = titles;
-            res.render('mylibrary', payload);
-
+            titles.push({id: result[i].isbn13, label: result[i].title});
         }
+        payload.titles = titles;
+        res.render('mylibrary', payload);
+    })
     })
 });
 
@@ -76,7 +71,7 @@ router.delete('/', (req, res, next) => {
             return;
         }
         res.json({ 'delete': true });
-    });
+    })
 });
 
 router.post('/add', (req, res, next) => {
