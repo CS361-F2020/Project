@@ -3,7 +3,6 @@ const url = window.location.href;
 
 
 function newupdateAboutMe() {
-	console.log(url);
     var updatedAboutMe = document.getElementById('newAboutMe').value;
     var data = {'aboutMe': updatedAboutMe };
     var req = new XMLHttpRequest();
