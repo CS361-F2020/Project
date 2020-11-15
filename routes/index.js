@@ -69,7 +69,14 @@ router.post('/login', (req, res, next) =>{
                         if (results[0].tempPassword) {
                             res.redirect('/resetpassword')
                         } else {
-                            res.redirect('/home')
+                            if (req.session.path)
+                            {
+                                res.redirect(req.session.path)
+                            }
+                            else
+                            {
+                                res.redirect('/home')
+                            }          
                         }
                     }
                 })

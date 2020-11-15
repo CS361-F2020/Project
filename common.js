@@ -12,6 +12,9 @@ var transport = nodemailer.createTransport({
 
 function isAuthenticated(req, res, next) {
     if (!req.session.user) {
+        if (req._parsedOriginalUrl){
+            req.session.path = req._parsedOriginalUrl.href
+        }
         res.redirect('/login')
     } else {
         next()
