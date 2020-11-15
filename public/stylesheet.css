@@ -65,3 +65,33 @@
         column-count: 5;
     }
 }
+
+.stars {
+    display: inline-block;
+}
+
+.stars input {
+    display: none;
+}
+
+.stars label {
+    float: right;
+    padding: 2px;
+    font-size: 24px;
+    color: #444;
+    transition: all .2s;
+}
+
+.stars label:before {
+    font-family: "FontAwesome";
+    content: '\f005';
+}
+
+.stars input:checked~label:before {
+    color: gold;
+    transition: all .25s;
+}
+
+.stars label:hover {
+    transform: scale(1.3);
+}
