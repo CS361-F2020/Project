@@ -39,9 +39,11 @@ CREATE TABLE Statuses (
 --
 DROP TABLE IF EXISTS TransactionStatusDates;
 CREATE TABLE TransactionStatusDates (
-    id int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    transactionId int(11) NOT NULL,
     statusId int(11) NOT NULL,
-    date date NOT NULL
+    date date NOT NULL,
+    FOREIGN KEY (transactionId) REFERENCES Transactions (id),
+    FOREIGN KEY (statusId) REFERENCES Statuses (id)
 );
 -- --------------------------------------------------------
 --
@@ -75,7 +77,7 @@ CREATE TABLE UserBooks (
     bookId int(11) NOT NULL,
     conditionId int(11) NULL,
     listingDate date NOT NULL,
-    available tinyint(1) NOT NULL,
+    available bit NOT NULL,
     FOREIGN KEY (userId) REFERENCES Users (id),
     FOREIGN KEY (bookId) REFERENCES Books (id)
 );
@@ -89,13 +91,12 @@ CREATE TABLE Transactions (
     userBookId int(11) NOT NULL,
     requestorId int(11) NOT NULL,
     statusId int(11) NOT NULL,
+    pointCost int(11) NOT NULL,
+    rcvdOnTime bit DEFAULT NULL,
+    conditionMatched bit DEFAULT NULL,
     rating int(11) DEFAULT NULL,
-    pointCost int(11) DEFAULT NULL,
-    pointReward int(11) DEFAULT NULL,
-    estShipping float DEFAULT NULL,
-    shipping float DEFAULT NULL,
-    rcvdOnTime tinyint(1) NOT NULL,
-    conditionMatched tinyint(1) NOT NULL,
+    created date NOT NULL,
+    modified date DEFAULT NULL,
     FOREIGN KEY (userBookId) REFERENCES UserBooks (id),
     FOREIGN KEY (requestorId) REFERENCES Users (id),
     FOREIGN KEY (statusId) REFERENCES Statuses (id)
