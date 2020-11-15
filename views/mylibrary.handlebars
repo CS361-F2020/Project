@@ -114,29 +114,32 @@
                     <div class="form-row">
                         <div class="form-group col-12">
                             <label for="isbn">Please enter an ISBN-10 or ISBN-13 value below to search for a book to
-                                add.</label>
+                                add or select a title that already exists in our system.</label>
                             <input type="text" class="form-control" id="inputid" pattern="[0-9]+" maxlength="13"
-                                onchange="javascript:getBookDetailsByISBN()" name="isbn" placeholder="ISBN-10 or ISBN-13"
-                                autocomplete="off" required>
-                                <br>
-                             <!--Search by Title-->   
-                            <label for="titleSearch">Or select a title that already exists in our system.</label>
-                            <select class="form-control" id="titleid" onchange="javascript:populateISBN()"  
-                                autocomplete="off" required placeholder="Select a Book Title">
-                                {{#each titles}}
-                                <option value=""></option>
-                                <option value="{{this.id}}">{{this.label}}</option>
-                                {{/each}}
-                            </select> 
+                                onchange="javascript:getBookDetailsByISBN()" name="isbn"
+                                placeholder="ISBN-10 or ISBN-13" autocomplete="off" required>
                         </div>
                     </div>
-
+                    <!--Search by Title-->
+                    <div class="form-row" id="titleselect">
+                        <div class="form-group col-12">
+                            <select class="form-control" id="titleid"  onchange="javascript:populateISBN()"
+                                autocomplete="off" required>
+                                <option value="">Select an existing title</option>
+                                {{#each titles}}
+                                <option value="{{this.id}}">{{this.label}}</option>
+                                {{/each}}
+                            </select>
+                        </div>
+                    </div>
                     <div class="form-row d-none google-field">
-                        <div class="form-group col-6">
+                        <div class="form-group col-12">
                             <label for="title">Title</label>
                             <input type="text" class="form-control" name="title" required readonly>
                         </div>
-                        <div class="form-group col">
+                    </div>
+                    <div class="form-row d-none google-field">
+                        <div class="form-group col-12">
                             <label for="author">Author</label>
                             <input type="text" class="form-control" name="author" required readonly>
                         </div>
@@ -151,14 +154,16 @@
                             <label for="language">Language</label>
                             <input type="text" class="form-control" name="language" readonly>
                         </div>
-                        <div class="form-group col-6">
-                            <label for="language">Book Condition</label>
-                            <select class="form-control" name="conditionId"
-                            autocomplete="off" required>
-                                {{#each title}}
-                                <option value="{{this.id}}" {{this.selected}}>{{this.label}}</option>
+                    </div>
+                    <div class="form-row d-none google-field">
+                        <div class="form-group col-12">
+                            <label for="bookCondition">Book Condition</label>
+                            <select class="form-control" id="conditionId" name="conditionId" autocomplete="off" required
+                                placeholder="Select a Book Condition">
+                                {{#each conditions}}
+                                <option value="{{this.id}}">{{this.label}}</option>
                                 {{/each}}
-                            </select> 
+                            </select>
                         </div>
                     </div>
                     <!-- hidded fields will populate from api-->
@@ -177,13 +182,15 @@
                                 Search</button>
                         </div>
                         <div class="col-6">
-                            <a class="btn btn-primary w-100" id="bookModalSubmit" onclick="javascript:addBook()">Submit</a>
+                            <a class="btn btn-primary w-100" id="bookModalSubmit"
+                                onclick="javascript:addBook()">Submit</a>
                         </div>
                     </div>
                 </form>
             </div>
         </div>
     </div>
+</div>
 </div>
 
 <script src="/client/library.js"></script>

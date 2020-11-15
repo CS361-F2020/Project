@@ -117,6 +117,8 @@ function getBookDetailsByISBN() {
 
                     // setting the input id to readonly so user cannot change
                     $('#inputid').prop('readonly', true)
+                    // setting the title id to readonly so user cannot change
+                    $('#titleselect').addClass('d-none')
                 }
             },
             error: function (jqXHR, textstatus, errorThrown) {
