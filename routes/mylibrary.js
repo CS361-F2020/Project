@@ -58,7 +58,6 @@ router.get('/', common.isAuthenticated, (req, res, next) => {
                 titles.push({ id: result[i].isbn13, label: result[i].title });
             }
             payload.titles = titles;
-            console.log(titles)
             sql.pool.query(selectAllConditions, [], (err, result) => {
                 if (err) {
                     req.flash('error', 'Error retrieving book by condition.')
@@ -68,7 +67,6 @@ router.get('/', common.isAuthenticated, (req, res, next) => {
                     conditions.push({ id: result[i].id, label: result[i].description });
                 }
                 payload.conditions = conditions
-                console.log(conditions)
                 res.render('mylibrary', payload);
             })
         })
@@ -91,7 +89,6 @@ router.delete('/', (req, res, next) => {
 });
 
 router.post('/add', (req, res, next) => {
-    console.log(req.body.isbn10, req.body.isbn13)
     var formData = {
         title: req.body.title,
         author: req.body.author,
