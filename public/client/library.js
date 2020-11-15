@@ -127,61 +127,12 @@ function getBookDetailsByISBN() {
     }
 } 
 
-// get book by title 
-//app.get('/jobs/detail/(:id)', isAuthenticated, function (req, res, next) {
-    var data{
-        titles : []
-        condition : []
-    }
-
-    sql.pool.query('SELECT Id, Title FROM Books ORDER BY Title',
-        [param_id, req.session.userId], function (err, rows) {
-            if (err) {
-                req.flash('error', err)
-                res.redirect('/jobs')
-            } else if (rows.length > 0) {
-                var data = {}
-                data = rows[0]
-                data.title = 'Job Detail'
-                data.isEdit = isEdit
-                isEdit = false
-                if (rows[0].companyUrl) {
-                    data.logo = companyLogo(rows[0].companyUrl, 50)
-                } else {
-                    data.logo = ''
-                }
-
-                data.status = []
-
-
-    sql.pool.query(
-        'SELECT Statuses.id, Statuses.label, CASE WHEN Jobs.id THEN ? ELSE ? END selected \
-        FROM Statuses LEFT JOIN Jobs ON Statuses.id = Jobs.statusId AND Jobs.id =?',
-        ['selected', '', param_id],
-            function (err, rows) {
-                if (err) {
-                    req.flash('error', err)
-                    res.redirect('/jobs')
-                    } else {
-                        for (var i = 0; i < rows.length; i++) {
-                        data.status.push({ id: rows[i].id, label: rows[i].label, selected: rows[i].selected })
-                        }
-
-                        res.render('jobs/detail', data)
-                        }
-                    })
-            }
-            else {
-                req.flash('error', 'Job could not be found for ID =' + param_id)
-                res.redirect('/jobs')
-            }
-        })
-})
-
-
-
-
-
+function populateISBN() {
+    // get input
+    var isbn = $('#titleid').val()
+    $('#inputid').val(isbn)
+    getBookDetailsByISBN()
+}
 
 
 function addBook(){

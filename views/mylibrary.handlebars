@@ -120,10 +120,11 @@
                                 autocomplete="off" required>
                                 <br>
                              <!--Search by Title-->   
-                            <label for="isbn">Or select a title that already exists in our system.</label>
-                            <select class="form-control" name="title" onchange="javascript:getBookDetailsByISBN()"  
+                            <label for="titleSearch">Or select a title that already exists in our system.</label>
+                            <select class="form-control" id="titleid" onchange="javascript:populateISBN()"  
                                 autocomplete="off" required placeholder="Select a Book Title">
                                 {{#each titles}}
+                                <option value=""></option>
                                 <option value="{{this.id}}">{{this.label}}</option>
                                 {{/each}}
                             </select> 
