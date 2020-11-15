@@ -20,6 +20,7 @@ const selectAllBooks = `SELECT UserBooks.id AS userBookId, Books.id AS bookId, a
 const deleteUserBook = 'DELETE FROM UserBooks WHERE id = ?';
 // get book by title 
 var selectAllTitles = 'SELECT isbn13, title FROM Books ORDER BY title'
+var selectAllTitles = 'SELECT isbn13, title FROM Books ORDER BY title'
 
 // @route   GET /mylibrary
 // @desc    Get current users mylibrary
