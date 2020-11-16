@@ -43,7 +43,7 @@ INSERT INTO `Statuses` (`id`, `description`) VALUES
 (5, 'Rejected'),
 (6, 'Cancelled'),
 (7, 'Lost'),
-(8, 'Cancelled');
+(8, 'Canceled');
 -- --------------------------------------------------------
 --
 -- Table structure for table TransactionStatusDates
