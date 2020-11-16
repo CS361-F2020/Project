@@ -1,4 +1,5 @@
 const nodemailer = require('nodemailer')
+const sql = require('./dbcon.js');
 
 var transport = nodemailer.createTransport({
     host: 'smtp.gmail.com',
@@ -18,7 +19,21 @@ function isAuthenticated(req, res, next) {
     }
 }
 
+function getPoints(userId, callback){
+    const id = userId
+    sql.pool.query('SELECT points FROM Users WHERE id = ?', [id], (err, result) => {
+    if (err) {
+        // do some error handling
+        next(err);
+        return;
+    }
+    var points = result[0].points;
+    return callback(points);
+    })
+}
+
 module.exports = {
     isAuthenticated,
-    transport
+    transport,
+    getPoints
 }

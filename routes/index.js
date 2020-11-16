@@ -20,12 +20,13 @@ function Account(firstName, lastName, email, address, city, state, postalCode, c
 
 
 router.get('/', (req, res, next) =>{
-    res.redirect('/home')
+    res.redirect('/search')
 })
 
 router.get('/home', common.isAuthenticated, (req, res, next) =>{
     var data = { title: 'Home' }
-    res.render('home', data)
+    res.redirect('/search') // redirect to the search page
+    // res.render('home', data)
 })
 
 router.get('/login', (req, res, next) =>{

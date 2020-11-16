@@ -24,6 +24,8 @@ CREATE TABLE Conditions (
     id int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
     description varchar(255) NOT NULL
 );
+INSERT INTO Conditions(id, description) VALUES (1, 'Poor'), (2, 'Fair'), (3, 'Good'), (4, 'Excellent');
+
 -- --------------------------------------------------------
 --
 -- Table structure for table Statuses
@@ -33,6 +35,15 @@ CREATE TABLE Statuses (
     id int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
     description varchar(255) NOT NULL
 );
+INSERT INTO `Statuses` (`id`, `description`) VALUES
+(1, 'Requested'),
+(2, 'Approved'),
+(3, 'Shipped'),
+(4, 'Received'),
+(5, 'Rejected'),
+(6, 'Cancelled'),
+(7, 'Lost'),
+(8, 'Cancelled');
 -- --------------------------------------------------------
 --
 -- Table structure for table TransactionStatusDates
@@ -75,10 +86,11 @@ CREATE TABLE UserBooks (
     id int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
     userId int(11) NOT NULL,
     bookId int(11) NOT NULL,
-    conditionId int(11) NULL,
+    conditionId int(11) NOT NULL,
     listingDate date NOT NULL,
     available bit NOT NULL,
     FOREIGN KEY (userId) REFERENCES Users (id),
+    FOREIGN KEY (conditionId) REFERENCES Conditions (id),
     FOREIGN KEY (bookId) REFERENCES Books (id)
 );
 -- --------------------------------------------------------
