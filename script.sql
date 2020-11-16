@@ -41,7 +41,7 @@ INSERT INTO `Statuses` (`id`, `description`) VALUES
 (3, 'Shipped'),
 (4, 'Received'),
 (5, 'Rejected'),
-(6, 'Cancelled'),
+(6, 'Canceled'),
 (7, 'Lost'),
 (8, 'Canceled');
 -- --------------------------------------------------------
