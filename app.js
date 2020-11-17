@@ -27,11 +27,16 @@ app.use(bodyParser.json())
 app.use(express.static("public"))
 app.use(flash())
 
+handlebars.handlebars.registerHelper('ifEquals', function(arg1, arg2, options){
+    return (arg1 == arg2) ? options.fn(this) : options.inverse(this);
+})
+
 // Routes
 app.use('/', require('./routes/index.js'))
 app.use('/googleapi', require('./routes/googleapi.js'))
 app.use('/mylibrary', require('./routes/mylibrary.js'))
 app.use('/myprofile', require('./routes/myprofile.js'))
+app.use('/myswaps', require('./routes/myswaps.js'))
 app.use('/search', require('./routes/search.js'))
 
 app.use(function (req, res) {

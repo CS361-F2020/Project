@@ -117,6 +117,8 @@ function getBookDetailsByISBN() {
 
                     // setting the input id to readonly so user cannot change
                     $('#inputid').prop('readonly', true)
+                    // setting the title id to readonly so user cannot change
+                    $('#titleselect').addClass('d-none')
                 }
             },
             error: function (jqXHR, textstatus, errorThrown) {
@@ -126,6 +128,14 @@ function getBookDetailsByISBN() {
         })
     }
 } 
+
+function populateISBN() {
+    // get input
+    var isbn = $('#titleid').val()
+    $('#inputid').val(isbn)
+    getBookDetailsByISBN()
+}
+
 
 function addBook(){
     var formArray = $('#addBookForm').serializeArray()
