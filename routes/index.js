@@ -311,8 +311,6 @@ router.get('/updateaccount', common.isAuthenticated, (req, res, next) => {
 
 router.post('/updateaccount', common.isAuthenticated, (req, res, next) => {
     var data = {
-        title: 'Update Account Settings',
-        userId: req.session.userId,
         firstName: req.body.firstName,
         lastName: req.body.lastName,
         email: req.body.email,
@@ -324,19 +322,26 @@ router.post('/updateaccount', common.isAuthenticated, (req, res, next) => {
         worldwide: req.body.worldwide,
         aboutMe: req.body.aboutMe
     }
-    sql.pool.query('UPDATE Users SET firstName=?, lastName=?, email=?, address=?, city=?, state=?, postalCode=?, country=?, worldwide=?, aboutMe=? WHERE id=?',
-    [data.firstName, data.lastName, data.email, data.address, data.city, data.state, data.postalCode, data.country, data.worldwide, data.aboutMe, data.userId],
+    sql.pool.query('SELECT id, email FROM Users WHERE email=?', [data.email],
     (err, results) => {
-        if (err) {
-            req.flash('error', err)
-            res.render('auth/updateaccount', data)
+        if (results.length != 0 && results[0].id != req.session.userId) {
+            req.flash("error", "This email is already associated with another account")
+            res.reload();  //this might need to be changed
         } else {
-            //put alert on screen saying that the information was successfully updated. Reset session data in case anything changed
-            req.session.user = data.firstName + " " + data.lastName
-            req.session.email = data.email
-            req.session.userId = data.userId
-            req.flash('success', 'Account Details Successfully Updated');
-            res.redirect('/preferences');
+            sql.pool.query('UPDATE Users SET ? WHERE id=?', [data, req.session.userId],
+            (err, results) => {
+                if (err) {
+                    req.flash('error', err)
+                    res.render('auth/updateaccount', data)
+                } else {
+                    //put alert on screen saying that the information was successfully updated. Reset session data in case anything changed
+                    req.session.user = data.firstName + " " + data.lastName
+                    req.session.email = data.email
+                    data.title = 'Update Account Settings'
+                    req.flash('success', 'Account Details Successfully Updated');
+                    res.redirect('/myprofile');
+                }
+            })
         }
     })
 })
