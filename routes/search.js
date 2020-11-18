@@ -4,14 +4,14 @@ const db = require('../dbcon.js');
 const common = require('../common')
 
 // Book object
-function Book(id, title, author, imgUrl, pointcost, isbn, userPoints) {
-    this.id = id;
-    this.title = title;
-    this.author = author;
-    this.imgUrl = imgUrl;
-    this.pointcost = pointcost;
-    this.isbn = isbn;
-    this.userPoints = userPoints;
+function Book(data) {
+    this.id = data.id;
+    this.title = data.title;
+    this.author = data.author;
+    this.imgUrl = data.imgUrl;
+    this.pointcost = data.pointcost;
+    this.isbn = data.isbn;
+    this.userPoints = data.userPoints;
 }
         
 // @route   GET /allBooks
@@ -71,7 +71,16 @@ function allBooks(id, callback){
                 if(country != result[i].country){
                     points = 4;
                 }
-                books.push(new Book(result[i].id, result[i].title, result[i].author, result[i].imgUrl, points, result[i].isbn, userPoints));           
+                var data = {
+                    id: result[i].id,
+                    title: result[i].title,
+                    author: result[i].author,
+                    imgUrl: result[i].imgUrl,
+                    pointcost: points,
+                    isbn: result[i].isbn,
+                    userPoints: userPoints
+                }
+                books.push(new Book(data));           
             }
             payload.books = books;
             
