@@ -68,7 +68,7 @@ router.post('/', common.isAuthenticated, (req, res, next) => {
             })
         }else {
             // add a new transaction record
-            db.pool.query('INSERT INTO Transactions (userBookId, requestorId, statusId, pointCost, created, modified) VALUES (?, ?, ?, ?, ?, ?)', [id, userId, 1, 5, date, date], (err,result) => {
+            db.pool.query('INSERT INTO Transactions (userBookId, requestorId, statusId, sellerPoints, buyerPoints, created, modified) VALUES (?, ?, ?, ?, ?, ?, ?)', [id, userId, 1, 4, 4, date, date], (err,result) => {
                 if (err) {
                     allBooks( userId, function(result){
                         var  payload = result;
