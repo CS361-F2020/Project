@@ -14,20 +14,22 @@ router.get('/', common.isAuthenticated, (req, res, next) => {
 
     var swaps =
         'SELECT "R" AS category, t.id, u.id AS userId, u.email, u.firstName, u.lastName, b.title, REPLACE(b.title, "\'", "") AS jsTitle, b.author, t.created, t.modified, t.statusId,\
-    s.description AS status, CASE WHEN t.statusId = 8 THEN t.sellerPoints ELSE "Pending" END AS points, t.lost \
+    s.description AS status, CASE WHEN t.statusId = 8 THEN t.sellerPoints ELSE "Pending" END AS points, t.lost, c.description AS cond, CASE WHEN t.rating is NULL THEN 0 ELSE 1 END AS hasSurvey\
     FROM Transactions t\
         INNER JOIN Users u ON t.requestorId = u.id\
         INNER JOIN Statuses s ON t.statusId = s.id\
         INNER JOIN UserBooks ub ON t.userBookId = ub.id\
+        INNER JOIN Conditions c ON ub.conditionId = c.id\
         INNER JOIN Books b ON ub.bookId = b.id\
     WHERE ub.userId = ?\
     UNION\
     SELECT "S" AS category, t.id, u.id AS userid, u.email, u.firstName, u.lastName, b.title, REPLACE(b.title, "\'", "") AS jsTitle, b.author, t.created, t.modified, t.statusId,\
-    s.description AS status, CASE WHEN t.statusId = 8 THEN t.buyerPoints ELSE "Pending" END AS points, t.lost \
+    s.description AS status, CASE WHEN t.statusId = 8 THEN t.buyerPoints ELSE "Pending" END AS points, t.lost, c.description AS cond, CASE WHEN t.rating is NULL THEN 0 ELSE 1 END AS hasSurvey\
     FROM Transactions t\
         INNER JOIN Statuses s ON t.statusId = s.Id\
         INNER JOIN UserBooks ub ON t.userBookId = ub.id\
         INNER JOIN Users u ON ub.userId = u.id\
+        INNER JOIN Conditions c ON ub.conditionId = c.id\
         INNER JOIN Books b ON ub.bookId = b.id\
     WHERE t.requestorId = ?'
 
@@ -60,12 +62,12 @@ router.post('/notReceived', (req, res, next) => {
 
     sql.pool.query(updateLostFlag, [today, req.body.id], (err, results) => {
         if (err) {
-            res.send({ error: 'Error occurred when trying to mark book as not received. Please try again.' })
+            return res.send({ error: 'Error occurred when trying to mark book as not received. Please try again.' })
         }
 
         sql.pool.query(getSeller, [req.body.id], (err, results) => {
             if (err) {
-                res.send({ error: 'Error occurred while sending email to the seller. Please try to manually send an email.' })
+                return res.send({ error: 'Error occurred while sending email to the seller. Please try to manually send an email.' })
             }
             else if (results.length > 0) {
                 var message = {
@@ -92,26 +94,28 @@ router.post('/updateStatus', (req, res, next) => {
     sql.pool.query(updateTransaction, [formData.statusId, today, formData.id],
         (err, results) => {
             if (err) {
-                res.send({ error: 'Error occurred when trying to update status. Please try again.' })
+                return res.send({ error: 'Error occurred when trying to update status. Please try again.' })
             }
 
             // add record to transaction status history
             sql.pool.query(transactionStatuses, [formData.id, formData.statusId, today],
                 (err, results) => {
                     if (err) {
-                        res.send({ error: 'Error occured when trying to update status history.' })
+                        return res.send({ error: 'Error occured when trying to update status history.' })
                     }
 
                     // if status is cancelled or rejected, make available immediately
                     if (formData.statusId == 5 || formData.statusId == 6) {
                         sql.pool.query(updateAvailable, [formData.id], (err, results) => {
                             if (err) {
-                                res.send({ error: 'Error occurred when trying to make book available. Please contact support at bookswaphelpdesk@gmail.com' })
+                                return res.send({ error: 'Error occurred when trying to make book available. Please contact support at bookswaphelpdesk@gmail.com' })
                             }
 
                             res.send({ success: 'success' })
                         })
                     }
+
+                    res.send({ success: 'success' })
                 })
         })
 })
@@ -121,7 +125,7 @@ router.post('/close', (req, res, next) => {
                             FROM Transactions t\
                                 INNER JOIN UserBooks ub ON t.userBookId = ub.Id\
                             WHERE t.id = ?'
-    var updateTransaction = 'UPDATE Transactions SET sellerPoints = ?, buyerPoints = ?, statusId = 8, lostFlag = ? WHERE id = ?'
+    var updateTransaction = 'UPDATE Transactions SET sellerPoints = ?, buyerPoints = ?, statusId = 8, lost = ? WHERE id = ?'
     var transactionStatuses = 'INSERT INTO TransactionStatusDates (transactionId, statusId, date) VALUES (?, 8, ?)'
     var updateUserPoints = 'UPDATE Users SET points = points + ? WHERE id = ?'
     var updateAvailable = 'UPDATE UserBooks SET available = ? WHERE id = (SELECT userBookId FROM Transactions WHERE id = ?)'
@@ -137,7 +141,7 @@ router.post('/close', (req, res, next) => {
 
     sql.pool.query(getTransaction, [formData.id], (err, results) => {
         if (err) {
-            res.send({ error: errorMessage })
+            return res.send({ error: errorMessage })
         }
 
         var transaction = results[0]
@@ -171,35 +175,34 @@ router.post('/close', (req, res, next) => {
         // update transaction
         sql.pool.query(updateTransaction, [sellerPointGain, buyerPointLoss, lostFlag, formData.id], (err, resuts) => {
             if (err) {
-                res.send({ error: errorMessage })
+                return res.send({ error: errorMessage })
             }
 
             // add transaction status record
             sql.pool.query(transactionStatuses, [formData.id, today], (err, results) => {
                 if (err) {
-                    res.send({ error: errorMessage })
+                    return res.send({ error: errorMessage })
                 }
 
                 // update book availability
                 sql.pool.query(updateAvailable, [available, formData.id], (err, results) => {
                     if (err) {
-                        res.send({ error: errorMessage })
+                        return res.send({ error: errorMessage })
                     }
 
                     // update seller points
                     sql.pool.query(updateUserPoints, [sellerPointGain, transaction.seller], (err, results) => {
                         if (err) {
-                            res.send({ error: errorMessage })
+                            return res.send({ error: errorMessage })
                         }
 
                         // update buyer points
                         sql.pool.query(updateUserPoints, [buyerPointLoss, transaction.buyer], (err, results) => {
                             if (err) {
-                                res.send({ error: errorMessage })
+                                return res.send({ error: errorMessage })
                             }
-                            else {
-                                res.send({ success: 'success' })
-                            }
+                            
+                            res.send({ success: 'success' })
                         })
                     })
                 })
@@ -250,7 +253,10 @@ router.post('/survey/submit', (req, res, next) => {
 })
 
 router.get('/survey/(:id)', common.isAuthenticated, (req, res, next) => {
-    var getSurvey = 'SELECT rcvdOnTime, conditionMatched, rating FROM Transactions WHERE id = ?'
+    var getSurvey = 'SELECT t.rcvdOnTime, t.conditionMatched, t.rating, t.created, c.description as cond\
+    FROM Transactions t\
+    INNER JOIN Conditions ON t.conditionId = c.id\
+    WHERE id = ?'
     sql.pool.query(getSurvey, [req.params.id], (err, results) => {
         if (err || results.length == 0) {
             return res.send({ error: 'Error occurred while getting survey' })
@@ -259,7 +265,9 @@ router.get('/survey/(:id)', common.isAuthenticated, (req, res, next) => {
         var data = {
             rcvdOnTime: results[0].rcvdOnTime ? 1 : 0,
             conditionMatched: results[0].conditionMatched ? 1 : 0,
-            star: results[0].rating
+            star: results[0].rating,
+            created: results[0].created,
+            condition: results[0].cond
         }
 
         res.send(data)

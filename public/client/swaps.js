@@ -68,8 +68,11 @@ $("ul.nav-tabs > li > a").on("shown.bs.tab", function (e) {
 
 $('.survey_modal').click(function (e) {
     var id = $(this).attr('data-id')
-    console.log(id)
+    var condition = $(this).attr('data-condition')
+    var created = $(this).attr('data-created')
     $('#surveyId').val(id)
+    $('#requestDate').text('Request made on: ' + created)
+    $('#sellerCondition').text('Seller listed condition: ' + condition)
 })
 
 function updateStatus(id, newStatusId, title) {
@@ -160,11 +163,11 @@ function notReceived(id, title) {
     }
 }
 
-function closeSwap(id, statusId, title, points) {
+function closeSwap(id, statusId, title) {
     //create alert message based on status
     var message = 'Please confirm you want to finalize the swap for ' + title + '.\n\n'
     if (statusId == 4) {
-        message += 'The requestor has marked this book as received.\nYou will receive ' + points + ' once this swap is closed.'
+        message += 'The requestor has marked this book as received.\nYour points will be made available once this swap is closed.'
     }
     else if (statusId == 5) {
         message += 'The seller has rejected your request for this book.\nBy closing this swap, you are confirming you understand you will not receive this book.\nAll pending points will be made available immediately.'
@@ -180,8 +183,7 @@ function closeSwap(id, statusId, title, points) {
     if (confirm(message)) {
         var data = {
             id: id,
-            statusId: statusId,
-            points: points
+            statusId: statusId
         }
 
         $.ajax({
@@ -245,7 +247,7 @@ function submitSurvey(isNew) {
         },
         error: function (jqXHR, textstatus, errorThrown) {
             console.log(textstatus)
-            alert('Error occured while adding book')
+            alert('Error occured while submitting survey')
         }
     })
 }
@@ -264,6 +266,8 @@ function viewSurvey(id, title, readOnly)
             // if no error or message, populate fields with address info
             else {
                 $('#surveyTitle').text('Survey for ' + title)
+                $('#requestDate').text('Request made on: ' + res.created)
+                $('#sellerCondition').text('Seller listed condition: ' + res.condition)
                 $("input[name='surveyid']").val(id)
                 $('input:radio[name=rcvdOnTime]').val([res.rcvdOnTime])
                 $('input:radio[name=conditionMatched]').val([res.conditionMatched])
@@ -313,7 +317,7 @@ function getAddress(userId)
         },
         error: function (jqXHR, textstatus, errorThrown) {
             console.log(textstatus)
-            alert('Error occured while retrieving book')
+            alert('Error occured while getting address')
         }
     })
 }
