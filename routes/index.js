@@ -317,9 +317,8 @@ router.get('/updateaccount', common.isAuthenticated, (req, res, next) => {
 })
 
 router.post('/updateaccount', common.isAuthenticated, (req, res, next) => {
-    var data = {
-        title: 'Update Account Settings',
-        userId: req.session.userId,
+    var payload = { title : 'Update Account Settings' }
+    var response = {
         firstName: req.body.firstName,
         lastName: req.body.lastName,
         email: req.body.email,
@@ -331,20 +330,50 @@ router.post('/updateaccount', common.isAuthenticated, (req, res, next) => {
         worldwide: req.body.worldwide,
         aboutMe: req.body.aboutMe
     }
-    sql.pool.query('UPDATE Users SET firstName=?, lastName=?, email=?, address=?, city=?, state=?, postalCode=?, country=?, worldwide=?, aboutMe=? WHERE id=?',
-    [data.firstName, data.lastName, data.email, data.address, data.city, data.state, data.postalCode, data.country, data.worldwide, data.aboutMe, data.userId],
+    sql.pool.query('SELECT id, email FROM Users WHERE email=?', [response.email],
     (err, results) => {
-        if (err) {
-            req.flash('error', err)
-            res.render('auth/updateaccount', data)
+        if (results.length != 0 && results[0].id != req.session.userId) {
+            req.flash("error", "This email is already associated with another account")
+            data = [];
+            data.push(new Account(response.firstName, response.lastName, "", response.address, response.city, response.state, response.postalCode, response.country, response.worldwide, response.aboutMe));
+            payload.data = data;
+            res.render('auth/updateaccount', payload);  
         } else {
-            //put alert on screen saying that the information was successfully updated. Reset session data in case anything changed
-            req.session.user = data.firstName + " " + data.lastName
-            req.session.email = data.email
-            req.session.userId = data.userId
-            req.flash('success', 'Account Details Successfully Updated');
-            res.redirect('/preferences');
+            sql.pool.query('UPDATE Users SET ? WHERE id=?', [response, req.session.userId],
+            (err, results) => {
+                if (err) {
+                    req.flash('error', err)
+                    res.render('auth/updateaccount', response)
+                } else {
+                    //put alert on screen saying that the information was successfully updated. Reset session data in case anything changed
+                    req.session.user = response.firstName + " " + response.lastName
+                    req.session.email = response.email
+                    response.title = 'Update Account Settings'
+                    req.flash('success', 'Account Details Successfully Updated');
+                    res.redirect('/myprofile');
+                }
+            })
         }
+    })
+})
+
+router.get('/getAddress/(:id)', common.isAuthenticated, (req, res, next) => {
+    var getAddress = 'SELECT firstName, lastName, address, city, state, postalCode, country FROM Users WHERE id = ?'
+    sql.pool.query(getAddress, [req.params.id], (err, results) => {
+        if (err || results.length == 0)
+        {
+            res.send({ error: 'Error retrieving buyer address. Please try again.' })
+        }
+
+        var result = results[0]
+        var data = {
+            fullName: result.firstName + ' ' + result.lastName,
+            address: result.address,
+            address2: result.city + ', ' + result.state + ' ' + result.postalCode,
+            country: result.country
+        }
+
+        res.send(data)
     })
 })
 
