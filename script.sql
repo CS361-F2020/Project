@@ -35,6 +35,15 @@ CREATE TABLE Statuses (
     id int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
     description varchar(255) NOT NULL
 );
+INSERT INTO `Statuses` (`id`, `description`) VALUES
+(1, 'Requested'),
+(2, 'Approved'),
+(3, 'Shipped'),
+(4, 'Received'),
+(5, 'Rejected'),
+(6, 'Canceled'),
+(7, 'Lost'),
+(8, 'Closed');
 -- --------------------------------------------------------
 --
 -- Table structure for table TransactionStatusDates

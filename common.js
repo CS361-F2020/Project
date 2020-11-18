@@ -1,5 +1,7 @@
 const nodemailer = require('nodemailer')
-const db = require('./dbcon.js');
+
+const sql = require('./dbcon.js');
+
 
 var transport = nodemailer.createTransport({
     host: 'smtp.gmail.com',
@@ -20,6 +22,20 @@ function isAuthenticated(req, res, next) {
 }
 
 
+function getPoints(userId, callback){
+    const id = userId
+    sql.pool.query('SELECT points FROM Users WHERE id = ?', [id], (err, result) => {
+    if (err) {
+        // do some error handling
+        next(err);
+        return;
+    }
+    var points = result[0].points;
+    return callback(points);
+    })
+}
+
+
 function getPendingPoints(userId){
     var outgoing = `SELECT SUM(u.points) AS totalPoints
     FROM 
@@ -32,7 +48,7 @@ function getPendingPoints(userId){
         INNER JOIN UserBooks ub on ub.id = t.userBookId 
     WHERE ub.userId = ? AND statusId <> 8) AS u`
 
-    db.pool.query(outgoing, [userId, userId], (err,results) => {
+    sql.pool.query(outgoing, [userId, userId], (err,results) => {
         if (err) {
             throw err
         }
@@ -42,8 +58,11 @@ function getPendingPoints(userId){
     })
     //console.log("sql query hasn't finished yet ");
 }
+
 module.exports = {
     isAuthenticated,
     getPendingPoints,
-    transport
+    transport,
+    getPoints
 }
+
