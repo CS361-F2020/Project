@@ -53,7 +53,8 @@ function bookDetails(isbn, pointCost, userPoints){
                 $("#detailLanguage").text(res.language)
                 $("#detailPointCost").text(pointCost)
                 $("#detailRating").text(res.rating)
-                $("#detailGoogleLink").text(res.googleLink)
+                //need to turn this into a button
+                //$("#detailGoogleLink").text(res.googleLink)
                 $("#detailDescription").text(res.description)
                
                 $("#detailModal").modal("show");
