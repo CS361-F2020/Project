@@ -33,7 +33,7 @@ router.get('/login', (req, res, next) =>{
         var data = { title: 'Login' }
         res.render('auth/login', data)
     } else {
-        res.redirect('/home')
+        res.redirect('/')
     }
 })
 
@@ -75,7 +75,7 @@ router.post('/login', (req, res, next) =>{
                             }
                             else
                             {
-                                res.redirect('/home')
+                                res.redirect('/')
                             }          
                         }
                     }
@@ -140,7 +140,7 @@ router.post('/resetpassword', common.isAuthenticated, (req, res, next) =>{
                                             } else {
                                                 req.session.tempPassword = false
                                                 req.flash('success', 'Password reset was successful!')
-                                                res.redirect('/home')
+                                                res.redirect('/')
                                             }
                                         })
                                 }
@@ -267,7 +267,7 @@ router.post('/register', (req, res, next) =>{
                                         req.session.user = results[0].firstName + " " + results[0].lastName
                                         req.session.email = results[0].email
                                         req.session.userId = results[0].id
-                                        res.redirect('/home')
+                                        res.redirect('/')
                                         
                                     }
                                 })
