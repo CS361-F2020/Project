@@ -4,14 +4,16 @@ const db = require('../dbcon.js');
 const common = require('../common')
 
 // Book object
-function Book(id, title, author, imgUrl, pointcost) {
-    this.id = id;
-    this.title = title;
-    this.author = author;
-    this.imgUrl = imgUrl;
-    this.pointcost = pointcost
+function Book(data) {
+    this.id = data.id;
+    this.title = data.title;
+    this.author = data.author;
+    this.imgUrl = data.imgUrl;
+    this.pointcost = data.pointcost;
+    this.isbn = data.isbn;
+    this.userPoints = data.userPoints;
 }
-                            
+        
 // @route   GET /allBooks
 // @desc    Get all available books that don't belong to the user and are not undergoing transactions
 router.get('/', common.isAuthenticated, (req, res, next) => {
@@ -21,32 +23,74 @@ router.get('/', common.isAuthenticated, (req, res, next) => {
     })
 })
 
+router.get('/pointsFAQ', common.isAuthenticated, (req,res,next) => {
+    res.render('pointsFAQ');
+})
+
 // Get all avaialable books
 // ******** need to update this based on worldwide shippers
 function allBooks(id, callback){
-    var selectAllAvailableBooks = `SELECT UserBooks.id AS id, title AS title, author AS author, imgUrl AS imgUrl
+    var selectAllAvailableBooks = `SELECT UserBooks.id AS id, title AS title, author AS author, imgUrl AS imgUrl, isbn13 AS isbn, Users.country
                                  FROM UserBooks
                                  INNER JOIN Books ON Books.id = UserBooks.bookId
-                                 WHERE UserBooks.userId != ? AND UserBooks.available = 1`;
+                                 INNER JOIN Users ON Users.id = UserBooks.userId
+                                 WHERE UserBooks.userId != ? AND UserBooks.available = 1 AND Users.worldwide = 1
+                                 UNION
+                                 SELECT UserBooks.id AS id, title AS title, author AS author, imgUrl AS imgUrl, isbn13 AS isbn, Users.country
+                                 FROM UserBooks
+                                 INNER JOIN Books ON Books.id = UserBooks.bookId
+                                 INNER JOIN Users ON Users.id = UserBooks.userId
+                                 WHERE UserBooks.userId != ? AND UserBooks.available = 1 AND Users.country = ?`;
+
+    var selectUserCountry = `SELECT Users.country AS country, Users.points AS userPoints
+                            FROM Users
+                            WHERE Users.id = ?`
     const userId = id;
     var payload = { title: 'Available Books'};
     var books = [];
-    db.pool.query(selectAllAvailableBooks, [userId], (err, result) => {
-        if (err) {
-            // update error handling
+    db.pool.query(selectUserCountry, [userId], (err,result) =>{
+        if(err){
             next(err);
-            return;
+            return
         }
-        var number = result.length;
-        // ********* need to update the point value 
-        for (let i = 0; i < number; i++) {
-            books.push(new Book(result[i].id, result[i].title, result[i].author, result[i].imgUrl, 5));           
-        }
-        payload.books = books;
-        // payload.number = number;
-        return callback(payload);
+        var country = result[0].country;
+        var userPoints = result[0].userPoints;
+        
+        db.pool.query(selectAllAvailableBooks, [userId, userId, country], (err, result) => {
+            if (err) {
+                // update error handling
+                next(err);
+                return;
+            }
+            var number = result.length;
+            // ********* need to update the point value
+            var points; 
+             
+            for (let i = 0; i < number; i++) {
+                points = 2;
+                if(country != result[i].country){
+                    points = 4;
+                }
+                var data = {
+                    id: result[i].id,
+                    title: result[i].title,
+                    author: result[i].author,
+                    imgUrl: result[i].imgUrl,
+                    pointcost: points,
+                    isbn: result[i].isbn,
+                    userPoints: userPoints
+                }
+                books.push(new Book(data));           
+            }
+            payload.books = books;
+            
+            return callback(payload);
+        })
     })
 }
+
+       
+
 
 // @route   POST /home
 // @desc    Request a book

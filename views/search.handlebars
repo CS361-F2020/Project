@@ -1,8 +1,7 @@
 <h3 class="pb-3">{{title}}</h3>
-{{!-- <div class="shelf">
-    <span class="shelf-title">{{number}} books are available to you.</span>
-</div> --}}
 
+ 
+<a href="/search/pointsFAQ" class = "btn btn-info" role = "button">Learn more about the point system</a>
 <div class="card-columns"></div>
         <br>
         <div class="row row-cols-2">
@@ -10,8 +9,8 @@
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 col-xl-2" id="{{id}}">
                     <div class="card h-100 cards">
                         <img src="{{imgUrl}}" class="card-img-top cover-art">
-                        <button type="button" class="btn btn-primary btn-details">View Details</button>
-                        <button type="button" class="btn btn-success btn-request" onclick="requestBook({{id}}, {{pointcost}}, '{{title}}')">Request A Copy</button>
+                        <button type="button" class="btn btn-primary btn-details" onclick = "bookDetails({{isbn}}, {{pointcost}})">View Details</button>
+                        <button type="button" class="btn btn-success btn-request" onclick="requestBook({{id}}, {{pointcost}}, '{{title}}', {{userPoints}})">Request A Copy</button>
                         {{!-- <div class="card-body"> --}}
                             <p class="card-text">{{title}}</p>
                             <p class = "card-text">{{author}}</p>
@@ -45,5 +44,71 @@
     </div>
 </div>
 
+<!-- Modal -->
+<div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalLabel">Book Details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <b><h8>Title</h8></b><br>
+                <p id = "detailTitle"></p>
+                <b><h8>Author</h8></b><br>
+                <p id = "detailAuthor"></p>
+                <b><h8>Genre</h8></b><br>
+                <p id = "detailGenre"></p>
+                <b><h8>Language</h8></b><br>
+                <p id = "detailLanguage"></p>
+                <b><h8>Point Cost</h8></b><br>
+                <p id = "detailPointCost"></p>
+                <b><h8>Rating</h8></b><br>
+                <p id = "detailRating"></p>
+                <!-- need to add this in later
+                <b><h8>Google Link</h8></b><br>
+                <p id = "detailGoogleLink"></p>
+                -->
+                <b><h8>Description</h8></b><br>
+                <p id = "detailDescription"></p>
+                {{isbn}}
+            </div>
+            </div>
+            <div class="modal-footer">
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="pointsModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalLabel">Request a Book</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <b>You do not have enough points.</b><br>
+                    <ul>
+                        <li>You earn 1 point when you post a book.</li>
+                        <li>You earn points when you respond to a request and ship a book successfully.</li>
+                            <ul>
+                                <li>2 points are earned if sent to your current country.</li>
+                                <li>4 points are earned if sent to another country.</li>  
+                            </ul>     
+                    </ul>
+                <a href="/search/pointsFAQ" class = "btn btn-info" role = "button">Learn more about the point system</a>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
 
 <script src="/client/search.js"></script>
