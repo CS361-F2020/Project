@@ -1,5 +1,6 @@
 <h3 class="pb-3">{{title}}</h3>
 
+
  
 <a href="/search/pointsFAQ" class = "btn btn-info" role = "button">Learn more about the point system</a>
 <div class="card-columns"></div>
@@ -8,9 +9,10 @@
             {{#each books}}
                 <div class="col-6 col-sm-4 col-md-3 col-lg-2 col-xl-2" id="{{id}}">
                     <div class="card h-100 cards">
+                        
                         <img src="{{imgUrl}}" class="card-img-top cover-art">
-                        <button type="button" class="btn btn-primary btn-details" onclick = "bookDetails({{isbn}}, {{pointcost}})">View Details</button>
-                        <button type="button" class="btn btn-success btn-request" onclick="requestBook({{id}}, {{pointcost}}, '{{title}}', {{userPoints}})">Request A Copy</button>
+                        <button type="button" class="btn btn-primary btn-details" onclick = "bookDetails('{{isbn}}', {{pointcost}})">View Details</button>
+                        <button type="button" class="btn btn-success btn-request" onclick="requestBook({{id}}, {{pointcost}}, `{{title}}`, {{userPoints}})">Request A Copy</button>
                         {{!-- <div class="card-body"> --}}
                             <p class="card-text">{{title}}</p>
                             <p class = "card-text">{{author}}</p>
@@ -73,7 +75,7 @@
                 -->
                 <b><h8>Description</h8></b><br>
                 <p id = "detailDescription"></p>
-                {{isbn}}
+                
             </div>
             </div>
             <div class="modal-footer">
