@@ -16,7 +16,7 @@
     <header id='header'>
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
             {{!-- Brand/Logo --}}
-            <a class="navbar-brand" href="/home">BookSwap</a>
+            <a class="navbar-brand" href="/home" style="color: DarkSlateBlue"><i class="fas fa-book-reader fa-lg pr-1"></i>BookSwap</a>
             {{#if session.user }}
             <div class="col-2 ml-auto order-lg-3">
                 <div class="row justify-content-end">
@@ -28,7 +28,6 @@
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                             <a class="dropdown-item" href="/myprofile">My Profile</a>
-                            <a class="dropdown-item" href="/preferences">Preferences</a>
                             <a class="dropdown-item" href="/resetPassword">Reset Password</a>
                             <a class="dropdown-item" href="/logout">Logout</a>
                         </div>
