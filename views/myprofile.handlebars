@@ -1,18 +1,17 @@
-{{#each user}}
 <div class="container pb-3">
     <div class="row">
       <div class="col-sm">
-        <h1>{{firstName}} {{lastName}}</h1><br>
+        <h1>{{this.user.firstName}} {{this.user.lastName}}</h1><br>
       </div>
     </div>
     <div class="row">
       <div class="col-sm">
-        <h3>{{city}}, {{state}}</h3><br>
+        <h3>{{this.user.city}}, {{this.user.state}}</h3><br>
       </div>
     </div>
     <div class="row">
       <div class="col-sm">
-        <h4>{{country}}</h4><br>
+        <h4>{{this.user.country}}</h4><br>
       </div>
     </div>
     </div>
@@ -29,9 +28,12 @@
     <div class="col-sm">
       <h6>Available Points</h6>
     </div>
+    <div class="col-sm">
+      <h6>Pending Points</h6>
+    </div>
   </div>
 </div>
-{{/each}}
+
 <div class="container pb-2">
   <div class="row">
     <div class="col-sm">
@@ -41,8 +43,10 @@
       {{receivedBooks}}
     </div>
     <div class="col-sm">
-      {{#each user}}
-      {{points}}
+      {{this.user.points}}
+    </div>
+    <div class="col-sm">
+      {{pendingPoints}}
     </div>
   </div>
 </div>
@@ -55,7 +59,7 @@
     </div>
     <div class="row">
         <div class="col">
-            {{aboutMe}}
+            {{this.user.aboutMe}}
         </div>
     </div>
 </div>
@@ -71,9 +75,6 @@
         </div>
     </div>
 </div>
-
-
-
 
 <!-- update form -->
 <div class="modal fade" id="updateAboutMe" tabindex="-1" role="dialog" aria-labelledby="modaltitle" aria-hidden="true">
@@ -97,5 +98,5 @@
             </div>
     </div>
 </div>
-{{/each}}
+
 <script src="/client/profile.js"></script>

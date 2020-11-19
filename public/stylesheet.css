@@ -22,6 +22,11 @@
 
 .cards{
     border: none;
+    max-width: 200px;
+}
+
+.cover-art{
+    max-height: 275px;
 }
 
 .delete-btn{
@@ -95,3 +100,4 @@
 .stars label:hover {
     transform: scale(1.3);
 }
+

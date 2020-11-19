@@ -1,9 +1,9 @@
 var mysql = require("mysql");
 var pool = mysql.createPool({
     host: "classmysql.engr.oregonstate.edu",
-    user: "cs361_<onid>",
+    user: "cs361_<ONID>",
     password: "<password>",
-    database: "cs361_<onid>",
+    database: "cs361_<ONID>",
     dateStrings: 'true',
     typeCast: function castField(field, useDefaultTypeCasting) {
         if (field.type === "BIT" && field.length === 1) {

@@ -20,12 +20,12 @@ function Account(firstName, lastName, email, address, city, state, postalCode, c
 
 
 router.get('/', (req, res, next) =>{
-    res.redirect('/home')
+    res.redirect('/search')
 })
 
 router.get('/home', common.isAuthenticated, (req, res, next) =>{
     var data = { title: 'Home' }
-    res.render('home', data)
+    res.redirect('/search')
 })
 
 router.get('/login', (req, res, next) =>{
@@ -69,7 +69,14 @@ router.post('/login', (req, res, next) =>{
                         if (results[0].tempPassword) {
                             res.redirect('/resetpassword')
                         } else {
-                            res.redirect('/home')
+                            if (req.session.path)
+                            {
+                                res.redirect(req.session.path)
+                            }
+                            else
+                            {
+                                res.redirect('/home')
+                            }          
                         }
                     }
                 })
@@ -347,6 +354,26 @@ router.post('/updateaccount', common.isAuthenticated, (req, res, next) => {
                 }
             })
         }
+    })
+})
+
+router.get('/getAddress/(:id)', common.isAuthenticated, (req, res, next) => {
+    var getAddress = 'SELECT firstName, lastName, address, city, state, postalCode, country FROM Users WHERE id = ?'
+    sql.pool.query(getAddress, [req.params.id], (err, results) => {
+        if (err || results.length == 0)
+        {
+            res.send({ error: 'Error retrieving buyer address. Please try again.' })
+        }
+
+        var result = results[0]
+        var data = {
+            fullName: result.firstName + ' ' + result.lastName,
+            address: result.address,
+            address2: result.city + ', ' + result.state + ' ' + result.postalCode,
+            country: result.country
+        }
+
+        res.send(data)
     })
 })
 

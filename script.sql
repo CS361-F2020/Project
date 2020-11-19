@@ -35,6 +35,15 @@ CREATE TABLE Statuses (
     id int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
     description varchar(255) NOT NULL
 );
+INSERT INTO `Statuses` (`id`, `description`) VALUES
+(1, 'Requested'),
+(2, 'Approved'),
+(3, 'Shipped'),
+(4, 'Received'),
+(5, 'Rejected'),
+(6, 'Canceled'),
+(7, 'Lost'),
+(8, 'Closed');
 -- --------------------------------------------------------
 --
 -- Table structure for table TransactionStatusDates
@@ -94,12 +103,14 @@ CREATE TABLE Transactions (
     userBookId int(11) NOT NULL,
     requestorId int(11) NOT NULL,
     statusId int(11) NOT NULL,
-    pointCost int(11) NOT NULL,
+    sellerPoints int(11) NOT NULL,
+    buyerPoints int(11) NOT NULL,
     rcvdOnTime bit DEFAULT NULL,
     conditionMatched bit DEFAULT NULL,
     rating int(11) DEFAULT NULL,
     created date NOT NULL,
     modified date DEFAULT NULL,
+    lost bit DEFAULT NULL,
     FOREIGN KEY (userBookId) REFERENCES UserBooks (id),
     FOREIGN KEY (requestorId) REFERENCES Users (id),
     FOREIGN KEY (statusId) REFERENCES Statuses (id)
