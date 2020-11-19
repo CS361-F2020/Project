@@ -114,6 +114,11 @@
     font-weight: bold;
 }
 
+.border-primary-bs {
+    border-color: #748B6F;
+    border-width: thick;
+}
+
 /* primary */
 .btn-primary-bs, .btn-primary-bs:hover {
     color:#fff !important;
