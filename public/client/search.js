@@ -9,7 +9,7 @@ function requestBook(bookId, pointCost, title, userPoints){
         
         modalBody.innerHTML = `Are you sure you want this book?: <br> <b>"${title}"</b>`
         var confirmButton = document.getElementById('confirmButton');
-        confirmButton.setAttribute("onclick", `request(${bookId}, ${pointCost}, '${title}')`);
+        confirmButton.setAttribute("onclick", `request(${bookId}, ${pointCost}, "${title}")`);
         // toogle modal
         $("#pageModal").modal("toggle");
     }
@@ -17,7 +17,7 @@ function requestBook(bookId, pointCost, title, userPoints){
 
 // AJAX request a book
 function request(bookId, pointCost, title){
-    console.log(title);
+   
     $.ajax({
         url: '/search',
         method: 'POST',
@@ -38,15 +38,14 @@ function request(bookId, pointCost, title){
     })
 }
 
-function bookDetails(isbn, pointCost, userPoints){
+function bookDetails(isbn, pointCost){
+       
         $.ajax({
             url: '/googleapi/isbn/' + isbn,
             method: 'GET',
             dataType: 'json',
             success: function (res) {
-                console.log(res);
-                
-                var details = document.getElementById('details');
+               
                 $("#detailTitle").text(res.title)
                 $("#detailAuthor").text(res.author)
                 $("#detailGenre").text(res.genre)
@@ -68,3 +67,4 @@ function bookDetails(isbn, pointCost, userPoints){
     
     
 }
+
