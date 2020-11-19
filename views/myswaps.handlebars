@@ -32,7 +32,7 @@
                                 <th>Requested</th>
                                 <th>Modified</th>
                                 <th>Status</th>
-                                <th class="no-sort">Quick Actions</th>
+                                <th class="no-sort col-auto">Quick Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -57,7 +57,7 @@
                             </td>
 
                             {{#ifEquals statusId "1"}}
-                            <td class="text-left pl-4">
+                            <td class="pl-4 col-auto text-center">
                                 <i class="far fa-check-circle fa-lg pr-2 text-primary-bs" title="Accept this swap"
                                     onclick="javascript:updateStatus({{id}}, 2, '{{{jsTitle}}}')"></i>
                                 <i class="far fa-times-circle fa-lg pr-2 text-danger-bs" title="Reject this swap"
@@ -66,8 +66,8 @@
                             {{/ifEquals}}
 
                             {{#ifEquals statusId "2"}}
-                            <td class="text-left pl-4">
-                                <i class="fas fa-shipping-fast fa-lg pr-1 text-info-bs" title="Mark as Shipped"
+                            <td class="pl-4 col-auto text-center">
+                                <i class="fas fa-shipping-fast fa-lg pr-2 text-info-bs" title="Mark as Shipped"
                                     onclick="javascript:updateStatus({{id}}, 3, '{{{jsTitle}}}')"></i>
                                 <i class="far fa-times-circle fa-lg pr-2 text-danger-bs" title="Reject this swap"
                                     onclick="javacript:updateStatus({{id}}, 5, '{{{jsTitle}}}')"></i>
@@ -75,7 +75,7 @@
                             {{/ifEquals}}
 
                             {{#ifEquals statusId "3"}}
-                            <td class="text-left pl-4">
+                            <td class="pl-4 col-auto text-center">
                                 <i class="fas fa-exclamation-triangle fa-lg pr-2 text-warning-bs" title="Mark as Lost"
                                     onclick="javacript:updateStatus({{id}}, 7, '{{{jsTitle}}}')"></i>
                                 <i class="far fa-times-circle fa-lg pr-2 text-danger-bs" title="Cancel this swap"
@@ -84,29 +84,29 @@
                             {{/ifEquals}}
 
                             {{#ifEquals statusId "4"}}
-                            <td class="text-left pl-4">
+                            <td class="pl-4 col-auto text-center">
                                 <a class="btn btn-primary-bs btn-small small" title="Complete this swap"
                                     onclick="javascript:closeSwap({{id}}, {{statusId}}, '{{{jsTitle}}}')">Close</a>
                             </td>
                             {{/ifEquals}}
 
                             {{#ifEquals statusId "5"}}
-                            <td class="text-left pl-4">
-                                <i class="fas fa-user-clock fa-lg pr-2 text-info-bs"
+                            <td class="pl-4 col-auto text-center">
+                                <i class="fas fa-user-clock fa-lg text-info-bs"
                                     title="We are waiting for the requestor to close this swap."></i>
                             </td>
                             {{/ifEquals}}
 
                             {{#ifEquals statusId "6"}}
-                            <td class="text-left pl-4">
+                            <td class="pl-4 col-auto text-center">
                                 <a class="btn btn-primary-bs btn-small small" title="Complete this swap"
                                     onclick="javascript:closeSwap({{id}}, {{statusId}}, '{{{jsTitle}}}')">Close</a>
                             </td>
                             {{/ifEquals}}
 
                             {{#ifEquals statusId "7"}}
-                            <td class="text-left pl-4">
-                                <i class="fas fa-user-clock fa-lg pr-2 text-info-bs"
+                            <td class="pl-4 col-auto text-center">
+                                <i class="fas fa-user-clock fa-lg text-info-bs"
                                     title="We are waiting for the requestor to close this swap."></i>
                             </td>
                             {{/ifEquals}}
@@ -126,7 +126,7 @@
                                 <th>Requested</th>
                                 <th>Modified</th>
                                 <th>Status</th>
-                                <th class="no-sort">Quick Actions</th>
+                                <th class="no-sort col-auto">Quick Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -149,56 +149,56 @@
                             </td>
 
                             {{#ifEquals statusId "1"}}
-                            <td class="text-left pl-4">
-                                <i class="far fa-times-circle fa-lg pr-2 text-danger-bs" title="Cancel this request"
+                            <td class="pl-4 col-auto text-center">
+                                <i class="far fa-times-circle fa-lg text-danger-bs" title="Cancel this request"
                                     onclick="javacript:updateStatus({{id}}, 6, '{{{jsTitle}}}')"></i>
                             </td>
                             {{/ifEquals}}
 
                             {{#ifEquals statusId "2"}}
-                            <td class="text-left pl-4">
-                                <i class="far fa-times-circle fa-lg pr-2 text-danger-bs" title="Cancel this request"
+                            <td class="pl-4 col-auto text-center">
+                                <i class="far fa-times-circle fa-lg text-danger-bs" title="Cancel this request"
                                     onclick="javacript:updateStatus({{id}}, 6, '{{{jsTitle}}}')"></i>
                             </td>
                             {{/ifEquals}}
 
                             {{#ifEquals statusId "3"}}
-                            <td class="text-left pl-4">
+                            <td class="pl-4 col-auto text-center">
                                 <a class="survey_modal btn" data-toggle="modal" data-id="{{id}}"
                                     data-condition="{{cond}}" data-created="{{created}}" href="#surveyModal"><i
-                                        class="fas fa-book fa-lg pr-2 text-primary-bs" title="Mark as Received"></i></a>
+                                        class="fas fa-book fa-lg text-primary-bs" title="Mark as Received"></i></a>
                                 {{#ifEquals lost "0"}}
-                                <i class="far fa-times-circle fa-lg pr-2 text-danger-bs" title="Mark as Not Received"
+                                <i class="far fa-times-circle fa-lg text-danger-bs" title="Mark as Not Received"
                                     onclick="javacript:updateStatus({{id}}, 7, '{{{jsTitle}}}')"></i>
                                 {{/ifEquals}}
                             </td>
                             {{/ifEquals}}
 
                             {{#ifEquals statusId "4"}}
-                            <td class="text-left pl-4">
-                                <i class="fas fa-user-clock fa-lg pr-2 text-info-bs"
+                            <td class="pl-4 col-auto text-center">
+                                <i class="fas fa-user-clock fa-lg text-info-bs"
                                     title="We are waiting for the seller to close this swap."></i>
-                                <i class="fas fa-star fa-lg pr-2 btn-warning-bs btn" title="Edit Your Survey"
+                                <i class="fas fa-star fa-lg btn-warning-bs btn" title="Edit Your Survey"
                                     onclick="javascript:viewSurvey({{id}}, '{{{jsTitle}}}', 0)"></i>
                             </td>
                             {{/ifEquals}}
 
                             {{#ifEquals statusId "5"}}
-                            <td class="text-left pl-4">
+                            <td class="pl-4 col-auto text-center">
                                 <a class="btn btn-primary-bs btn-small small" title="Complete this swap"
                                     onclick="javascript:closeSwap({{id}}, {{statusId}}, '{{{jsTitle}}}')">Close</a>
                             </td>
                             {{/ifEquals}}
 
                             {{#ifEquals statusId "6"}}
-                            <td class="text-left pl-4">
-                                <i class="fas fa-user-clock fa-lg pr-2 text-info-bs"
+                            <td class="pl-4 col-auto text-center">
+                                <i class="fas fa-user-clock fa-lg text-info-bs"
                                     title="We are waiting for the seller to close this swap."></i>
                             </td>
                             {{/ifEquals}}
 
                             {{#ifEquals statusId "7"}}
-                            <td class="text-left pl-4">
+                            <td class="pl-4 col-auto text-center">
                                 <a class="btn btn-primary-bs btn-small small" title="Complete this swap"
                                     onclick="javascript:closeSwap({{id}}, {{statusId}}, '{{{jsTitle}}}')">Close</a>
                             </td>
@@ -219,7 +219,7 @@
                                 <th>Modified</th>
                                 <th>Status</th>
                                 <th>Points</th>
-                                <th class="no-sort">Quick Actions</th>
+                                <th class="no-sort col-auto">Quick Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -247,7 +247,7 @@
                                 <td class="text-primary-bs-bold text-center font-weight-bold">{{points}}</td>
                                 {{/ifEquals}}
 
-                                <td class="text-left pl-4">
+                                <td class="pl-4 col-auto text-center">
                                     {{#ifEquals category "R"}}
                                     <i class="far fa-user fa-lg pr-2 text-secondary-bs" title="View Recipient's Profile"></i>
                                     {{/ifEquals}}

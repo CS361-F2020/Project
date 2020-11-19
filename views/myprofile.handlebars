@@ -11,7 +11,7 @@
         </div>
       </div>
       <div class="row pb-4">
-        <div class="col-2">
+        <div class="col-sm-2 col-3 pr-2">
           <h5>Address:</h5>
         </div>
         <div class="w-50 border rounded border-dark p-2">
@@ -23,7 +23,7 @@
         </div>
       </div>
       <div class="row pb-4">
-        <div class="col-2">
+        <div class="col-sm-2 col-3 pr-2">
           <h5>About Me: </h5>
         </div>
         <div class="w-50 border rounded border-dark p-2">
@@ -35,65 +35,76 @@
           </div>
         </div>
       </div>
-          <div class="row pb-4">
-      <div class="col-auto">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">Books Shipped</h5>
-            <p class="card-text">
-            <h2 class="text-center">{{sentBooks}}</h2>
-            </p>
+      <div class="row pb-4">
+        <div class="col-auto">
+          <div class="card mb-2">
+            <div class="card-body">
+              <h5 class="card-title">Books Shipped</h5>
+              <p class="card-text">
+              <h2 class="text-center">{{sentBooks}}</h2>
+              </p>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="col-auto">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">Books Received</h5>
-            <p class="card-text">
-            <h2 class="text-center">{{receivedBooks}}</h2>
-            </p>
+        <div class="col-auto">
+          <div class="card mb-2">
+            <div class="card-body">
+              <h5 class="card-title">Books Received</h5>
+              <p class="card-text">
+              <h2 class="text-center">{{receivedBooks}}</h2>
+              </p>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="col-auto">
-        <div class="card">
-          <div class="card-body">
-            <h5 class="card-title">Available Points</h5>
-            <p class="card-text">
-            <h2 class="text-center">{{this.user.points}}</h2>
-            </p>
+        <div class="col-auto">
+          <div class="card mb-2">
+            <div class="card-body">
+              <h5 class="card-title">Available Points</h5>
+              <p class="card-text">
+              <h2 class="text-center">{{user.points}}</h2>
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="col-auto">
+          <div class="card mb-2">
+            <div class="card-body">
+              <h5 class="card-title">Pending Points</h5>
+              <p class="card-text">
+              <h2 class="text-center">{{pendingPoints}}</h2>
+              </p>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-</div>
 
-<!-- update form -->
-<div class="modal fade" id="updateAboutMe" tabindex="-1" role="dialog" aria-labelledby="modaltitle" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header bg-med-bs text-center">
-        <h5 class="modal-title">Update About Me</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body" id="modalBody">
-        <div class="md-form">
-          <textarea type="text" name="newAboutMe" id="newAboutMe" class="md-textarea form-control" rows="4"
-            value="{{aboutMe}}"></textarea>
+  <!-- update form -->
+  <div class="modal fade" id="updateAboutMe" tabindex="-1" role="dialog" aria-labelledby="modaltitle"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header bg-med-bs text-center">
+          <h5 class="modal-title">Update About Me</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
         </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary-bs" onclick="newupdateAboutMe()">Confirm Changes</button>
+        <div class="modal-body" id="modalBody">
+          <div class="md-form">
+            <textarea type="text" name="newAboutMe" id="newAboutMe" class="md-textarea form-control" rows="4"
+              value="{{aboutMe}}"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary-bs" onclick="newupdateAboutMe()">Confirm Changes</button>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
 
 
-<script src="/client/profile.js"></script>
+  <script src="/client/profile.js"></script>

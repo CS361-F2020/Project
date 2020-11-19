@@ -39,7 +39,7 @@ function getPoints(userId, callback){
 }
 
 
-function getPendingPoints(userId){
+function getPendingPoints(userId, callback){
     var outgoing = `SELECT SUM(u.points) AS totalPoints
     FROM 
     (SELECT (SUM(Transactions.pointCost) * -1) AS points 
@@ -55,11 +55,9 @@ function getPendingPoints(userId){
         if (err) {
             throw err
         }
-            var totalPoints = results[0].totalPoints;
-            //console.log("sql query has returned results: going to send total points to callback: " + totalPoints)
-            return totalPoints;
+            var totalPoints = results[0].totalPoints
+            return callback(totalPoints)
     })
-    //console.log("sql query hasn't finished yet ");
 }
 
 module.exports = {
