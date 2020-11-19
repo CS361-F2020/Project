@@ -28,11 +28,6 @@ router.get('/faq', common.isAuthenticated, (req,res,next) => {
     res.render('faq', data);
 })
 
-router.get('/home', common.isAuthenticated, (req, res, next) =>{
-    var data = { title: 'Home' }
-    res.redirect('/search')
-})
-
 router.get('/login', (req, res, next) =>{
     if (!req.session.user) {
         var data = { title: 'Login' }

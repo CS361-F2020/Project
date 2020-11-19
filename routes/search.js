@@ -17,14 +17,10 @@ function Book(data) {
 // @route   GET /allBooks
 // @desc    Get all available books that don't belong to the user and are not undergoing transactions
 router.get('/', common.isAuthenticated, (req, res, next) => {
-    allBooks( req.session.userId, function(result){
+    allBooks(req.session.userId, function(result) {
         var payload = result;
         res.render('search', payload);
     })
-})
-
-router.get('/pointsFAQ', common.isAuthenticated, (req,res,next) => {
-    res.render('pointsFAQ');
 })
 
 // Get all avaialable books
@@ -140,7 +136,7 @@ router.post('/', common.isAuthenticated, (req, res, next) => {
                         }
                         common.transport.sendMail(message);
                 
-                        res.json({success: true});
+                        res.send({success: true});
                     });
                 }
             });
