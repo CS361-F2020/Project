@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html class="h-100">
 
 <head>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
@@ -12,24 +12,25 @@
     <title>BookSwap {{title}}</title>
 </head>
 
-<body>
+<body class="h-100">
     <header id='header'>
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
             {{!-- Brand/Logo --}}
-            <a class="navbar-brand" href="/home" style="color: DarkSlateBlue"><i class="fas fa-book-reader fa-lg pr-1"></i>BookSwap</a>
+            <a class="navbar-brand" href="/home" style="color: #6a6476"><i
+                    class="fas fa-book-reader fa-lg pr-1"></i>BookSwap</a>
             {{#if session.user }}
             <div class="col-2 ml-auto order-lg-3">
                 <div class="row justify-content-end">
                     {{!-- User dropdown --}}
                     <div class="nav-item dropdown">
-                        <a class="btn dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
-                            aria-haspopup="true" aria-expanded="false">
+                        <a class="btn dropdown-toggle" style="color: #6a6476" href="#" id="navbarDropdown" role="button"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             {{ session.user }}
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item" href="/myprofile">My Profile</a>
-                            <a class="dropdown-item" href="/resetPassword">Reset Password</a>
-                            <a class="dropdown-item" href="/logout">Logout</a>
+                            <a class="dropdown-item link-dark-bs" href="/myprofile">My Profile</a>
+                            <a class="dropdown-item link-dark-bs" href="/resetPassword">Reset Password</a>
+                            <a class="dropdown-item link-dark-bs" href="/logout">Logout</a>
                         </div>
                     </div>
                     {{!-- End User dropdown --}}
@@ -57,8 +58,9 @@
                     <li class="nav-item">
                         <a class="nav-link" href="#">Wishlist</a>
                     </li>
-                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Help</a>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Help</a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                             <a class="dropdown-item" href="/gettingstarted">Getting Started</a>
                             <a class="dropdown-item" href="/faq">Frequently Asked Questions</a>
@@ -73,45 +75,44 @@
             {{/if}}
             {{!-- End toggle page navigation --}}
         </nav>
-        </div>
-        </div>
     </header>
     <script src="https://code.jquery.com/jquery-3.3.1.js" crossorigin="anonymous"></script>
-    <main class="container-fluid pt-5 col-xl-10 col-lg-11 col-md-12 col-sm-12 col-12">
-        {{!-- Flash messages --}}
-        {{#if messages.success}}
-        <div class="alert alert-success" role="alert">{{messages.success}}
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-        {{/if}}
+    <main class="container-fluid pt-1 col-12 pt-2 h-100">
+        <div class="d-flex justify-content-center">
+            {{!-- Flash messages --}}
+            {{#if messages.success}}
+            <div class="alert alert-success w-75" role="alert">{{messages.success}}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            {{/if}}
 
-        {{#if messages.error}}
-        <div class="alert alert-danger" role="alert">{{messages.error}}</div>
-        {{/if}}
+            {{#if messages.error}}
+            <div class="alert alert-danger w-75" role="alert">{{messages.error}}</div>
+            {{/if}}
 
-        {{#if messages.info}}
-        <div class="alert alert-info" role="alert">{{messages.info}}
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-        {{/if}}
-        {{!-- End flash messages --}}
+            {{#if messages.info}}
+            <div class="alert alert-info w-75" role="alert">{{messages.info}}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            {{/if}}
+            {{!-- End flash messages --}}
 
-        <div class="alert alert-success d-none" role="alert" id="alert-success">
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
+            <div class="alert alert-success d-none w-75" role="alert" id="alert-success">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="alert alert-danger d-none w-75" role="alert" id="alert-error"></div>
+            <div class="alert alert-info d-none w-75" role="alert" id="alert-info">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
         </div>
-        <div class="alert alert-danger d-none" role="alert" id="alert-error"></div>
-        <div class="alert alert-info d-none" role="alert" id="alert-info">
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-
         {{{body}}}
     </main>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
@@ -126,7 +127,8 @@
     <script>
         $(document).ready(function () {
             $('li.active').removeClass('active');
-            $('a[href="' + location.pathname + '"]').closest('li').addClass('active');
+            var path = location.pathname == '/search' ? '/home' : location.pathname
+            $('a[href="' + path + '"]').closest('li').addClass('active');
         });
     </script>
 </body>

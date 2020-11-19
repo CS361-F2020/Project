@@ -309,9 +309,8 @@ router.get('/updateaccount', common.isAuthenticated, (req, res, next) => {
                 res.render('/auth/updateaccount', data)
             }
         } else {
-            data.push(new Account(results[0].firstName, results[0].lastName, results[0].email, results[0].address, results[0].city, results[0].state, results[0].postalCode, results[0].country, results[0].worldwide, results[0].aboutMe));
+            payload.user = new Account(results[0].firstName, results[0].lastName, results[0].email, results[0].address, results[0].city, results[0].state, results[0].postalCode, results[0].country, results[0].worldwide, results[0].aboutMe);
         }
-        payload.data = data;
         res.render('auth/updateaccount', payload);
     });
 })
@@ -354,26 +353,6 @@ router.post('/updateaccount', common.isAuthenticated, (req, res, next) => {
                 }
             })
         }
-    })
-})
-
-router.get('/getAddress/(:id)', common.isAuthenticated, (req, res, next) => {
-    var getAddress = 'SELECT firstName, lastName, address, city, state, postalCode, country FROM Users WHERE id = ?'
-    sql.pool.query(getAddress, [req.params.id], (err, results) => {
-        if (err || results.length == 0)
-        {
-            res.send({ error: 'Error retrieving buyer address. Please try again.' })
-        }
-
-        var result = results[0]
-        var data = {
-            fullName: result.firstName + ' ' + result.lastName,
-            address: result.address,
-            address2: result.city + ', ' + result.state + ' ' + result.postalCode,
-            country: result.country
-        }
-
-        res.send(data)
     })
 })
 

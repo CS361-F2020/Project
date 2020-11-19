@@ -1,81 +1,84 @@
-<div class="row pb-3">
-    <div class="col-6">
-        <h3>{{title}}</h3>
-    </div>
-    <div class="col-6 text-right">
-        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#bookModal">
-            <i class="fas fa-plus"></i> Add a New Book
-        </button>
-    </div>
-
-</div>
-
-<div class="shelf">
-    <span class="shelf-title">{{avail}} Books Available to Swap</span>
-    <button class="library-toggle" type="button" data-toggle="collapse" data-target="#collapsSwapShelf"
-        aria-expanded="true" aria-controls="collapsSwapShelf">
-        <a id="topShelfTip" data-toggle="tooltip" data-placement="top" data-html="true"
-            title='click here to<br>see less'>
-            <i id="topShelf" class="fas fa-chevron-up"></i>
-        </a>
-    </button>
-</div>
-<div class="collapse show" id="collapsSwapShelf">
-    <br>
-    <div class="row row-cols-2">
-        {{#each library}}
-        {{#if swap}}
-        <div class="col-6 col-sm-4 col-md-3 col-lg-2 col-xl-2" id="{{userBookId}}">
-            <div class="card h-100 cards">
-                <img src="{{imgUrl}}" class="card-img-top" alt="...">
-                <button type="button" class="btn btn-outline-light delete-btn"
-                    onclick="clickRemove({{userBookId}}, '{{title}}')" data-toggle="tooltip" data-placement="bottom"
-                    data-html="true" title='click here to<br>remove this book'>
-                    <i class="far fa-trash-alt"></i>
+<div class="container-fluid h-100 d-flex justify-content-center">
+    <div class="col-xl-10 col-lg-10 col-md-12 col-sm-12 col-12 pt-4">
+        <div class="row pb-3">
+            <div class="col-6">
+                <h3 class="header-text">{{title}}</h3>
+            </div>
+            <div class="col-6 text-right">
+                <button type="button" class="btn btn-outline-primary-bs" data-toggle="modal" data-target="#bookModal">
+                    <i class="fas fa-plus"></i> Add a New Book
                 </button>
-                <div class="card-body">
-                    <p class="card-text">{{title}}</p>
-                </div>
             </div>
         </div>
-        {{/if}}
-        {{/each}}
-    </div>
-    <br><br>
-</div>
-
-<div class="shelf">
-    <span class="shelf-title">{{rcvd}} Books Received From Swaps</span>
-    <button class="library-toggle" type="button" data-toggle="collapse" data-target="#collapsRCVDShelf"
-        aria-expanded="true" aria-controls="collapsRCVDShelf">
-        <a id="bottomShelfTip" data-toggle="tooltip" data-placement="top" data-html="true"
-            title='click here to<br>see less'>
-            <i id="bottomShelf" class="fas fa-chevron-up"></i>
-        </a>
-    </button>
-</div>
-<div class="collapse show" id="collapsRCVDShelf">
-    <br>
-    <div class="row row-cols-2 row-cols-md-4">
-        {{#each library}}
-        {{#unless swap}}
-        <div class="col-6 col-sm-4 col-md-3 col-lg-2 col-xl-2">
-            <div class="card h-100 cards">
-                <img src="{{imgUrl}}" class="card-img-top" alt="...">
-                <button type="button" class="btn btn-outline-light delete-btn"
-                    onclick="clickRemove({{userBookId}}, '{{title}}')" data-toggle="tooltip" data-placement="bottom"
-                    data-html="true" title='click here to<br>remove this book'>
-                    <i class="far fa-trash-alt"></i>
-                </button>
-                <div class="card-body">
-                    <p class="card-text">{{title}}</p>
+        <div class="shelf bg-med-bs mb-3">
+            <span class="shelf-title">{{avail}} Books Available to Swap</span>
+            <button class="library-toggle" type="button" data-toggle="collapse" data-target="#collapsSwapShelf"
+                aria-expanded="true" aria-controls="collapsSwapShelf">
+                <a id="topShelfTip" data-toggle="tooltip" data-placement="top" data-html="true"
+                    title='Click here to see less'>
+                    <i id="topShelf" class="fas fa-chevron-up"></i>
+                </a>
+            </button>
+        </div>
+        <div class="collapse show pb-3" id="collapsSwapShelf">
+            <div class="row row-cols-2">
+                {{#each library}}
+                {{#if swap}}
+                <div class="col-6 col-sm-4 col-md-3 col-lg-2 col-xl-2" id="{{userBookId}}">
+                    <div class="card h-100 cards">
+                        <img src="{{imgUrl}}" class="card-img-top" alt="...">
+                        <button type="button" class="btn btn-outline-light delete-btn"
+                            onclick="clickRemove({{userBookId}}, '{{title}}')" data-toggle="tooltip"
+                            data-placement="bottom" data-html="true" title='click here to<br>remove this book'>
+                            <i class="far fa-trash-alt"></i>
+                        </button>
+                        <div class="card-body px-0 pt-1 pb-0 text-center">
+                            <p class="card-text">{{title}}</p>
+                        </div>
+                    </div>
                 </div>
+                {{/if}}
+                {{/each}}
             </div>
         </div>
-        {{/unless}}
-        {{/each}}
+
+        <div class="shelf bg-med-bs mb-3">
+            <span class="shelf-title">{{rcvd}} Books Received From Swaps</span>
+            <button class="library-toggle" type="button" data-toggle="collapse" data-target="#collapsRCVDShelf"
+                aria-expanded="true" aria-controls="collapsRCVDShelf">
+                <a id="bottomShelfTip" data-toggle="tooltip" data-placement="top" data-html="true"
+                    title='Click here to see less'>
+                    <i id="bottomShelf" class="fas fa-chevron-up"></i>
+                </a>
+            </button>
+        </div>
+        <div class="collapse show pb-3" id="collapsRCVDShelf">
+            <div class="row row-cols-2 row-cols-md-4">
+                {{#each library}}
+                {{#unless swap}}
+                <div class="col-6 col-sm-4 col-md-3 col-lg-2 col-xl-2">
+                    <div class="card h-100 cards">
+                        <img src="{{imgUrl}}" class="card-img-top" alt="...">
+                        <button type="button" class="btn btn-outline-light delete-btn"
+                            onclick="clickRemove({{userBookId}}, '{{title}}')" data-toggle="tooltip"
+                            data-placement="bottom" data-html="true" title='click here to<br>remove this book'>
+                            <i class="far fa-trash-alt"></i>
+                        </button>
+                        <div class="px-0 pt-1 pb-0 text-center">
+                            <p class="card-text">{{title}}</p>
+                        </div>
+                    </div>
+                </div>
+                {{/unless}}
+                {{/each}}
+            </div>
+        </div>
     </div>
 </div>
+
+
+
+
 
 <!-- Modal -->
 <div class="modal fade" id="pageModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
@@ -91,7 +94,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" id="confirmButton" onclick="">Confirm</button>
+                <button type="button" class="btn btn-primary-bs" id="confirmButton" onclick="">Confirm</button>
             </div>
         </div>
     </div>
@@ -123,7 +126,7 @@
                     <!--Search by Title-->
                     <div class="form-row" id="titleselect">
                         <div class="form-group col-12">
-                            <select class="form-control" id="titleid"  onchange="javascript:populateISBN()"
+                            <select class="form-control" id="titleid" onchange="javascript:populateISBN()"
                                 autocomplete="off" required>
                                 <option value="">Select an existing title</option>
                                 {{#each titles}}
@@ -182,7 +185,7 @@
                                 Search</button>
                         </div>
                         <div class="col-6">
-                            <a class="btn btn-primary w-100" id="bookModalSubmit"
+                            <a class="btn btn-primary-bs w-100" id="bookModalSubmit"
                                 onclick="javascript:addBook()">Submit</a>
                         </div>
                     </div>
@@ -190,7 +193,6 @@
             </div>
         </div>
     </div>
-</div>
 </div>
 
 <script src="/client/library.js"></script>

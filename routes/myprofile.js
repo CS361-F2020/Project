@@ -4,9 +4,10 @@ const db = require('../dbcon.js');
 const common = require('../common')
 
 //User
-function User(firstName, lastName, city, state, country, aboutMe, points, booksReceived) {
+function User(firstName, lastName, address, city, state, country, aboutMe, points, booksReceived) {
     this.firstName = firstName;
     this.lastName = lastName;
+    this.address = address;
     this.city = city;
     this.state = state;
     this.country = country;
@@ -16,7 +17,7 @@ function User(firstName, lastName, city, state, country, aboutMe, points, booksR
 }
 
 //database queries
-const selectUserinfo = `SELECT firstName AS firstName, lastName AS lastName, city AS city, state AS state, country AS country, aboutMe AS aboutMe,  points AS points
+const selectUserinfo = `SELECT firstName, lastName, address, city, state, country, aboutMe,  points
                         FROM Users
                         WHERE Users.id = ?`;
 const getTransactionInfo = `SELECT  userBookId AS sentBook, requestorId AS receivedBook, rating AS rating
@@ -30,7 +31,7 @@ const updateAboutMe = `UPDATE Users SET aboutMe=? WHERE id=?`;
 router.get('/', common.isAuthenticated, (req, res, next) => {
     const userId = req.session.userId;
     var payload = {};
-    var user = [];
+    var user = {};
     var sentBooks = 0;
     var receivedBooks = 0;
     db.pool.query(selectUserinfo, [userId], (err, result) => {
@@ -38,8 +39,11 @@ router.get('/', common.isAuthenticated, (req, res, next) => {
             next(err);
             return;
         } else {
-            user.push(new User(result[0].firstName, result[0].lastName, result[0].city, result[0].state, result[0].country, result[0].aboutMe, result[0].points, result[0].booksReceived));
-            payload.user = user;
+            payload.user = new User(result[0].firstName, result[0].lastName, result[0].address, result[0].city, result[0].state, result[0].country, result[0].aboutMe, result[0].points, result[0].booksReceived);
+            if (payload.user.aboutMe == "" || payload.user.aboutMe == null)
+            {
+                payload.user.aboutMe = "You do not have anything in your About Me, you can change that now by clicking the edit icon!"
+            }
             
         }
     db.pool.query(getTransactionInfo, [userId, userId], (err, tranResult) => {

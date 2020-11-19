@@ -1,274 +1,286 @@
-<div class="col-6 pb-3">
-    <h3>{{title}}</h3>
-</div>
-
-<div>
-    <ul class="nav nav-tabs" role="tablist" id="swapTabs">
-        <li class="nav-item active">
-            <a class="nav-link active" href="#tab-table1" data-toggle="tab">
-                Received Requests - Active {{#if receivedCount}}({{receivedCount}}){{/if}}</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="#tab-table2" data-toggle="tab">
-                My Requests - Active {{#if sentCount}}({{sentCount}}){{/if}}</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="#tab-table3" data-toggle="tab">
-                History {{#if historyCount}}({{historyCount}}){{/if}}</a>
-        </li>
-    </ul>
-    <div class="tab-content pt-4">
-        <div class="tab-pane active" id="tab-table1">
-            <table id="myTable1" class="table table-swap table-striped table-bordered" cellspacing="0" width="100%">
-                <thead>
-                    <tr>
-                        <th>Id</th>
-                        <th>Requestor</th>
-                        <th>Book</th>
-                        <th>Requested</th>
-                        <th>Modified</th>
-                        <th>Status</th>
-                        <th class="no-sort">Quick Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {{#each received}}
-                    <td>{{id}}</td>
-                    <td>
-                        <a href="mailto:{{email}}"><i class="fas fa-envelope pr-2 text-secondary"></i></a>
-                        <i class="fas fa-home pr-2 text-primary" title="View buyer's address"
-                            onclick="javascript:getAddress({{userId}})"></i>
-                        {{firstName}} {{lastName}}
-                    </td>
-                    <td>{{title}} - {{author}}</td>
-                    <td>{{created}}</td>
-                    <td>{{modified}}</td>
-                    <td>{{status}}
-                        {{#ifEquals statusId "3"}}
-                        {{#ifEquals lost "1"}}
-                        <i class="fas fa-exclamation-circle text-danger"
-                            title="The requestor has noted that they have not received this book. Please check the shipping and mark as lost or cancel the swap."></i>
-                        {{/ifEquals}}
-                        {{/ifEquals}}
-                    </td>
-
-                    {{#ifEquals statusId "1"}}
-                    <td class="text-left pl-4">
-                        <i class="far fa-check-circle fa-lg pr-2 text-success btn" title="Accept this swap"
-                            onclick="javascript:updateStatus({{id}}, 2, '{{{jsTitle}}}')"></i>
-                        <i class="far fa-times-circle fa-lg pr-2 text-danger btn" title="Reject this swap"
-                            onclick="javascript:updateStatus({{id}}, 5, '{{{jsTitle}}}')"></i>
-                    </td>
-                    {{/ifEquals}}
-
-                    {{#ifEquals statusId "2"}}
-                    <td class="text-left pl-4">
-                        <i class="fas fa-shipping-fast fa-lg pr-1 text-info btn" title="Mark as Shipped"
-                            onclick="javascript:updateStatus({{id}}, 3, '{{{jsTitle}}}')"></i>
-                        <i class="far fa-times-circle fa-lg pr-2 text-danger btn" title="Reject this swap"
-                            onclick="javacript:updateStatus({{id}}, 5, '{{{jsTitle}}}')"></i>
-                    </td>
-                    {{/ifEquals}}
-
-                    {{#ifEquals statusId "3"}}
-                    <td class="text-left pl-4">
-                        <i class="fas fa-exclamation-triangle fa-lg pr-2 text-warning btn" title="Mark as Lost"
-                            onclick="javacript:updateStatus({{id}}, 7, '{{{jsTitle}}}')"></i>
-                        <i class="far fa-times-circle fa-lg pr-2 text-danger btn" title="Cancel this swap"
-                            onclick="javacript:updateStatus({{id}}, 5, '{{{jsTitle}}}')"></i>
-                    </td>
-                    {{/ifEquals}}
-
-                    {{#ifEquals statusId "4"}}
-                    <td class="text-left pl-4">
-                        <a class="btn btn-success btn-small small text-white" title="Complete this swap"
-                            onclick="javascript:closeSwap({{id}}, {{statusId}}, '{{{jsTitle}}}')">Close</a>
-                    </td>
-                    {{/ifEquals}}
-
-                    {{#ifEquals statusId "5"}}
-                    <td class="text-left pl-4">
-                        <i class="fas fa-user-clock fa-lg pr-2 text-info"
-                            title="We are waiting for the requestor to close this swap."></i>
-                    </td>
-                    {{/ifEquals}}
-
-                    {{#ifEquals statusId "6"}}
-                    <td class="text-left pl-4">
-                        <a class="btn btn-success btn-small small text-white" title="Complete this swap"
-                            onclick="javascript:closeSwap({{id}}, {{statusId}}, '{{{jsTitle}}}')">Close</a>
-                    </td>
-                    {{/ifEquals}}
-
-                    {{#ifEquals statusId "7"}}
-                    <td class="text-left pl-4">
-                        <i class="fas fa-user-clock fa-lg pr-2 text-info"
-                            title="We are waiting for the requestor to close this swap."></i>
-                    </td>
-                    {{/ifEquals}}
-
-                    {{/each}}
-                </tbody>
-            </table>
+<div class="container-fluid h-100 d-flex justify-content-center">
+    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 pt-4">
+        <div class="col-6 pb-3">
+            <h3 class="header-text">{{title}}</h3>
         </div>
-        <div class="tab-pane" id="tab-table2">
-            <table id="myTable2" class="table table-swap table-striped table-bordered" cellspacing="0" width="100%">
-                <thead>
-                    <tr>
-                        <th>Id</th>
-                        <th>Seller</th>
-                        <th>Book</th>
-                        <th>Requested</th>
-                        <th>Modified</th>
-                        <th>Status</th>
-                        <th class="no-sort">Quick Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {{#each sent}}
-                    <td>{{id}}</td>
-                    <td><a href="mailto:{{email}}"><i class="fas fa-envelope pr-2 text-secondary"></i></a>{{firstName}}
-                        {{lastName}}</td>
-                    <td>{{title}} - {{author}}</td>
-                    <td>{{created}}</td>
-                    <td>{{modified}}</td>
-                    <td>{{status}}
-                        {{#ifEquals statusId "3"}}
-                        {{#ifEquals lost "1"}}
-                        - Pending Response
-                        <i class="fas fa-exclamation-circle text-danger"
-                            title="We've notified the seller that you have not received this book. We are waiting for their response."></i>
-                        {{/ifEquals}}
-                        {{/ifEquals}}
-                    </td>
 
-                    {{#ifEquals statusId "1"}}
-                    <td class="text-left pl-4">
-                        <i class="far fa-times-circle fa-lg pr-2 text-danger btn" title="Cancel this request"
-                            onclick="javacript:updateStatus({{id}}, 6, '{{{jsTitle}}}')"></i>
-                    </td>
-                    {{/ifEquals}}
 
-                    {{#ifEquals statusId "2"}}
-                    <td class="text-left pl-4">
-                        <i class="far fa-times-circle fa-lg pr-2 text-danger" title="Cancel this request"
-                            onclick="javacript:updateStatus({{id}}, 6, '{{{jsTitle}}}')"></i>
-                    </td>
-                    {{/ifEquals}}
+        <div>
+            <ul class="nav nav-tabs" role="tablist" id="swapTabs">
+                <li class="nav-item active">
+                    <a class="nav-link active link-bs" href="#tab-table1" data-toggle="tab">
+                        Received Requests - Active {{#if receivedCount}}({{receivedCount}}){{/if}}</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link link-bs" href="#tab-table2" data-toggle="tab">
+                        My Requests - Active {{#if sentCount}}({{sentCount}}){{/if}}</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link link-bs" href="#tab-table3" data-toggle="tab">
+                        History {{#if historyCount}}({{historyCount}}){{/if}}</a>
+                </li>
+            </ul>
+            <div class="tab-content pt-4">
+                <div class="tab-pane active" id="tab-table1">
+                    <table id="myTable1" class="table table-swap table-hover table-bordered" cellspacing="0"
+                        width="100%">
+                        <thead>
+                            <tr>
+                                <th>Id</th>
+                                <th>Requestor</th>
+                                <th>Book</th>
+                                <th>Requested</th>
+                                <th>Modified</th>
+                                <th>Status</th>
+                                <th class="no-sort">Quick Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{#each received}}
+                            <td>{{id}}</td>
+                            <td>
+                                <a href="mailto:{{email}}"><i class="fas fa-envelope pr-2 text-secondary-bs"></i></a>
+                                <i class="fas fa-home pr-2 text-primary-bs" title="View buyer's address"
+                                    onclick="javascript:getAddress({{userId}})"></i>
+                                {{firstName}} {{lastName}}
+                            </td>
+                            <td>{{title}} - {{author}}</td>
+                            <td>{{created}}</td>
+                            <td>{{modified}}</td>
+                            <td>{{status}}
+                                {{#ifEquals statusId "3"}}
+                                {{#ifEquals lost "1"}}
+                                <i class="fas fa-exclamation-circle text-danger-bs"
+                                    title="The requestor has noted that they have not received this book. Please check the shipping and mark as lost or cancel the swap."></i>
+                                {{/ifEquals}}
+                                {{/ifEquals}}
+                            </td>
 
-                    {{#ifEquals statusId "3"}}
-                    <td class="text-left pl-4">
-                        <a class="survey_modal btn" data-toggle="modal" data-id="{{id}}" data-condition="{{cond}}"
-                            data-created="{{created}}" href="#surveyModal"><i
-                                class="fas fa-book fa-lg pr-2 text-success" title="Mark as Received"></i></a>
-                        {{#ifEquals lost "0"}}
-                        <i class="far fa-times-circle fa-lg pr-2 text-danger" title="Mark as Not Received"
-                            onclick="javacript:updateStatus({{id}}, 7, '{{{jsTitle}}}')"></i>
-                        {{/ifEquals}}
-                    </td>
-                    {{/ifEquals}}
-
-                    {{#ifEquals statusId "4"}}
-                    <td class="text-left pl-4">
-                        <i class="fas fa-user-clock fa-lg pr-2 text-info"
-                            title="We are waiting for the seller to close this swap."></i>
-                        <i class="fas fa-star fa-lg pr-2 text-warning btn" title="Edit Your Survey"
-                            onclick="javascript:viewSurvey({{id}}, '{{{jsTitle}}}', 0)"></i>
-                    </td>
-                    {{/ifEquals}}
-
-                    {{#ifEquals statusId "5"}}
-                    <td class="text-left pl-4">
-                        <a class="btn btn-success btn-small small text-white" title="Complete this swap"
-                            onclick="javascript:closeSwap({{id}}, {{statusId}}, '{{{jsTitle}}}')">Close</a>
-                    </td>
-                    {{/ifEquals}}
-
-                    {{#ifEquals statusId "6"}}
-                    <td class="text-left pl-4">
-                        <i class="fas fa-user-clock fa-lg pr-2 text-info"
-                            title="We are waiting for the seller to close this swap."></i>
-                    </td>
-                    {{/ifEquals}}
-
-                    {{#ifEquals statusId "7"}}
-                    <td class="text-left pl-4">
-                        <a class="btn btn-success btn-small small text-white" title="Complete this swap"
-                            onclick="javascript:closeSwap({{id}}, {{statusId}}, '{{{jsTitle}}}')">Close</a>
-                    </td>
-                    {{/ifEquals}}
-
-                    {{/each}}
-            </table>
-        </div>
-        <div class="tab-pane" id="tab-table3">
-            <table id="myTable3" class="table table-swap table-striped table-bordered" cellspacing="0" width="100%">
-                <thead>
-                    <tr>
-                        <th>Id</th>
-                        <th>Type</th>
-                        <th>Book</th>
-                        <th>Requested</th>
-                        <th>Modified</th>
-                        <th>Status</th>
-                        <th>Points</th>
-                        <th class="no-sort">Quick Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {{#each history}}
-                    <tr>
-                        <td>{{id}}</td>
-                        {{#ifEquals category "S"}}
-                        <td>Incoming</td>
-                        {{/ifEquals}}
-
-                        {{#ifEquals category "R"}}
-                        <td>Outgoing</td>
-                        {{/ifEquals}}
-
-                        <td>{{title}} - {{author}}</td>
-                        <td>{{created}}</td>
-                        <td>{{modified}}</td>
-                        <td>{{status}}</td>
-
-                        {{#ifEquals category "S"}}
-                        <td class="text-danger text-center font-weight-bold">{{points}}</td>
-                        {{/ifEquals}}
-
-                        {{#ifEquals category "R"}}
-                        <td class="text-success text-center font-weight-bold">{{points}}</td>
-                        {{/ifEquals}}
-
-                        <td class="text-left pl-4">
-                            {{#ifEquals category "R"}}
-                            <i class="far fa-user fa-lg pr-2 text-dark" title="View Recipient's Profile"></i>
+                            {{#ifEquals statusId "1"}}
+                            <td class="text-left pl-4">
+                                <i class="far fa-check-circle fa-lg pr-2 text-primary-bs" title="Accept this swap"
+                                    onclick="javascript:updateStatus({{id}}, 2, '{{{jsTitle}}}')"></i>
+                                <i class="far fa-times-circle fa-lg pr-2 text-danger-bs" title="Reject this swap"
+                                    onclick="javascript:updateStatus({{id}}, 5, '{{{jsTitle}}}')"></i>
+                            </td>
                             {{/ifEquals}}
-                            {{#ifEquals category "S"}}
-                            <i class="far fa-user fa-lg pr-2 text-dark" title="View Seller's Profile"></i>
-                            {{/ifEquals}}
-                            <i class="far fa-file-alt fa-lg pr-2 text-info btn" title="View Swap Details"
-                                onclick="javascript:viewHistory({{id}})"></i>
-                            {{#ifEquals category "S"}}
-                            {{#ifEquals hasSurvey "1"}}
-                            <i class="fas fa-star fa-lg pr-2 text-warning btn" title="View Your Survey"
-                                onclick="javascript:viewSurvey({{id}}, '{{{jsTitle}}}', 1)"></i>
-                            {{/ifEquals}}
-                            {{/ifEquals}}
-                        </td>
-                    </tr>
-                    {{/each}}
 
-                </tbody>
-            </table>
+                            {{#ifEquals statusId "2"}}
+                            <td class="text-left pl-4">
+                                <i class="fas fa-shipping-fast fa-lg pr-1 text-info-bs" title="Mark as Shipped"
+                                    onclick="javascript:updateStatus({{id}}, 3, '{{{jsTitle}}}')"></i>
+                                <i class="far fa-times-circle fa-lg pr-2 text-danger-bs" title="Reject this swap"
+                                    onclick="javacript:updateStatus({{id}}, 5, '{{{jsTitle}}}')"></i>
+                            </td>
+                            {{/ifEquals}}
+
+                            {{#ifEquals statusId "3"}}
+                            <td class="text-left pl-4">
+                                <i class="fas fa-exclamation-triangle fa-lg pr-2 text-warning-bs" title="Mark as Lost"
+                                    onclick="javacript:updateStatus({{id}}, 7, '{{{jsTitle}}}')"></i>
+                                <i class="far fa-times-circle fa-lg pr-2 text-danger-bs" title="Cancel this swap"
+                                    onclick="javacript:updateStatus({{id}}, 5, '{{{jsTitle}}}')"></i>
+                            </td>
+                            {{/ifEquals}}
+
+                            {{#ifEquals statusId "4"}}
+                            <td class="text-left pl-4">
+                                <a class="btn btn-primary-bs btn-small small" title="Complete this swap"
+                                    onclick="javascript:closeSwap({{id}}, {{statusId}}, '{{{jsTitle}}}')">Close</a>
+                            </td>
+                            {{/ifEquals}}
+
+                            {{#ifEquals statusId "5"}}
+                            <td class="text-left pl-4">
+                                <i class="fas fa-user-clock fa-lg pr-2 text-info-bs"
+                                    title="We are waiting for the requestor to close this swap."></i>
+                            </td>
+                            {{/ifEquals}}
+
+                            {{#ifEquals statusId "6"}}
+                            <td class="text-left pl-4">
+                                <a class="btn btn-primary-bs btn-small small" title="Complete this swap"
+                                    onclick="javascript:closeSwap({{id}}, {{statusId}}, '{{{jsTitle}}}')">Close</a>
+                            </td>
+                            {{/ifEquals}}
+
+                            {{#ifEquals statusId "7"}}
+                            <td class="text-left pl-4">
+                                <i class="fas fa-user-clock fa-lg pr-2 text-info-bs"
+                                    title="We are waiting for the requestor to close this swap."></i>
+                            </td>
+                            {{/ifEquals}}
+
+                            {{/each}}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="tab-pane" id="tab-table2">
+                    <table id="myTable2" class="table table-swap table-hover table-bordered" cellspacing="0"
+                        width="100%">
+                        <thead>
+                            <tr>
+                                <th>Id</th>
+                                <th>Seller</th>
+                                <th>Book</th>
+                                <th>Requested</th>
+                                <th>Modified</th>
+                                <th>Status</th>
+                                <th class="no-sort">Quick Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{#each sent}}
+                            <td>{{id}}</td>
+                            <td><a href="mailto:{{email}}"><i
+                                        class="fas fa-envelope pr-2 text-secondary-bs"></i></a>{{firstName}}
+                                {{lastName}}</td>
+                            <td>{{title}} - {{author}}</td>
+                            <td>{{created}}</td>
+                            <td>{{modified}}</td>
+                            <td>{{status}}
+                                {{#ifEquals statusId "3"}}
+                                {{#ifEquals lost "1"}}
+                                - Pending Response
+                                <i class="fas fa-exclamation-circle text-danger-bs"
+                                    title="We've notified the seller that you have not received this book. We are waiting for their response."></i>
+                                {{/ifEquals}}
+                                {{/ifEquals}}
+                            </td>
+
+                            {{#ifEquals statusId "1"}}
+                            <td class="text-left pl-4">
+                                <i class="far fa-times-circle fa-lg pr-2 text-danger-bs" title="Cancel this request"
+                                    onclick="javacript:updateStatus({{id}}, 6, '{{{jsTitle}}}')"></i>
+                            </td>
+                            {{/ifEquals}}
+
+                            {{#ifEquals statusId "2"}}
+                            <td class="text-left pl-4">
+                                <i class="far fa-times-circle fa-lg pr-2 text-danger-bs" title="Cancel this request"
+                                    onclick="javacript:updateStatus({{id}}, 6, '{{{jsTitle}}}')"></i>
+                            </td>
+                            {{/ifEquals}}
+
+                            {{#ifEquals statusId "3"}}
+                            <td class="text-left pl-4">
+                                <a class="survey_modal btn" data-toggle="modal" data-id="{{id}}"
+                                    data-condition="{{cond}}" data-created="{{created}}" href="#surveyModal"><i
+                                        class="fas fa-book fa-lg pr-2 text-primary-bs" title="Mark as Received"></i></a>
+                                {{#ifEquals lost "0"}}
+                                <i class="far fa-times-circle fa-lg pr-2 text-danger-bs" title="Mark as Not Received"
+                                    onclick="javacript:updateStatus({{id}}, 7, '{{{jsTitle}}}')"></i>
+                                {{/ifEquals}}
+                            </td>
+                            {{/ifEquals}}
+
+                            {{#ifEquals statusId "4"}}
+                            <td class="text-left pl-4">
+                                <i class="fas fa-user-clock fa-lg pr-2 text-info-bs"
+                                    title="We are waiting for the seller to close this swap."></i>
+                                <i class="fas fa-star fa-lg pr-2 btn-warning-bs btn" title="Edit Your Survey"
+                                    onclick="javascript:viewSurvey({{id}}, '{{{jsTitle}}}', 0)"></i>
+                            </td>
+                            {{/ifEquals}}
+
+                            {{#ifEquals statusId "5"}}
+                            <td class="text-left pl-4">
+                                <a class="btn btn-primary-bs btn-small small" title="Complete this swap"
+                                    onclick="javascript:closeSwap({{id}}, {{statusId}}, '{{{jsTitle}}}')">Close</a>
+                            </td>
+                            {{/ifEquals}}
+
+                            {{#ifEquals statusId "6"}}
+                            <td class="text-left pl-4">
+                                <i class="fas fa-user-clock fa-lg pr-2 text-info-bs"
+                                    title="We are waiting for the seller to close this swap."></i>
+                            </td>
+                            {{/ifEquals}}
+
+                            {{#ifEquals statusId "7"}}
+                            <td class="text-left pl-4">
+                                <a class="btn btn-primary-bs btn-small small" title="Complete this swap"
+                                    onclick="javascript:closeSwap({{id}}, {{statusId}}, '{{{jsTitle}}}')">Close</a>
+                            </td>
+                            {{/ifEquals}}
+
+                            {{/each}}
+                    </table>
+                </div>
+                <div class="tab-pane" id="tab-table3">
+                    <table id="myTable3" class="table table-swap table-hover table-bordered" cellspacing="0"
+                        width="100%">
+                        <thead>
+                            <tr>
+                                <th>Id</th>
+                                <th>Type</th>
+                                <th>Book</th>
+                                <th>Requested</th>
+                                <th>Modified</th>
+                                <th>Status</th>
+                                <th>Points</th>
+                                <th class="no-sort">Quick Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{#each history}}
+                            <tr>
+                                <td>{{id}}</td>
+                                {{#ifEquals category "S"}}
+                                <td>Incoming</td>
+                                {{/ifEquals}}
+
+                                {{#ifEquals category "R"}}
+                                <td>Outgoing</td>
+                                {{/ifEquals}}
+
+                                <td>{{title}} - {{author}}</td>
+                                <td>{{created}}</td>
+                                <td>{{modified}}</td>
+                                <td>{{status}}</td>
+
+                                {{#ifEquals category "S"}}
+                                <td class="text-danger-bs-bold text-center font-weight-bold">{{points}}</td>
+                                {{/ifEquals}}
+
+                                {{#ifEquals category "R"}}
+                                <td class="text-primary-bs-bold text-center font-weight-bold">{{points}}</td>
+                                {{/ifEquals}}
+
+                                <td class="text-left pl-4">
+                                    {{#ifEquals category "R"}}
+                                    <i class="far fa-user fa-lg pr-2 text-secondary-bs" title="View Recipient's Profile"></i>
+                                    {{/ifEquals}}
+                                    {{#ifEquals category "S"}}
+                                    <i class="far fa-user fa-lg pr-2 text-secondary-bs" title="View Seller's Profile"></i>
+                                    {{/ifEquals}}
+                                    <i class="far fa-file-alt fa-lg pr-2 text-info-bs" title="View Swap Details"
+                                        onclick="javascript:viewHistory({{id}})"></i>
+                                    {{#ifEquals category "S"}}
+                                    {{#ifEquals hasSurvey "1"}}
+                                    <i class="fas fa-star fa-lg pr-2 text-warning-bs" title="View Your Survey"
+                                        onclick="javascript:viewSurvey({{id}}, '{{{jsTitle}}}', 1)"></i>
+                                    {{/ifEquals}}
+                                    {{/ifEquals}}
+                                </td>
+                            </tr>
+                            {{/each}}
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
+
+
+
 <div class="modal fade" tabindex="-1" role="dialog" id="surveyModal">
     <div class="modal-dialog modal-sm">
         <div class="modal-content">
-            <div class="modal-header bg-info text-white text-center">
+            <div class="modal-header bg-med-bs text-center">
                 <h6 class="modal-title" id="surveyTitle">Swap Survey</h6>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
@@ -281,7 +293,7 @@
                     <div class="form-group col-12 text-center">
                         <div><label class="font-weight-bold">Did you receieve your book within 10 days of your
                                 request?</label></div>
-                        <div id="requestDate" class="text-primary pb-1"></div>
+                        <div id="requestDate" class="text-primary-bs pb-1"></div>
                         <div class="form-check form-check-inline">
                             <input class="form-check-input" type="radio" name="rcvdOnTime" id="rcvdOnTime1" value="1"
                                 required>
@@ -296,7 +308,7 @@
                     <div class="form-group col-12 text-center">
                         <div><label class="font-weight-bold">Did you receieve your book in the condition listed by the
                                 seller?</label></div>
-                        <div id="sellerCondition" class="text-primary pb-1"></div>
+                        <div id="sellerCondition" class="text-primary-bs pb-1"></div>
                         <div class="form-check form-check-inline">
                             <input class="form-check-input" type="radio" name="conditionMatched" id="conditionMatched1"
                                 value="1" required>
@@ -328,9 +340,9 @@
                     <div class="form-row pl-1 text-center">
                         <button type="button" class="btn btn-secondary btn-sm col-5 mr-1"
                             data-dismiss="modal">Cancel</button>
-                        <a type="submit" class="btn btn-primary btn-sm col-6" id="newSurveyBtn"
+                        <a class="btn btn-primary-bs btn-sm col-6" id="newSurveyBtn"
                             onclick="javascript:submitSurvey('true')">Complete Survey</a>
-                        <a type="submit" class="btn btn-primary btn-sm col-6 d-none edit-only" id="editSurveyBtn"
+                        <a class="btn btn-primary-bs btn-sm col-6 d-none edit-only" id="editSurveyBtn"
                             onclick="javascript:submitSurvey('false')">Edit Survey</a>
                     </div>
                 </form>
@@ -342,7 +354,7 @@
 <div class="modal fade" tabindex="-1" role="dialog" id="historyModal">
     <div class="modal-dialog modal-sm">
         <div class="modal-content">
-            <div class="modal-header bg-info text-white text-center">
+            <div class="modal-header bg-med-bs text-center">
                 <h6 class="modal-title">Swap Status History</h6>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
@@ -369,7 +381,7 @@
 <div class="modal fade" tabindex="-1" role="dialog" id="addressModal">
     <div class="modal-dialog modal-sm">
         <div class="modal-content">
-            <div class="modal-header bg-info text-white">
+            <div class="modal-header bg-med-bs text-center">
                 <h5 class="modal-title">Address Info</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
