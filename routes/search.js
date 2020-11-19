@@ -80,7 +80,9 @@ function allBooks(id, callback){
                     isbn: result[i].isbn,
                     userPoints: userPoints
                 }
-                books.push(new Book(data));           
+               
+                books.push(new Book(data));
+                           
             }
             payload.books = books;
             
@@ -112,7 +114,7 @@ router.post('/', common.isAuthenticated, (req, res, next) => {
             })
         }else {
             // add a new transaction record
-            db.pool.query('INSERT INTO Transactions (userBookId, requestorId, statusId, pointCost, created, modified) VALUES (?, ?, ?, ?, ?, ?)', [id, userId, 1, 5, date, date], (err,result) => {
+            db.pool.query('INSERT INTO Transactions (userBookId, requestorId, statusId, sellerPoints, buyerPoints, created, modified) VALUES (?, ?, ?, ?, ?, ?, ?)', [id, userId, 1, 4, 4, date, date], (err,result) => {
                 if (err) {
                     allBooks( userId, function(result){
                         var  payload = result;
@@ -154,5 +156,86 @@ router.post('/', common.isAuthenticated, (req, res, next) => {
         }
     });
 });
+
+
+
+// Get books that meet search terms
+
+function bookResults(id, terms, callback){
+    
+    
+    var selectBooks = `SELECT UserBooks.id AS id, title AS title, author AS author, imgUrl AS imgUrl, isbn13 AS isbn, Users.country
+                                 FROM UserBooks
+                                 INNER JOIN Books ON Books.id = UserBooks.bookId
+                                 INNER JOIN Users ON Users.id = UserBooks.userId
+                                 WHERE UserBooks.userId != ? AND UserBooks.available = 1 AND Users.worldwide = 1 AND (Books.title = ? OR Books.author = ? OR Books.genre = ?)
+                                 UNION
+                                 SELECT UserBooks.id AS id, title AS title, author AS author, imgUrl AS imgUrl, isbn13 AS isbn, Users.country
+                                 FROM UserBooks
+                                 INNER JOIN Books ON Books.id = UserBooks.bookId
+                                 INNER JOIN Users ON Users.id = UserBooks.userId
+                                 WHERE UserBooks.userId != ? AND UserBooks.available = 1 AND Users.country = ? AND (Books.title = ? OR Books.author = ? OR Books.genre = ?)`;
+
+    var selectUserCountry = `SELECT Users.country AS country, Users.points AS userPoints
+                            FROM Users
+                            WHERE Users.id = ?`
+    const userId = id;
+
+   
+    var payload = { title: 'Available Books'};
+    var books = [];
+    db.pool.query(selectUserCountry, [userId], (err,result) =>{
+        if(err){
+            next(err);
+            return
+        }
+        var country = result[0].country;
+        var userPoints = result[0].userPoints;
+        var terms = terms;
+        db.pool.query(selectBooks, [userId, terms, terms, terms, userId, country, terms, terms, terms], (err, result) => {
+            if (err) {
+                // update error handling
+                next(err);
+                return;
+            }
+            var number = result.length;
+            // ********* need to update the point value
+            var points; 
+             
+            for (let i = 0; i < number; i++) {
+                points = 2;
+                if(country != result[i].country){
+                    points = 4;
+                }
+                var data = {
+                    id: result[i].id,
+                    title: result[i].title,
+                    author: result[i].author,
+                    imgUrl: result[i].imgUrl,
+                    pointcost: points,
+                    isbn: result[i].isbn,
+                    userPoints: userPoints
+                }
+               
+                books.push(new Book(data));
+                           
+            }
+            payload.books = books;
+            
+            return callback(payload);
+        })
+    })
+}
+
+// @route   GET /results
+// @desc    Get all books that match search terms
+router.get('/results/', common.isAuthenticated, (req, res, next) => {
+   
+    bookResults(req.session.userId, req.query.terms, function(result){
+        
+        var payload = result;
+        res.render('search', payload);
+    })
+})
 
 module.exports = router;
