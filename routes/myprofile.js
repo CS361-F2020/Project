@@ -25,23 +25,42 @@ const getTransactionInfo = `SELECT  userBookId AS sentBook, requestorId AS recei
                             OR Transactions.requestorId = ?`;
 const updateAboutMe = `UPDATE Users SET aboutMe=? WHERE id=?`;
 
+// work around function for async
+function count(res, payload, counter, num){
+    if(counter == num){
+        res.render('myprofile', payload);
+    }
+}
+
 // @route   GET /myprofile
 // @desc    Get current users profile
 router.get('/', common.isAuthenticated, (req, res, next) => {
     const userId = req.session.userId;
     var payload = {};
-    var user = [];
+    payload.pendingPoints = 0;
+    payload.user;
     var sentBooks = 0;
     var receivedBooks = 0;
+    var counter = 0;
+
+    // get users pending points
+    common.getPendingPoints(userId, function(result){
+        payload.pendingPoints = result;
+        counter++;
+        count(res, payload, counter, 3);
+    })
+    // get user info
     db.pool.query(selectUserinfo, [userId], (err, result) => {
         if (err) {
             next(err);
             return;
         } else {
-            user.push(new User(result[0].firstName, result[0].lastName, result[0].city, result[0].state, result[0].country, result[0].aboutMe, result[0].points, result[0].booksReceived));
-            payload.user = user;
-            
+            payload.user = new User(result[0].firstName, result[0].lastName, result[0].city, result[0].state, result[0].country, result[0].aboutMe, result[0].points, result[0].booksReceived);
+            counter++;
+            count(res, payload, counter, 3);            
         }
+    })
+    // get transaction record
     db.pool.query(getTransactionInfo, [userId, userId], (err, tranResult) => {
         if (err) {
             next(err);
@@ -53,11 +72,9 @@ router.get('/', common.isAuthenticated, (req, res, next) => {
             }
             payload.sentBooks = sentBooks;
             payload.receivedBooks = receivedBooks;
-            res.render('myprofile', payload);
+            counter++;
+            count(res, payload, counter, 3);
         }
-    })
-     
-
     })
 });
 
