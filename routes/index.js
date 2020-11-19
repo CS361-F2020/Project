@@ -23,6 +23,11 @@ router.get('/', (req, res, next) =>{
     res.redirect('/search')
 })
 
+router.get('/faq', common.isAuthenticated, (req,res,next) => {
+    var data = { title: 'Frequently Asked Questions '}
+    res.render('faq', data);
+})
+
 router.get('/home', common.isAuthenticated, (req, res, next) =>{
     var data = { title: 'Home' }
     res.redirect('/search')

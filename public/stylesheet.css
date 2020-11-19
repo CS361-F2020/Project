@@ -102,7 +102,7 @@
 }
 
 .header-text {
-    color: #2A403D
+    color: #2A403D !important;
 }
 
 .link-bs, .link-bs:hover {
@@ -143,6 +143,7 @@
 
 .text-primary-bs-bold {
     color: #748B6F;
+    font-weight: bold;
 }
 
 /* secondary */
