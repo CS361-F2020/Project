@@ -64,7 +64,5 @@ function bookDetails(isbn, pointCost, userPoints){
                 console.log(textstatus)
                 alert('Error occured while retrieving book')
             }
-        })
-    
-    
+        })  
 }
