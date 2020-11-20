@@ -18,6 +18,28 @@ function Account(firstName, lastName, email, address, city, state, postalCode, c
     this.aboutMe = aboutMe
 }
 
+function Book(userBookId, bookId, swap, title, imgUrl) {
+    this.userBookId = userBookId;
+    this.bookId = bookId;
+    this.swap = swap
+    this.title = title;
+    this.imgUrl = imgUrl;
+}
+
+//MOVE THIS BEFORE PR, PROBABLY 
+const selectUserinfo = `SELECT firstName AS firstName, lastName AS lastName, city AS city, state AS state, country AS country, aboutMe AS aboutMe,  points AS points
+                        FROM Users
+                        WHERE Users.id = ?`;
+const getTransactionInfo = `SELECT  userBookId AS sentBook, requestorId AS receivedBook, rating AS rating
+                            FROM Transactions
+                            WHERE Transactions.userBookId = ?
+                            OR Transactions.requestorId = ?`;
+
+//might need to consult andrew on grabbing titles from this, not sure if one query is sufficient
+const selectAllBooks = `SELECT UserBooks.id AS userBookId, Books.id AS bookId, available AS swap, listingDate AS date, Books.title AS title, Books.imgUrl AS imgUrl
+                        FROM UserBooks
+                        INNER JOIN Books ON Books.id = UserBooks.bookId
+                        WHERE UserBooks.userId = ?`;
 
 router.get('/', (req, res, next) =>{
     res.redirect('/search')
@@ -376,4 +398,51 @@ router.get('/getAddress/(:id)', common.isAuthenticated, (req, res, next) => {
     })
 })
 
+router.get('/profile/:userId', common.isAuthenticated, (req, res, next) => {
+    var userId = req.params.userId;
+    var payload = {};
+    payload.user;
+    var library = [];
+    var sentBooks = 0;
+    var receivedBooks = 0;
+
+    sql.pool.query(selectUserinfo, [userId], (err, result) => {
+        if (err) {
+            next(err);
+            return;
+        } else {
+            payload.user = new Account(result[0].firstName, result[0].lastName, "", "", result[0].city, result[0].state, "", result[0].country, "", result[0].aboutMe);        
+        }
+        // get transaction record
+        sql.pool.query(getTransactionInfo, [userId, userId], (err, tranResult) => {
+            if (err) {
+                next(err);
+                return;
+            } else {
+                for(let i = 0; i < tranResult.length; i++) {
+                    if (tranResult[i].sentBook == userId) { sentBooks++; }
+                    else if (tranResult[i].receivedBook == userId) { receivedBooks++; }  
+                }
+                payload.sentBooks = sentBooks;
+                payload.receivedBooks = receivedBooks;
+                
+            }
+            //get library
+            sql.pool.query(selectAllBooks, [userId], (err, libResult) => {
+                if (err) {
+                    req.flash('error', 'Error retrieving all books. Try refreshing your page.')
+                    res.render('myLibrary')
+                }
+                for (let i = 0; i < libResult.length; i++) {
+                    if (libResult[i].swap != 0) {
+                    library.push(new Book(libResult[i].userBookId, libResult[i].bookId, libResult[i].swap, libResult[i].title, libResult[i].imgUrl));
+                    }
+                }
+                payload.library = library;
+                res.render('profile', payload);
+            })
+            //get wishlist if implemented. 
+        })
+    })
+})
 module.exports = router
