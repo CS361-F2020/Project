@@ -17,14 +17,10 @@ function Book(data) {
 // @route   GET /allBooks
 // @desc    Get all available books that don't belong to the user and are not undergoing transactions
 router.get('/', common.isAuthenticated, (req, res, next) => {
-    allBooks( req.session.userId, function(result){
+    allBooks(req.session.userId, function(result) {
         var payload = result;
         res.render('search', payload);
     })
-})
-
-router.get('/pointsFAQ', common.isAuthenticated, (req,res,next) => {
-    res.render('pointsFAQ');
 })
 
 // Get all avaialable books
@@ -134,20 +130,13 @@ router.post('/', common.isAuthenticated, (req, res, next) => {
                         // send an email to the seller that a book has been requested
                         // **** update text or maybe use html
                         var message = {
-                            // from: 'bookswap@gmail.com',
                             to: req.session.email,
                             subject: 'Book Request',
                             text: 'You have a new request for ' + title
                         }
                         common.transport.sendMail(message);
-                        // send response
-                        // allBooks( userId, function(result){
-                        //     var  payload = result;
-                        //     req.flash('success', 'Book has been requested from seller');
-                        //     res.render('search', payload);
-                        // })
                 
-                        res.json({success: true});
+                        res.send({success: true});
                     });
                 }
             });

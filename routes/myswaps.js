@@ -255,8 +255,10 @@ router.post('/survey/submit', (req, res, next) => {
 router.get('/survey/(:id)', common.isAuthenticated, (req, res, next) => {
     var getSurvey = 'SELECT t.rcvdOnTime, t.conditionMatched, t.rating, t.created, c.description as cond\
     FROM Transactions t\
-    INNER JOIN Conditions ON t.conditionId = c.id\
-    WHERE id = ?'
+    INNER JOIN UserBooks ub ON t.userBookId = ub.id\
+    INNER JOIN Conditions c ON ub.conditionId = c.id\
+    WHERE t.id = ?'
+    console.log(req.params.id)
     sql.pool.query(getSurvey, [req.params.id], (err, results) => {
         if (err || results.length == 0) {
             return res.send({ error: 'Error occurred while getting survey' })

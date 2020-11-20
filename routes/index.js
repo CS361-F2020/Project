@@ -23,9 +23,9 @@ router.get('/', (req, res, next) =>{
     res.redirect('/search')
 })
 
-router.get('/home', common.isAuthenticated, (req, res, next) =>{
-    var data = { title: 'Home' }
-    res.redirect('/search')
+router.get('/faq', common.isAuthenticated, (req,res,next) => {
+    var data = { title: 'Frequently Asked Questions '}
+    res.render('faq', data);
 })
 
 router.get('/login', (req, res, next) =>{
@@ -33,7 +33,7 @@ router.get('/login', (req, res, next) =>{
         var data = { title: 'Login' }
         res.render('auth/login', data)
     } else {
-        res.redirect('/home')
+        res.redirect('/')
     }
 })
 
@@ -75,7 +75,7 @@ router.post('/login', (req, res, next) =>{
                             }
                             else
                             {
-                                res.redirect('/home')
+                                res.redirect('/')
                             }          
                         }
                     }
@@ -140,7 +140,7 @@ router.post('/resetpassword', common.isAuthenticated, (req, res, next) =>{
                                             } else {
                                                 req.session.tempPassword = false
                                                 req.flash('success', 'Password reset was successful!')
-                                                res.redirect('/home')
+                                                res.redirect('/')
                                             }
                                         })
                                 }
@@ -267,7 +267,7 @@ router.post('/register', (req, res, next) =>{
                                         req.session.user = results[0].firstName + " " + results[0].lastName
                                         req.session.email = results[0].email
                                         req.session.userId = results[0].id
-                                        res.redirect('/home')
+                                        res.redirect('/')
                                         
                                     }
                                 })
@@ -309,9 +309,8 @@ router.get('/updateaccount', common.isAuthenticated, (req, res, next) => {
                 res.render('/auth/updateaccount', data)
             }
         } else {
-            data.push(new Account(results[0].firstName, results[0].lastName, results[0].email, results[0].address, results[0].city, results[0].state, results[0].postalCode, results[0].country, results[0].worldwide, results[0].aboutMe));
+            payload.user = new Account(results[0].firstName, results[0].lastName, results[0].email, results[0].address, results[0].city, results[0].state, results[0].postalCode, results[0].country, results[0].worldwide, results[0].aboutMe);
         }
-        payload.data = data;
         res.render('auth/updateaccount', payload);
     });
 })
