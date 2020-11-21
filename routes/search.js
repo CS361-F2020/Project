@@ -42,8 +42,11 @@ function allBooks(id, callback){
                             FROM Users
                             WHERE Users.id = ?`
     const userId = id;
-    var payload = { title: 'Available Books'};
-    var books = [];
+    var payload = { 
+        title: 'Available Books',
+        books: [],
+    };
+    
     db.pool.query(selectUserCountry, [userId], (err,result) =>{
         if(err){
             next(err);
@@ -61,7 +64,6 @@ function allBooks(id, callback){
             var number = result.length;
             // ********* need to update the point value
             var points; 
-             
             for (let i = 0; i < number; i++) {
                 points = 2;
                 if(country != result[i].country){
@@ -76,16 +78,12 @@ function allBooks(id, callback){
                     isbn: result[i].isbn,
                     userPoints: userPoints
                 }
-                books.push(new Book(data));           
-            }
-            payload.books = books;
-            
+                payload.books.push(new Book(data));           
+            }     
             return callback(payload);
         })
     })
 }
-
-       
 
 
 // @route   POST /home
