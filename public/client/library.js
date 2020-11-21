@@ -36,22 +36,29 @@ function clickRemove(userBookId, title) {
 
 // remove a book from user mylibrary
 function remove(userBookId) {
-    var data = { 'userBookId': userBookId };
-    var req = new XMLHttpRequest();
-    req.open("DELETE", url, true);
-    req.setRequestHeader("Content-Type", "application/json");
-    req.send(JSON.stringify(data));
-    req.addEventListener('load', () => {
-        // remove the book by bookid from the page
-        if (JSON.parse(req.response).delete == true) {
-            var book = document.getElementById(userBookId);
-            book.parentNode.removeChild(book);
-            // update the modal to a sucsess... or some other type of alert
-            $('#pageModal').modal('hide')
-        } else {
-            // update the modal to an error msg
+    $.ajax({
+        url: '/mylibrary',
+        method: 'DELETE',
+        dataType: 'json',
+        data: JSON.stringify({ 'userBookId': userBookId }),
+        contentType: "application/json",
+        success: function (res) {
+            // if response contains an error, display in error alert
+            if (res.error) {
+                $('#modal-alert-error').removeClass('d-none').text(res.error)
+            } 
+            // if success, hide the modal, redirect and display message
+            else
+            {
+                $('#pageModal').modal('hide')
+                location.reload()
+            } 
+        },
+        error: function (jqXHR, textstatus, errorThrown) {
+            console.log(textstatus)
+            alert('Error occured while adding book')
         }
-    });
+    })
 };
 
 function clearSearch() {
