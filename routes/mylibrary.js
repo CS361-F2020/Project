@@ -12,28 +12,24 @@ function Book(userBookId, bookId, swap, title, imgUrl) {
     this.imgUrl = imgUrl;
 }
 
-// Queries
-const selectAllBooks = `SELECT UserBooks.id AS userBookId, Books.id AS bookId, available AS swap, listingDate AS date, Books.title AS title, Books.imgUrl AS imgUrl
-                        FROM UserBooks
-                        INNER JOIN Books ON Books.id = UserBooks.bookId
-                        WHERE UserBooks.userId = ?`;
-const deleteUserBook = 'DELETE FROM UserBooks WHERE id = ?';
-// get book by title 
-var selectAllTitles = 'SELECT isbn13, title FROM Books ORDER BY title'
-var selectAllConditions = 'SELECT id, description FROM Conditions ORDER BY id'
-
 // @route   GET /mylibrary
 // @desc    Get current users mylibrary
 router.get('/', common.isAuthenticated, (req, res, next) => {
     const userId = req.session.userId;
-    var payload = { 
-        title: 'My Library', 
+    var payload = {
+        title: 'My Library',
         library: [],
         titles: [],
         conditions: [],
         avail: 0,
-        rcvd: 0 };
-
+        rcvd: 0
+    };
+    var selectAllBooks = `SELECT UserBooks.id AS userBookId, Books.id AS bookId, available AS swap, listingDate AS date, Books.title AS title, Books.imgUrl AS imgUrl
+                        FROM UserBooks
+                        INNER JOIN Books ON Books.id = UserBooks.bookId
+                        WHERE UserBooks.userId = ?`
+    var selectAllConditions = 'SELECT id, description FROM Conditions ORDER BY id'
+    var selectAllTitles = 'SELECT isbn13, title FROM Books ORDER BY title'
     sql.pool.query(selectAllBooks, [userId], (err, result) => {
         if (err) {
             req.flash('error', 'Error retrieving all books. Try refreshing your page.')
@@ -73,14 +69,15 @@ router.get('/', common.isAuthenticated, (req, res, next) => {
 // @desc    Removing a book from a user library
 router.delete('/', (req, res, next) => {
     var { userBookId } = req.body;
+    var deleteUserBook = 'DELETE FROM UserBooks WHERE id = ?'
     sql.pool.query(deleteUserBook, [userBookId], (err, result) => {
         if (err) {
             console.log(err)
             res.send({ error: 'Error removing your book. Try refreshing your page.' })
-        }else if(result){
+        } else if (result) {
             req.flash('success', 'A book has been removed from your library!')
             res.send({ success: 'success' })
-        }        
+        }
     })
 });
 
