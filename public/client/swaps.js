@@ -22,7 +22,7 @@ $(document).ready(function () {
     // on load of the page: switch to the currently selected tab
     var hash = window.location.hash;
     $('#swapTabs a[href="' + hash + '"]').tab('show');
-});
+})
 
 function viewHistory(id) {
     console.log(id)
@@ -48,18 +48,32 @@ function viewHistory(id) {
 
 $('#surveyModal').on('hidden.bs.modal', function (e) {
     $('#surveyForm').trigger("reset")
+    $('input:radio[name=rcvdOnTime]').attr('disabled', false)
+    $('input:radio[name=conditionMatched]').attr('disabled', false)
+    $('input:radio[name=star]').attr('disabled', false)
+    $('#newSurveyBtn').removeClass('d-none')
+    $('#editSurveyBtn').addClass('d-none')
 })
 
 $('#swapTabs a').click(function (e) {
     e.preventDefault();
     $(this).tab('show');
-});
+})
 
 // store the currently selected tab in the hash value
 $("ul.nav-tabs > li > a").on("shown.bs.tab", function (e) {
     var id = $(e.target).attr("href").substr(1);
     window.location.hash = id;
-});
+})
+
+$('.survey_modal').click(function (e) {
+    var id = $(this).attr('data-id')
+    var condition = $(this).attr('data-condition')
+    var created = $(this).attr('data-created')
+    $('#surveyId').val(id)
+    $('#requestDate').text('Request made on: ' + created)
+    $('#sellerCondition').text('Seller listed condition: ' + condition)
+})
 
 function updateStatus(id, newStatusId, title) {
     // create alert message based on status
@@ -79,7 +93,7 @@ function updateStatus(id, newStatusId, title) {
         message = 'Please confirm you want to cancel the request you made for ' + title + '.\n\nThis will make the book available to other users.'
     }
     else if (newStatusId == 7) {
-        message = 'Please confirm you want to mark the book ' + title + ' as lost.\n\nThis will cause the seller to lose points on this swap.\nIf you are unsure, we recommend contacting the seller before selecting this option.'
+        message = 'Please confirm you want to mark the book ' + title + ' as lost.\n\nYou will still receive half of your points and this will count towards your 2 lost book limit for this year.'
     }
 
     // if the user confirms, continue with update
@@ -117,29 +131,59 @@ function updateStatus(id, newStatusId, title) {
     }
 }
 
-function closeSwap(id, statusId, title, points) {
+function notReceived(id, title) {
+    var message = 'Please confirm you are marking this book as not received.\nThe seller will be notified and may be able to provide more details on the shipping status.\nIf you do receive the book, please remember to come back and mark as received!'
+
+    if (confirm(message)) {
+        var data = {
+            id: id
+        }
+
+        $.ajax({
+            url: 'myswaps/notReceived',
+            method: 'POST',
+            dataType: 'json',
+            data: JSON.stringify(data),
+            contentType: "application/json",
+            success: function (res) {
+                // if response contains an error, display in error alert
+                if (res.error) {
+                    $('#alert-error').removeClass('d-none').text(res.error)
+                }
+                // if success, reload the page
+                else {
+                    location.reload()
+                }
+            },
+            error: function (jqXHR, textstatus, errorThrown) {
+                console.log(textstatus)
+                alert('Error occured while updating status')
+            }
+        })
+    }
+}
+
+function closeSwap(id, statusId, title) {
     //create alert message based on status
     var message = 'Please confirm you want to finalize the swap for ' + title + '.\n\n'
     if (statusId == 4) {
-        message += 'The requestor has marked this book as received.\nYou will receive ' + points + ' once this swap is closed.'
+        message += 'The requestor has marked this book as received.\nYour points will be made available once this swap is closed.'
+    }
+    else if (statusId == 5) {
+        message += 'The seller has rejected your request for this book.\nBy closing this swap, you are confirming you understand you will not receive this book.\nAll pending points will be made available immediately.'
     }
     else if (statusId == 6) {
         message += 'This swap has been cancelled by the requestor.\nYou will not receive any points for this swap.'
     }
     else if (statusId == 7) {
-        message += 'The requestor has marked this book as lost.\nBy closing this swap you are confirming the book was lost during shipping and you will not receive any points for this swap.\nAll pending points will be made available immediately.'
-    }
-    else if (statusId == 5) {
-        message += 'The seller has rejected your request for this book.\nBy closing this swap, you are confirming you understand you will not receive this book.\nAll pending points will be made available immediately.'
-        message = 'Please confirm you want to cancel the request you made for ' + title + '.\n\nThis will make the book available to other users.'
+        message += 'The seller has marked this book as lost.\nBy closing this swap you are confirming the book was lost during shipping.\nYou will not be charged for this swap.'
     }
 
     // if the user confirms, continue with close
     if (confirm(message)) {
         var data = {
             id: id,
-            statusId: statusId,
-            points: points
+            statusId: statusId
         }
 
         $.ajax({
@@ -170,7 +214,7 @@ function closeSwap(id, statusId, title, points) {
     }
 }
 
-function submitSurvey() {
+function submitSurvey(isNew) {
     // serialize array
     var formArray = $('#surveyForm').serializeArray()
     var formData = {}
@@ -179,9 +223,12 @@ function submitSurvey() {
         function (i, v) {
             formData[v.name] = v.value
         })
+    
+    formData.id = $('#surveyId').val()
+    formData.isNew = isNew
 
     $.ajax({
-        url: '/myswaps/survey',
+        url: '/myswaps/survey/submit',
         method: 'POST',
         dataType: 'json',
         data: JSON.stringify(formData),
@@ -189,17 +236,88 @@ function submitSurvey() {
         success: function (res) {
             // if response contains an error, display in error alert
             if (res.error) {
-                $('#modal-alert-error').removeClass('d-none').text(res.error)
+                $('#survey-modal-alert-error').removeClass('d-none').text(res.error)
             }
             // if success, hide the modal, redirect and reload page
             else {
                 $('#surveyModal').modal('hide')
+                //$('#alert-success').removeClass('d-none').text(res.success)
                 location.reload()
             }
         },
         error: function (jqXHR, textstatus, errorThrown) {
             console.log(textstatus)
-            alert('Error occured while adding book')
+            alert('Error occured while submitting survey')
+        }
+    })
+}
+
+function viewSurvey(id, title, readOnly)
+{
+    $.ajax({
+        url: '/myswaps/survey/' + id,
+        method: 'GET',
+        dataType: 'json',
+        success: function (res) {
+            // if response contains an error, display in error alert
+            if (res.error) {
+                $('#alert-error').removeClass('d-none').text(res.error)
+            } 
+            // if no error or message, populate fields with address info
+            else {
+                $('#surveyTitle').text('Survey for ' + title)
+                $('#requestDate').text('Request made on: ' + res.created)
+                $('#sellerCondition').text('Seller listed condition: ' + res.condition)
+                $("input[name='surveyid']").val(id)
+                $('input:radio[name=rcvdOnTime]').val([res.rcvdOnTime])
+                $('input:radio[name=conditionMatched]').val([res.conditionMatched])
+                $('input:radio[name=star]').val([res.star])
+                $('#newSurveyBtn').addClass('d-none')
+                $('#editSurveyBtn').removeClass('d-none')
+
+                if (readOnly == 1)
+                {
+                    $('input:radio[name=rcvdOnTime]').attr('disabled', true)
+                    $('input:radio[name=conditionMatched]').attr('disabled', true)
+                    $('input:radio[name=star]').attr('disabled', true)
+                    $('#newSurveyBtn').addClass('d-none')
+                    $('#editSurveyBtn').addClass('d-none')
+                }
+
+                $('#surveyModal').modal('show')
+            }
+        },
+        error: function (jqXHR, textstatus, errorThrown) {
+            console.log(textstatus)
+            alert('Error occured while retrieving survey')
+        }
+    })
+}
+
+function getAddress(userId)
+{
+    $.ajax({
+        url: '/getaddress/' + userId,
+        method: 'GET',
+        dataType: 'json',
+        success: function (res) {
+            // if response contains an error, display in error alert
+            if (res.error) {
+                $('#alert-error').removeClass('d-none').text(res.error)
+            } 
+            // if no error or message, populate fields with address info
+            else {
+                $("#name").text(res.fullName)
+                $("#address").text(res.address)
+                $("#address2").text(res.address2)
+                $("#country").text('Country: ' + res.country)
+
+                $('#addressModal').modal('show')
+            }
+        },
+        error: function (jqXHR, textstatus, errorThrown) {
+            console.log(textstatus)
+            alert('Error occured while getting address')
         }
     })
 }

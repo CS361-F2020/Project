@@ -18,15 +18,36 @@ function Account(firstName, lastName, email, address, city, state, postalCode, c
     this.aboutMe = aboutMe
 }
 
+function Book(userBookId, bookId, swap, title, imgUrl) {
+    this.userBookId = userBookId;
+    this.bookId = bookId;
+    this.swap = swap
+    this.title = title;
+    this.imgUrl = imgUrl;
+}
+
+//MOVE THIS BEFORE PR, PROBABLY 
+const selectUserinfo = `SELECT firstName AS firstName, lastName AS lastName, city AS city, state AS state, country AS country, aboutMe AS aboutMe,  points AS points
+                        FROM Users
+                        WHERE Users.id = ?`;
+const getTransactionInfo = `SELECT  userBookId AS sentBook, requestorId AS receivedBook, rating AS rating
+                            FROM Transactions
+                            WHERE Transactions.userBookId = ?
+                            OR Transactions.requestorId = ?`;
+
+//might need to consult andrew on grabbing titles from this, not sure if one query is sufficient
+const selectAllBooks = `SELECT UserBooks.id AS userBookId, Books.id AS bookId, available AS swap, listingDate AS date, Books.title AS title, Books.imgUrl AS imgUrl
+                        FROM UserBooks
+                        INNER JOIN Books ON Books.id = UserBooks.bookId
+                        WHERE UserBooks.userId = ?`;
 
 router.get('/', (req, res, next) =>{
     res.redirect('/search')
 })
 
-router.get('/home', common.isAuthenticated, (req, res, next) =>{
-    var data = { title: 'Home' }
-    res.redirect('/search') // redirect to the search page
-    // res.render('home', data)
+router.get('/faq', common.isAuthenticated, (req,res,next) => {
+    var data = { title: 'Frequently Asked Questions '}
+    res.render('faq', data);
 })
 
 router.get('/login', (req, res, next) =>{
@@ -34,7 +55,7 @@ router.get('/login', (req, res, next) =>{
         var data = { title: 'Login' }
         res.render('auth/login', data)
     } else {
-        res.redirect('/home')
+        res.redirect('/')
     }
 })
 
@@ -70,7 +91,14 @@ router.post('/login', (req, res, next) =>{
                         if (results[0].tempPassword) {
                             res.redirect('/resetpassword')
                         } else {
-                            res.redirect('/home')
+                            if (req.session.path)
+                            {
+                                res.redirect(req.session.path)
+                            }
+                            else
+                            {
+                                res.redirect('/')
+                            }          
                         }
                     }
                 })
@@ -134,7 +162,7 @@ router.post('/resetpassword', common.isAuthenticated, (req, res, next) =>{
                                             } else {
                                                 req.session.tempPassword = false
                                                 req.flash('success', 'Password reset was successful!')
-                                                res.redirect('/home')
+                                                res.redirect('/')
                                             }
                                         })
                                 }
@@ -261,7 +289,7 @@ router.post('/register', (req, res, next) =>{
                                         req.session.user = results[0].firstName + " " + results[0].lastName
                                         req.session.email = results[0].email
                                         req.session.userId = results[0].id
-                                        res.redirect('/home')
+                                        res.redirect('/')
                                         
                                     }
                                 })
@@ -303,17 +331,15 @@ router.get('/updateaccount', common.isAuthenticated, (req, res, next) => {
                 res.render('/auth/updateaccount', data)
             }
         } else {
-            data.push(new Account(results[0].firstName, results[0].lastName, results[0].email, results[0].address, results[0].city, results[0].state, results[0].postalCode, results[0].country, results[0].worldwide, results[0].aboutMe));
+            payload.user = new Account(results[0].firstName, results[0].lastName, results[0].email, results[0].address, results[0].city, results[0].state, results[0].postalCode, results[0].country, results[0].worldwide, results[0].aboutMe);
         }
-        payload.data = data;
         res.render('auth/updateaccount', payload);
     });
 })
 
 router.post('/updateaccount', common.isAuthenticated, (req, res, next) => {
-    var data = {
-        title: 'Update Account Settings',
-        userId: req.session.userId,
+    var payload = { title : 'Update Account Settings' }
+    var response = {
         firstName: req.body.firstName,
         lastName: req.body.lastName,
         email: req.body.email,
@@ -325,21 +351,98 @@ router.post('/updateaccount', common.isAuthenticated, (req, res, next) => {
         worldwide: req.body.worldwide,
         aboutMe: req.body.aboutMe
     }
-    sql.pool.query('UPDATE Users SET firstName=?, lastName=?, email=?, address=?, city=?, state=?, postalCode=?, country=?, worldwide=?, aboutMe=? WHERE id=?',
-    [data.firstName, data.lastName, data.email, data.address, data.city, data.state, data.postalCode, data.country, data.worldwide, data.aboutMe, data.userId],
+    sql.pool.query('SELECT id, email FROM Users WHERE email=?', [response.email],
     (err, results) => {
-        if (err) {
-            req.flash('error', err)
-            res.render('auth/updateaccount', data)
+        if (results.length != 0 && results[0].id != req.session.userId) {
+            req.flash("error", "This email is already associated with another account")
+            data = [];
+            data.push(new Account(response.firstName, response.lastName, "", response.address, response.city, response.state, response.postalCode, response.country, response.worldwide, response.aboutMe));
+            payload.data = data;
+            res.render('auth/updateaccount', payload);  
         } else {
-            //put alert on screen saying that the information was successfully updated. Reset session data in case anything changed
-            req.session.user = data.firstName + " " + data.lastName
-            req.session.email = data.email
-            req.session.userId = data.userId
-            req.flash('success', 'Account Details Successfully Updated');
-            res.redirect('/preferences');
+            sql.pool.query('UPDATE Users SET ? WHERE id=?', [response, req.session.userId],
+            (err, results) => {
+                if (err) {
+                    req.flash('error', err)
+                    res.render('auth/updateaccount', response)
+                } else {
+                    //put alert on screen saying that the information was successfully updated. Reset session data in case anything changed
+                    req.session.user = response.firstName + " " + response.lastName
+                    req.session.email = response.email
+                    response.title = 'Update Account Settings'
+                    req.flash('success', 'Account Details Successfully Updated');
+                    res.redirect('/myprofile');
+                }
+            })
         }
     })
 })
 
+router.get('/getAddress/(:id)', common.isAuthenticated, (req, res, next) => {
+    var getAddress = 'SELECT firstName, lastName, address, city, state, postalCode, country FROM Users WHERE id = ?'
+    sql.pool.query(getAddress, [req.params.id], (err, results) => {
+        if (err || results.length == 0)
+        {
+            res.send({ error: 'Error retrieving buyer address. Please try again.' })
+        }
+
+        var result = results[0]
+        var data = {
+            fullName: result.firstName + ' ' + result.lastName,
+            address: result.address,
+            address2: result.city + ', ' + result.state + ' ' + result.postalCode,
+            country: result.country
+        }
+
+        res.send(data)
+    })
+})
+
+router.get('/profile/:userId', common.isAuthenticated, (req, res, next) => {
+    var userId = req.params.userId;
+    var payload = {};
+    payload.user;
+    var library = [];
+    var sentBooks = 0;
+    var receivedBooks = 0;
+
+    sql.pool.query(selectUserinfo, [userId], (err, result) => {
+        if (err) {
+            next(err);
+            return;
+        } else {
+            payload.user = new Account(result[0].firstName, result[0].lastName, "", "", result[0].city, result[0].state, "", result[0].country, "", result[0].aboutMe);        
+        }
+        // get transaction record
+        sql.pool.query(getTransactionInfo, [userId, userId], (err, tranResult) => {
+            if (err) {
+                next(err);
+                return;
+            } else {
+                for(let i = 0; i < tranResult.length; i++) {
+                    if (tranResult[i].sentBook == userId) { sentBooks++; }
+                    else if (tranResult[i].receivedBook == userId) { receivedBooks++; }  
+                }
+                payload.sentBooks = sentBooks;
+                payload.receivedBooks = receivedBooks;
+                
+            }
+            //get library
+            sql.pool.query(selectAllBooks, [userId], (err, libResult) => {
+                if (err) {
+                    req.flash('error', 'Error retrieving all books. Try refreshing your page.')
+                    res.render('myLibrary')
+                }
+                for (let i = 0; i < libResult.length; i++) {
+                    if (libResult[i].swap != 0) {
+                    library.push(new Book(libResult[i].userBookId, libResult[i].bookId, libResult[i].swap, libResult[i].title, libResult[i].imgUrl));
+                    }
+                }
+                payload.library = library;
+                res.render('profile', payload);
+            })
+            //get wishlist if implemented. 
+        })
+    })
+})
 module.exports = router

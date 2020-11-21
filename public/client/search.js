@@ -9,6 +9,7 @@ function requestBook(bookId, pointCost, title, userPoints){
         
         modalBody.innerHTML = `Are you sure you want this book?: <br> <b>"${title}"</b>`
         var confirmButton = document.getElementById('confirmButton');
+        //title was previously surrounded in single quotes
         confirmButton.setAttribute("onclick", `request(${bookId}, ${pointCost}, "${title}")`);
         // toogle modal
         $("#pageModal").modal("toggle");
@@ -63,8 +64,5 @@ function bookDetails(isbn, pointCost){
                 console.log(textstatus)
                 alert('Error occured while retrieving book')
             }
-        })
-    
-    
+        })  
 }
-
