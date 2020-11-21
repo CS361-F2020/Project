@@ -3,6 +3,9 @@ const router = express.Router()
 const sql = require('../dbcon.js')
 const common = require('../common')
 
+// global variables
+var today = new Date()
+
 // Book object
 function Book(userBookId, bookId, swap, title, imgUrl) {
     this.userBookId = userBookId;
@@ -12,65 +15,134 @@ function Book(userBookId, bookId, swap, title, imgUrl) {
     this.imgUrl = imgUrl;
 }
 
-// Queries
-const selectAllBooks = `SELECT UserBooks.id AS userBookId, Books.id AS bookId, available AS swap, listingDate AS date, Books.title AS title, Books.imgUrl AS imgUrl
-                        FROM UserBooks
-                        INNER JOIN Books ON Books.id = UserBooks.bookId
-                        WHERE UserBooks.userId = ?`;
-const deleteUserBook = 'DELETE FROM UserBooks WHERE id = ?';
-// get book by title 
-var selectAllTitles = 'SELECT isbn13, title FROM Books ORDER BY title'
-var selectAllConditions = 'SELECT id, description FROM Conditions ORDER BY id'
+// Full Book Object
+function BookFull(data)
+{
+    this.title = data.title,
+    this.author = data.author,
+    this.genre =  data.genre,
+    this.language = data.language,
+    this.imgUrl = data.imgUrl,
+    this.rating = data.rating,
+    this.pubDate = data.pubDate,
+    this.pageCount = data.pageCount,
+    this.isbn10 = data.isbn10,
+    this.isbn13 = data.isbn13
+}
+
+// Adds a new book to the user's library (only use if bookExists returns false)
+function addNewBookToLibrary(book, conditionId, userId, callback)
+{
+    var query = 'INSERT INTO Books SET ?'
+    sql.pool.query(query, [book], (err, result) => {
+        if (err) {
+            return callback(err, false)
+        }
+
+        addUserBook(userId, result.insertId, conditionId, (err) => {
+            if (err) {
+                return callback(err, false)
+            }
+
+            common.updateUserPoints(userId, 1, (err) => {
+                if (err) {
+                    return callback(err, false)
+                }
+
+                return callback('', true)
+            })
+        })
+    })
+}
+
+// Add existing book to user's library (must have an existing book id to use this!)
+function addExistingBookToLibrary(bookId, conditionId, userId, callback)
+{
+    addUserBook(userId, bookId, conditionId, (err) => {
+        if (err) {
+            return callback(err, false)
+        }
+
+        common.updateUserPoints(userId, 1, (err) => {
+            if (err) {
+                return callback(err, false)
+            }
+
+            return callback('', true)
+        })
+    })
+}
+
+// Add record to UserBooks table
+function addUserBook(userId, bookId, conditionId, callback)
+{
+    var userBook = { 
+        userId: userId, 
+        bookId: bookId , 
+        conditionId: conditionId,
+        listingDate: today,
+        available: true
+    }
+
+    var query = 'INSERT INTO UserBooks SET ?'
+    sql.pool.query(query, [userBook], (err) => {
+        if (err) {
+            return callback(err, false)
+        }
+        return callback('', true)
+    })
+}
 
 // @route   GET /mylibrary
 // @desc    Get current users mylibrary
 router.get('/', common.isAuthenticated, (req, res, next) => {
     const userId = req.session.userId;
-    var payload = { title: 'My Library' };
-    var library = [];
-    var titles = [];
-    var conditions = [];
-    var avail = 0;
-    var rcvd = 0;
+    var payload = {
+        title: 'My Library',
+        library: [],
+        titles: [],
+        conditions: [],
+        avail: 0,
+        rcvd: 0
+    };
+    var selectAllBooks = `SELECT UserBooks.id AS userBookId, Books.id AS bookId, available AS swap, listingDate AS date, Books.title AS title, Books.imgUrl AS imgUrl
+                        FROM UserBooks
+                        INNER JOIN Books ON Books.id = UserBooks.bookId
+                        WHERE UserBooks.userId = ?`
+    var selectAllConditions = 'SELECT id, description FROM Conditions ORDER BY id'
+    var selectAllTitles = 'SELECT isbn13, title FROM Books ORDER BY title'
     sql.pool.query(selectAllBooks, [userId], (err, result) => {
         if (err) {
             req.flash('error', 'Error retrieving all books. Try refreshing your page.')
             res.render('myLibrary')
         }
         for (let i = 0; i < result.length; i++) {
-            library.push(new Book(result[i].userBookId, result[i].bookId, result[i].swap, result[i].title, result[i].imgUrl));
+            payload.library.push(new Book(result[i].userBookId, result[i].bookId, result[i].swap, result[i].title, result[i].imgUrl));
             if (result[i].swap == 0) {
-                rcvd++;
+                payload.rcvd++;
             } else {
-                avail++;
+                payload.avail++;
             }
         }
-        payload.library = library;
-        payload.avail = avail;
-        payload.rcvd = rcvd;
-        payload.title = 'My Library'
         sql.pool.query(selectAllTitles, [], (err, result) => {
             if (err) {
                 req.flash('error', 'Error retrieving book by title.')
                 res.render('myLibrary', payload)
             }
             for (let i = 0; i < result.length; i++) {
-                titles.push({ id: result[i].isbn13, label: result[i].title });
+                payload.titles.push({ id: result[i].isbn13, label: result[i].title });
             }
-            payload.titles = titles;
             sql.pool.query(selectAllConditions, [], (err, result) => {
                 if (err) {
                     req.flash('error', 'Error retrieving book by condition.')
                     res.render('myLibrary', payload)
                 }
                 for (let i = 0; i < result.length; i++) {
-                    conditions.push({ id: result[i].id, label: result[i].description });
+                    payload.conditions.push({ id: result[i].id, label: result[i].description });
                 }
-                payload.conditions = conditions
                 res.render('mylibrary', payload);
             })
         })
-
     })
 });
 
@@ -78,116 +150,56 @@ router.get('/', common.isAuthenticated, (req, res, next) => {
 // @desc    Removing a book from a user library
 router.delete('/', (req, res, next) => {
     var { userBookId } = req.body;
+    var deleteUserBook = 'DELETE FROM UserBooks WHERE id = ?'
     sql.pool.query(deleteUserBook, [userBookId], (err, result) => {
         if (err) {
-            // fix error handeling with flash response?
-            next(err);
-            return;
+            console.log(err)
+            res.send({ error: 'Error removing your book. Try refreshing your page.' })
+        } else if (result) {
+            req.flash('success', 'A book has been removed from your library!')
+            res.send({ success: 'success' })
         }
-        res.json({ 'delete': true });
     })
 });
 
-router.post('/add', (req, res, next) => {
-    var formData = {
-        title: req.body.title,
-        author: req.body.author,
-        genre: req.body.genre,
-        language: req.body.language,
-        imgUrl: req.body.imgUrl,
-        rating: req.body.rating,
-        pubDate: req.body.pubDate,
-        pageCount: req.body.pageCount,
-        isbn10: req.body.isbn10,
-        isbn13: req.body.isbn13
-    }
-    var isbn = formData.isbn13
-    var defaultErrorMessage = 'Error in adding book. Please try again later.'
+router.post('/add', (req, res) => {
+    var errorMsg = 'Error while trying to add book. Please try again or contact support at bookswaphelpdesk@gmail.com'
+    var successMsg = req.body.title + ' has been added to your library!'
 
-    var userBook = {
-        userId: req.session.userId,
-        bookId: 0,
-        conditionId: req.body.conditionId,
-        listingDate: new Date(),
-        available: true
-    }
-
-    // Check if book already exists
-    sql.pool.query('SELECT * FROM Books WHERE isbn10 = ? OR isbn13 = ?', [isbn, isbn],
-        function (err, rows) {
-            if (err) {
-                console.log(err)
-                res.send({ error: defaultErrorMessage })
-            }
-            else if (rows.length == 0) {
-                // if does not exist, insert book
-                sql.pool.query('INSERT INTO Books SET ?', [formData],
-                    function (err, result) {
-                        if (err) {
-                            console.log(err)
-                            res.send({ error: defaultErrorMessage })
-                        }
-                        else {
-                            // insert record into user book using insert id
-                            userBook.bookId = result.insertId
-                            sql.pool.query('INSERT INTO UserBooks SET ?', [userBook],
-                                function (err, rows) {
-                                    if (err) {
-                                        console.log(err)
-                                        res.send({ error: defaultErrorMessage })
-                                    }
-                                    else {
-                                        //add points for adding book 
-                                        sql.pool.query('UPDATE Users SET points = points + 1 WHERE id = ?', [req.session.userId],
-                                            function (err, rows) {
-                                                if (err) {
-                                                    console.log(err)
-                                                    res.send({ error: defaultErrorMessage })
-                                                }
-                                                // send success message after insert
-                                                req.flash('success', req.body.title + ' has been added to your library!')
-                                                res.send({ success: 'success' })
-                                            })
-                                    }
-                                })
-                        }
-                    })
-            } else {
-                // if exists, get book id from table
-                sql.pool.query('SELECT id FROM Books WHERE isbn10 = ? OR isbn13 = ?', [isbn, isbn],
-                    function (err, rows) {
-                        if (err) {
-                            console.log(err)
-                            res.send({ error: defaultErrorMessage })
-                        }
-                        else {
-                            // insert record for user books using existing book id
-                            userBook.bookId = rows[0].id
-                            sql.pool.query('INSERT INTO UserBooks SET ?', [userBook],
-                                function (err, rows) {
-                                    if (err) {
-                                        console.log(err)
-                                        res.send({ error: defaultErrorMessage })
-                                    }
-                                    else {
-                                        //add points for adding book 
-                                        sql.pool.query('UPDATE Users SET points = points + 1 WHERE id = ?', [req.session.userId],
-                                            function (err, rows) {
-                                                if (err) {
-                                                    console.log(err)
-                                                    res.send({ error: defaultErrorMessage })
-                                                }
-                                                // send success message after insert
-                                                req.flash('success', req.body.title + ' has been added to your library!')
-                                                res.send({ success: 'success' })
-                                            })
-
-                                    }
-                                })
-                        }
-                    })
-            }
-        })
+    common.bookExists(req.body.isbn13, (err, exists, bookId) => {
+        if (err)
+        {
+            console.log(err)
+            return res.send({ error: errorMsg})
+        }
+        else if (exists == false)
+        {
+            var bookDetails = new BookFull(req.body)
+            addNewBookToLibrary(bookDetails, req.body.conditionId, req.session.userId, (err, success) => {
+                if (success == false) {
+                    console.log(err)
+                    return res.send({ error: err })
+                }
+                req.flash('success', successMsg)
+                return res.send({ success: 'success' })
+            })
+        }
+        else 
+        {
+            addExistingBookToLibrary(bookId, req.body.conditionId, req.session.userId, (err, success) => {
+                if (success == false)
+                {
+                    console.log(err)
+                    return res.send({ error: err })
+                }
+                req.flash('success', successMsg)
+                return res.send({ success: 'success'})
+            })
+        }
+    })
 })
+
+
+
 
 module.exports = router;

@@ -2,6 +2,7 @@ const nodemailer = require('nodemailer')
 const sql = require('./dbcon.js');
 
 
+
 var transport = nodemailer.createTransport({
     host: 'smtp.gmail.com',
     port: 465,
@@ -57,10 +58,40 @@ function getPendingPoints(userId, callback) {
     })
 }
 
+// Update a user's point total
+function updateUserPoints(userId, pointAdj, callback)
+{
+    var query = 'UPDATE Users SET points = points + ? WHERE id = ?'
+    sql.pool.query(query, [pointAdj, userId], (err) => {
+        if (err) {
+            return callback(err, false)
+        }
+        return callback('', true)
+    })
+}
+
+// Checks if book exists already based on isbn
+function bookExists(isbn, callback) {
+    var query = 'SELECT id FROM Books WHERE isbn10 = ? OR isbn13 = ?'
+    sql.pool.query(query, [isbn, isbn], (err, result) => {
+        if (err) {
+            return callback(err, '', 0)
+        }
+        else if (result.length == 0) {
+            return callback('', false, 0)
+        }
+        else {
+            return callback('', true, result[0].id)
+        }
+    })
+}
+
 module.exports = {
     isAuthenticated,
-    getPendingPoints,
     transport,
-    getPoints
+    getPoints,
+    getPendingPoints,
+    updateUserPoints,
+    bookExists
 }
 
