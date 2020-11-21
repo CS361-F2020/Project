@@ -23,8 +23,8 @@ router.get('/', common.isAuthenticated, (req, res, next) => {
     })
 })
 
-router.get('/pointsFAQ', common.isAuthenticated, (req,res,next) => {
-    res.render('pointsFAQ');
+router.get('/faq', common.isAuthenticated, (req,res,next) => {
+    res.render('faq');
 })
 
 // Get all avaialable books
