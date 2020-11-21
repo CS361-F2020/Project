@@ -12,65 +12,56 @@ function Book(userBookId, bookId, swap, title, imgUrl) {
     this.imgUrl = imgUrl;
 }
 
-// Queries
-const selectAllBooks = `SELECT UserBooks.id AS userBookId, Books.id AS bookId, available AS swap, listingDate AS date, Books.title AS title, Books.imgUrl AS imgUrl
-                        FROM UserBooks
-                        INNER JOIN Books ON Books.id = UserBooks.bookId
-                        WHERE UserBooks.userId = ?`;
-const deleteUserBook = 'DELETE FROM UserBooks WHERE id = ?';
-// get book by title 
-var selectAllTitles = 'SELECT isbn13, title FROM Books ORDER BY title'
-var selectAllConditions = 'SELECT id, description FROM Conditions ORDER BY id'
-
 // @route   GET /mylibrary
 // @desc    Get current users mylibrary
 router.get('/', common.isAuthenticated, (req, res, next) => {
     const userId = req.session.userId;
-    var payload = { title: 'My Library' };
-    var library = [];
-    var titles = [];
-    var conditions = [];
-    var avail = 0;
-    var rcvd = 0;
+    var payload = {
+        title: 'My Library',
+        library: [],
+        titles: [],
+        conditions: [],
+        avail: 0,
+        rcvd: 0
+    };
+    var selectAllBooks = `SELECT UserBooks.id AS userBookId, Books.id AS bookId, available AS swap, listingDate AS date, Books.title AS title, Books.imgUrl AS imgUrl
+                        FROM UserBooks
+                        INNER JOIN Books ON Books.id = UserBooks.bookId
+                        WHERE UserBooks.userId = ?`
+    var selectAllConditions = 'SELECT id, description FROM Conditions ORDER BY id'
+    var selectAllTitles = 'SELECT isbn13, title FROM Books ORDER BY title'
     sql.pool.query(selectAllBooks, [userId], (err, result) => {
         if (err) {
             req.flash('error', 'Error retrieving all books. Try refreshing your page.')
             res.render('myLibrary')
         }
         for (let i = 0; i < result.length; i++) {
-            library.push(new Book(result[i].userBookId, result[i].bookId, result[i].swap, result[i].title, result[i].imgUrl));
+            payload.library.push(new Book(result[i].userBookId, result[i].bookId, result[i].swap, result[i].title, result[i].imgUrl));
             if (result[i].swap == 0) {
-                rcvd++;
+                payload.rcvd++;
             } else {
-                avail++;
+                payload.avail++;
             }
         }
-        payload.library = library;
-        payload.avail = avail;
-        payload.rcvd = rcvd;
-        payload.title = 'My Library'
         sql.pool.query(selectAllTitles, [], (err, result) => {
             if (err) {
                 req.flash('error', 'Error retrieving book by title.')
                 res.render('myLibrary', payload)
             }
             for (let i = 0; i < result.length; i++) {
-                titles.push({ id: result[i].isbn13, label: result[i].title });
+                payload.titles.push({ id: result[i].isbn13, label: result[i].title });
             }
-            payload.titles = titles;
             sql.pool.query(selectAllConditions, [], (err, result) => {
                 if (err) {
                     req.flash('error', 'Error retrieving book by condition.')
                     res.render('myLibrary', payload)
                 }
                 for (let i = 0; i < result.length; i++) {
-                    conditions.push({ id: result[i].id, label: result[i].description });
+                    payload.conditions.push({ id: result[i].id, label: result[i].description });
                 }
-                payload.conditions = conditions
                 res.render('mylibrary', payload);
             })
         })
-
     })
 });
 
@@ -78,13 +69,15 @@ router.get('/', common.isAuthenticated, (req, res, next) => {
 // @desc    Removing a book from a user library
 router.delete('/', (req, res, next) => {
     var { userBookId } = req.body;
+    var deleteUserBook = 'DELETE FROM UserBooks WHERE id = ?'
     sql.pool.query(deleteUserBook, [userBookId], (err, result) => {
         if (err) {
-            // fix error handeling with flash response?
-            next(err);
-            return;
+            console.log(err)
+            res.send({ error: 'Error removing your book. Try refreshing your page.' })
+        } else if (result) {
+            req.flash('success', 'A book has been removed from your library!')
+            res.send({ success: 'success' })
         }
-        res.json({ 'delete': true });
     })
 });
 

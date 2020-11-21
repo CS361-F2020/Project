@@ -76,7 +76,7 @@
     </div>
 </div>
 
-<!-- Modal -->
+<!-- Remove Book Modal -->
 <div class="modal fade" id="pageModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -87,6 +87,8 @@
                 </button>
             </div>
             <div class="modal-body" id="modalBody">
+                <div class="alert alert-danger d-none" role="alert" id="modal-alert-error"></div>
+                <div class="alert alert-info d-none" role="alert" id="modal-alert-info"></div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
@@ -119,7 +121,6 @@
                                 placeholder="ISBN-10 or ISBN-13" autocomplete="off" required>
                         </div>
                     </div>
-                    <!--Search by Title-->
                     <div class="form-row" id="titleselect">
                         <div class="form-group col-12">
                             <select class="form-control" id="titleid" onchange="javascript:populateISBN()"
