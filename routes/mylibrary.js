@@ -18,9 +18,8 @@ const selectAllBooks = `SELECT UserBooks.id AS userBookId, Books.id AS bookId, a
                         INNER JOIN Books ON Books.id = UserBooks.bookId
                         WHERE UserBooks.userId = ?`;
 const deleteUserBook = 'DELETE FROM UserBooks WHERE id = ?';
-// get book by title 
-var selectAllTitles = 'SELECT isbn13, title FROM Books ORDER BY title'
-var selectAllConditions = 'SELECT id, description FROM Conditions ORDER BY id'
+const selectAllTitles = 'SELECT isbn13, title FROM Books ORDER BY title'
+const selectAllConditions = 'SELECT id, description FROM Conditions ORDER BY id'
 
 // @route   GET /mylibrary
 // @desc    Get current users mylibrary
