@@ -31,6 +31,16 @@ handlebars.handlebars.registerHelper('ifEquals', function(arg1, arg2, options){
     return (arg1 == arg2) ? options.fn(this) : options.inverse(this);
 })
 
+handlebars.handlebars.registerHelper("select", function(value, options) {
+    return options.fn(this)
+      .split('\n')
+      .map(function(v) {
+        var t = 'value="' + value + '"'
+        return ! RegExp(t).test(v) ? v : v.replace(t, t + ' selected="selected"')
+      })
+      .join('\n')
+  })
+
 // Routes
 app.use('/', require('./routes/index.js'))
 app.use('/googleapi', require('./routes/googleapi.js'))
