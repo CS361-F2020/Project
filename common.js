@@ -40,11 +40,11 @@ function getPoints(userId, callback) {
 function getPendingPoints(userId, callback) {
     var outgoing = `SELECT SUM(u.points) AS totalPoints
     FROM 
-    (SELECT (SUM(Transactions.pointCost) * -1) AS points 
-    FROM Transactions 
+    (SELECT SUM(t.buyerPoints) AS points 
+    FROM Transactions t
     WHERE requestorId = ? AND statusId <> 8 
     UNION 
-    SELECT SUM(t.pointCost) AS points 
+    SELECT SUM(t.sellerPoints) AS points 
     FROM Transactions t 
         INNER JOIN UserBooks ub on ub.id = t.userBookId 
     WHERE ub.userId = ? AND statusId <> 8) AS u`
@@ -59,8 +59,7 @@ function getPendingPoints(userId, callback) {
 }
 
 // Update a user's point total
-function updateUserPoints(userId, pointAdj, callback)
-{
+function updateUserPoints(userId, pointAdj, callback) {
     var query = 'UPDATE Users SET points = points + ? WHERE id = ?'
     sql.pool.query(query, [pointAdj, userId], (err) => {
         if (err) {
