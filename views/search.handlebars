@@ -12,28 +12,43 @@
         </div>
         <div class = "row">
                 <div class = "col-auto pr-0">
-                            <form action = "/search/results/" class="form-inline my-2 my-lg-0 ml-auto" method = "GET">
-                    <input class="form-control form-control-sm small mr-sm-2" type="search" placeholder="Search"
-                        aria-label="Search" name = "terms">
-                   
-                    <button class="btn btn-outline-primary-bs" href="/search">Reset</button>
+                    <form action = "/search/results/" class="form-inline my-2 my-lg-0 ml-auto" method = "GET">
+                        <input class="form-control form-control-sm small mr-sm-2" type="text" placeholder="Search"
+                            aria-label="Search" name = "terms">
+                        <button class="btn btn-outline-primary-bs" href="/search">Reset</button>
                     </form>
+                </div>
+                <div class = "col-auto pr-0">
+                    <input type="text" id="myFilter" class="form-control" onkeyup="filterSearchResults()" placeholder="Enter terms and filter by...">
+                </div>
+                <div class = "col-auto pr-0">
+                    <select id="mySelect"  class="form-inline my-2 my-lg-0 ml-auto" name="mySelect">
+                        <option value="genre">Genre</option>
+                        <option value="author">Author</option>
+                        <option value="title">Title</option>
+                        <option value="rating">Rating</option>
+                        <option value="pubDate">Publication Date (YYYY-MM-DD)</option>
+                    </select>
                     
                 </div>
+
         </div>
 
         <div class="card-columns">
             
         </div>
-        <div class="row">
-            
+        
+        <div class="row" id = "myItems">
             {{#each books}}
             <div id="{{id}}"
                 class="card cards border rounded bg-light p-3 col-xl-2 col-lg-3 col-md-3 col-sm-4 col-5 mr-3 mb-3">
                 <img src="{{imgUrl}}" class="card-img-top cover-art pb-1">
                 <div class="card-body px-0 pt-1 pb-1 text-center">
-                    <p class="card-text mb-0">{{title}}</p>
-                    <p class="card-text">{{author}}</p>
+                    <p class="card-text mb-0 card-title">{{title}}</p>
+                    <p class="card-text mb-0 card-author">{{author}}</p>
+                    <p class="card-text mb-0 card-genre" hidden>{{genre}}</p>
+                    <p class="card-text mb-0 card-rating" hidden>{{rating}}</p>
+                    <p class="card-text mb-0 card-pubdate" hidden>{{pubDate}}</p>
                 </div>
                 <button class="btn btn-small small btn-info-bs mb-1" onclick = "bookDetails('{{isbn}}', {{pointcost}})">View Details</button>
                 <button class="btn btn-primary-bs btn-small small"
@@ -215,5 +230,7 @@
         </div>
     </div>
 </div>
+
+
 
 <script src="/client/search.js"></script>

@@ -66,3 +66,37 @@ function bookDetails(isbn, pointCost){
             }
         })  
 }
+
+function filterSearchResults() {
+    var input, filter, cards, cardContainer, p, title, i;
+    input = document.getElementById("myFilter");
+    filter = input.value.toUpperCase();
+    cardContainer = document.getElementById("myItems");
+    cards = cardContainer.getElementsByClassName("card");
+    var selection = document.getElementById("mySelect").selectedIndex;
+    switch(selection){
+        case 0:
+            text = ".card-body p.card-genre";
+            break;
+        case 1:
+            text = ".card-body p.card-author";
+            break;
+        case 2:
+            text = ".card-body p.card-title";
+            break;
+        case 3:
+            text = ".card-body p.card-rating";
+            break;
+        case 4:
+            text = ".card-body p.card-pubdate";
+            break;
+    }
+    for (i = 0; i < cards.length; i++) {
+        title = cards[i].querySelector(text);
+        if (title.innerText.toUpperCase().indexOf(filter) > -1) {
+            cards[i].style.display = "";
+        } else {
+            cards[i].style.display = "none";
+        }
+    }
+}
