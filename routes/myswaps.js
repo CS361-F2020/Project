@@ -87,37 +87,30 @@ router.post('/updateStatus', (req, res, next) => {
     var updateTransaction = 'UPDATE Transactions SET statusId = ?, modified = ? WHERE id = ?'
     var transactionStatuses = 'INSERT INTO TransactionStatusDates (transactionId, statusId, date) VALUES (?, ?, ?)'
     var updateAvailable = 'UPDATE UserBooks SET available = 1 WHERE id = (SELECT userBookId FROM Transactions WHERE id = ?)'
-
     var formData = req.body
-
     // update transaction record status and modified date
     sql.pool.query(updateTransaction, [formData.statusId, today, formData.id],
         (err, results) => {
             if (err) {
                 return res.send({ error: 'Error occurred when trying to update status. Please try again.' })
             }
-
             // add record to transaction status history
             sql.pool.query(transactionStatuses, [formData.id, formData.statusId, today],
                 (err, results) => {
                     if (err) {
                         return res.send({ error: 'Error occured when trying to update status history.' })
                     }
-
                     // if status is cancelled or rejected, make available immediately
                     if (formData.statusId == 5 || formData.statusId == 6) {
                         sql.pool.query(updateAvailable, [formData.id], (err, results) => {
                             if (err) {
                                 return res.send({ error: 'Error occurred when trying to make book available. Please contact support at bookswaphelpdesk@gmail.com' })
                             }
-
-                            res.send({ success: 'success' })
                         })
                     }
-
-                    res.send({ success: 'success' })
                 })
         })
+        return res.send({ success: 'success'})
 })
 
 router.post('/close', (req, res, next) => {
