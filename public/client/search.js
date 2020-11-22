@@ -53,8 +53,6 @@ function bookDetails(isbn, pointCost){
                 $("#detailLanguage").text(res.language)
                 $("#detailPointCost").text(pointCost)
                 $("#detailRating").text(res.rating)
-                //need to turn this into a button
-                //$("#detailGoogleLink").text(res.googleLink)
                 $("#detailDescription").text(res.description)
                
                 $("#detailModal").modal("show");
@@ -67,33 +65,36 @@ function bookDetails(isbn, pointCost){
         })  
 }
 
-function filterSearchResults() {
+function searchResults() {
     var input, filter, cards, cardContainer, p, title, i;
     input = document.getElementById("myFilter");
     filter = input.value.toUpperCase();
     cardContainer = document.getElementById("myItems");
     cards = cardContainer.getElementsByClassName("card");
-    var selection = document.getElementById("mySelect").selectedIndex;
-    switch(selection){
-        case 0:
-            text = ".card-body p.card-genre";
-            break;
-        case 1:
-            text = ".card-body p.card-author";
-            break;
-        case 2:
-            text = ".card-body p.card-title";
-            break;
-        case 3:
-            text = ".card-body p.card-rating";
-            break;
-        case 4:
-            text = ".card-body p.card-pubdate";
-            break;
-    }
+  
+    genreText = ".card-body p.card-genre";
+
+    authorText = ".card-body p.card-author";
+
+    titleText = ".card-body p.card-title";
+    
+    ratingText = ".card-body p.card-rating";
+
+    pubDateText = ".card-body p.card-pubdate";
+           
+    
     for (i = 0; i < cards.length; i++) {
-        title = cards[i].querySelector(text);
-        if (title.innerText.toUpperCase().indexOf(filter) > -1) {
+        genre = cards[i].querySelector(genreText);
+        author = cards[i].querySelector(authorText);
+        title = cards[i].querySelector(titleText);
+        rating = cards[i].querySelector(ratingText);
+        pubDate = cards[i].querySelector(pubDateText);
+        if ((genre.innerText.toUpperCase().indexOf(filter) > -1) ||
+            (author.innerText.toUpperCase().indexOf(filter) > -1) ||
+            (title.innerText.toUpperCase().indexOf(filter) > -1) ||
+            (rating.innerText.toUpperCase().indexOf(filter) > -1) ||
+            (pubDate.innerText.toUpperCase().indexOf(filter) > -1)) 
+        {
             cards[i].style.display = "";
         } else {
             cards[i].style.display = "none";

@@ -16,6 +16,16 @@ function Book(data) {
     this.pubDate = data.pubDate;
     this.userPoints = data.userPoints;
 }
+
+//Glenn: I was testing out character removal with this function. 
+//I think it works a little better than the one from the stack overflow post provided the other day
+//maybe a good candidate for handling characters?
+function replaceCharacters(userText) {
+    var regExpr = /[^a-zA-Z0-9-. ]/g;
+    
+    return userText.replace(regExpr, "");
+}
+
         
 // @route   GET /allBooks
 // @desc    Get all available books that don't belong to the user and are not undergoing transactions
@@ -154,85 +164,5 @@ router.post('/', common.isAuthenticated, (req, res, next) => {
 
 
 
-// Get books that meet search terms
-
-function bookResults(id, terms, callback){
-    
-    
-    var selectBooks = `SELECT UserBooks.id AS id, title AS title, author AS author, imgUrl AS imgUrl, isbn13 AS isbn, genre AS genre, rating AS rating, pubDate AS pubDate, Users.country
-                                 FROM UserBooks
-                                 INNER JOIN Books ON Books.id = UserBooks.bookId
-                                 INNER JOIN Users ON Users.id = UserBooks.userId
-                                 WHERE UserBooks.userId != ? AND UserBooks.available = 1 AND Users.worldwide = 1 AND (title LIKE ? OR author LIKE ? OR genre LIKE ?)
-                                 UNION
-                                 SELECT UserBooks.id AS id, title AS title, author AS author, imgUrl AS imgUrl, isbn13 AS isbn, genre AS genre, rating AS rating, pubDate AS pubDate, Users.country
-                                 FROM UserBooks
-                                 INNER JOIN Books ON Books.id = UserBooks.bookId
-                                 INNER JOIN Users ON Users.id = UserBooks.userId
-                                 WHERE UserBooks.userId != ? AND UserBooks.available = 1 AND Users.country = ? AND (title LIKE ? OR author LIKE ? OR genre LIKE ?)`;
-
-    var selectUserCountry = `SELECT Users.country AS country, Users.points AS userPoints
-                            FROM Users
-                            WHERE Users.id = ?`
-    const userId = id;
-
-    var terms = "%" + terms + "%";
-    var payload = { title: 'Available Books',
-                    books: [],
-    };
-    
-    db.pool.query(selectUserCountry, [userId], (err,result) =>{
-        if(err){
-            next(err);
-            return
-        }
-        var country = result[0].country;
-        var userPoints = result[0].userPoints;
-
-        db.pool.query(selectBooks, [userId, terms, terms, terms, userId, country, terms, terms, terms], (err, result) => {
-            if (err) {
-                // update error handling
-                next(err);
-                return;
-            }
-            var number = result.length;
-            // ********* need to update the point value
-            var points; 
-             
-            for (let i = 0; i < number; i++) {
-                points = 2;
-                if(country != result[i].country){
-                    points = 4;
-                }
-                var data = {
-                    id: result[i].id,
-                    title: result[i].title,
-                    author: result[i].author,
-                    imgUrl: result[i].imgUrl,
-                    pointcost: points,
-                    isbn: result[i].isbn,
-                    genre: result[i].genre,
-                    rating: result[i].rating,
-                    pubDate: result[i].pubDate,
-                    userPoints: userPoints
-                }
-                payload.books.push(new Book(data));          
-            }
-            return callback(payload);
-        })
-    })
-}
-
-// @route   GET /results
-// @desc    Get all books that match search terms
-router.get('/results/', common.isAuthenticated, (req, res, next) => {
-
-    bookResults(req.session.userId, req.query.terms, function(result){
-        
-        var payload = result;
-        
-        res.render('search', payload);
-    })
-})
 
 module.exports = router;

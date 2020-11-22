@@ -12,30 +12,12 @@
         </div>
         <div class = "row">
                 <div class = "col-auto pr-0">
-                    <form action = "/search/results/" class="form-inline my-2 my-lg-0 ml-auto" method = "GET">
-                        <input class="form-control form-control-sm small mr-sm-2" type="text" placeholder="Search"
-                            aria-label="Search" name = "terms">
-                        <button class="btn btn-outline-primary-bs" href="/search">Reset</button>
-                    </form>
+                    <input type="text" id="myFilter" class="form-control" onkeyup="searchResults()" placeholder="Enter terms">
                 </div>
-                <div class = "col-auto pr-0">
-                    <input type="text" id="myFilter" class="form-control" onkeyup="filterSearchResults()" placeholder="Enter terms and filter by...">
-                </div>
-                <div class = "col-auto pr-0">
-                    <select id="mySelect"  class="form-inline my-2 my-lg-0 ml-auto" name="mySelect">
-                        <option value="genre">Genre</option>
-                        <option value="author">Author</option>
-                        <option value="title">Title</option>
-                        <option value="rating">Rating</option>
-                        <option value="pubDate">Publication Date (YYYY-MM-DD)</option>
-                    </select>
-                    
-                </div>
-
         </div>
 
         <div class="card-columns">
-            
+
         </div>
         
         <div class="row" id = "myItems">
@@ -115,11 +97,6 @@
                     <h8>Rating</h8>
                 </b><br>
                 <p id="detailRating"></p>
-                <!-- need to add this in later
-                <b><h8>Google Link</h8></b><br>
-                <p id = "detailGoogleLink"></p>
-                -->
-                <b>
                     <h8>Description</h8>
                 </b><br>
                 <p id="detailDescription"></p>
@@ -187,10 +164,6 @@
                 <p id = "detailPointCost"></p>
                 <b><h8>Rating</h8></b><br>
                 <p id = "detailRating"></p>
-                <!-- need to add this in later
-                <b><h8>Google Link</h8></b><br>
-                <p id = "detailGoogleLink"></p>
-                -->
                 <b><h8>Description</h8></b><br>
                 <p id = "detailDescription"></p>
                 
