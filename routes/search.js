@@ -159,13 +159,13 @@ router.post('/', common.isAuthenticated, (req, res, next) => {
 function bookResults(id, terms, callback){
     
     
-    var selectBooks = `SELECT UserBooks.id AS id, title AS title, author AS author, imgUrl AS imgUrl, isbn13 AS isbn, Users.country
+    var selectBooks = `SELECT UserBooks.id AS id, title AS title, author AS author, imgUrl AS imgUrl, isbn13 AS isbn, genre AS genre, rating AS rating, pubDate AS pubDate, Users.country
                                  FROM UserBooks
                                  INNER JOIN Books ON Books.id = UserBooks.bookId
                                  INNER JOIN Users ON Users.id = UserBooks.userId
                                  WHERE UserBooks.userId != ? AND UserBooks.available = 1 AND Users.worldwide = 1 AND (title LIKE ? OR author LIKE ? OR genre LIKE ?)
                                  UNION
-                                 SELECT UserBooks.id AS id, title AS title, author AS author, imgUrl AS imgUrl, isbn13 AS isbn, Users.country
+                                 SELECT UserBooks.id AS id, title AS title, author AS author, imgUrl AS imgUrl, isbn13 AS isbn, genre AS genre, rating AS rating, pubDate AS pubDate, Users.country
                                  FROM UserBooks
                                  INNER JOIN Books ON Books.id = UserBooks.bookId
                                  INNER JOIN Users ON Users.id = UserBooks.userId
@@ -177,8 +177,10 @@ function bookResults(id, terms, callback){
     const userId = id;
 
     var terms = "%" + terms + "%";
-    var payload = { title: 'Available Books'};
-    var books = [];
+    var payload = { title: 'Available Books',
+                    books: [],
+    };
+    
     db.pool.query(selectUserCountry, [userId], (err,result) =>{
         if(err){
             next(err);
@@ -186,8 +188,7 @@ function bookResults(id, terms, callback){
         }
         var country = result[0].country;
         var userPoints = result[0].userPoints;
-        
-       
+
         db.pool.query(selectBooks, [userId, terms, terms, terms, userId, country, terms, terms, terms], (err, result) => {
             if (err) {
                 // update error handling
@@ -210,14 +211,13 @@ function bookResults(id, terms, callback){
                     imgUrl: result[i].imgUrl,
                     pointcost: points,
                     isbn: result[i].isbn,
+                    genre: result[i].genre,
+                    rating: result[i].rating,
+                    pubDate: result[i].pubDate,
                     userPoints: userPoints
                 }
-               
-                books.push(new Book(data));
-                           
+                payload.books.push(new Book(data));          
             }
-            payload.books = books;
-            
             return callback(payload);
         })
     })
