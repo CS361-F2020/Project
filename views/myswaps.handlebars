@@ -251,12 +251,12 @@
 
                                 <td class="pl-4 col-auto text-center">
                                     {{#ifEquals category "R"}}
-                                    <i class="far fa-user fa-lg pr-2 text-secondary-bs"
-                                        title="View Recipient's Profile"></i>
+                                    <a href="/profile/{{userId}}" target="_blank"> <i class="far fa-user fa-lg pr-2 text-secondary-bs"
+                                        title="View Recipient's Profile"></i></a>           
                                     {{/ifEquals}}
                                     {{#ifEquals category "S"}}
-                                    <i class="far fa-user fa-lg pr-2 text-secondary-bs"
-                                        title="View Seller's Profile"></i>
+                                    <a href="/profile/{{userId}}" target="_blank"><i class="far fa-user fa-lg pr-2 text-secondary-bs"
+                                        title="View Seller's Profile"></i></a>
                                     {{/ifEquals}}
                                     <i class="far fa-file-alt fa-lg pr-2 text-info-bs" title="View Swap Details"
                                         onclick="javascript:viewHistory({{id}})"></i>
