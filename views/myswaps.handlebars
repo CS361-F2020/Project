@@ -171,7 +171,7 @@
                                             class="fas fa-book fa-lg text-primary-bs" title="Mark as Received"></i></a>
                                     {{#ifEquals lost "0"}}
                                     <i class="far fa-times-circle fa-lg text-danger-bs" title="Mark as Not Received"
-                                        onclick="javacript:updateStatus({{id}}, 7, '{{{jsTitle}}}')"></i>
+                                        onclick="javacript:notReceived({{id}}, '{{{jsTitle}}}')"></i>
                                     {{/ifEquals}}
                                 </td>
                                 {{/ifEquals}}
@@ -180,7 +180,7 @@
                                 <td class="pl-4 col-auto text-center">
                                     <i class="fas fa-user-clock fa-lg text-info-bs"
                                         title="We are waiting for the seller to close this swap."></i>
-                                    <i class="fas fa-star fa-lg btn-warning-bs btn" title="Edit Your Survey"
+                                    <i class="fas fa-star fa-lg text-warning-bs" title="Edit Your Survey"
                                         onclick="javascript:viewSurvey({{id}}, '{{{jsTitle}}}', 0)"></i>
                                 </td>
                                 {{/ifEquals}}
