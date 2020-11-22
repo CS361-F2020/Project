@@ -81,4 +81,5 @@ router.post('/', common.isAuthenticated, (req, res, next) => {
         }
     });
 });
+
 module.exports = router;
