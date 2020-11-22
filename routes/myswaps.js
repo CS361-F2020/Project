@@ -26,6 +26,41 @@ function TransactionDb(data) {
         this.lost = data.lost
 }
 
+function TransactionDbClose(data) {
+    if (data.statusId == 5 || data.statusId == 6)
+    {
+        this.buyerPoints = 0
+        this.sellerPoints = 0
+    }
+    else if (data.statusId == 7)
+    {
+        this.buyerPoints = data.buyerPoints / 2
+        this.sellerPoints = 0
+    }
+    else if (data.statusId == 4)
+    {
+        this.lost = false
+        if (data.rcvdOnTime == 0 && data.conditionMatched == 0)
+        {
+            this.buyerPoints = 0
+            this.sellerPoints = 0
+        }
+        else if (data.rcvdOnTime == 0 || data.conditionMatched == 0)
+        {
+            this.buyerPoints = data.buyerPoints / 2
+            this.sellerPoints = data.sellerPoints / 2
+        }
+        else
+        {
+            this.buyerPoints = data.buyerPoints
+            this.sellerPoints = data.buyerPoints
+        }
+    }
+    this.rcvdOnTime = data.rcvdOnTime
+    this.conditionMatched = data.conditionMatched
+    this.statusId = 8
+}
+
 function getSellerEmail(t_id, callback) {
     var query = 'SELECT u.email, b.title FROM Transactions t\
                 INNER JOIN UserBooks ub ON userBookId = ub.id\
@@ -138,6 +173,7 @@ function updateSellerPoints(t_id, seller_id, callback) {
         return callback(null, 'success')
     })
 }
+
 
 router.get('/', common.isAuthenticated, (req, res) => {
     var data = {
@@ -255,8 +291,7 @@ router.post('/close', (req, res) => {
             return res.send({ error: errorMsg })
         }
         var originalObj = result
-        var updatedObj = new TransactionDb(result)
-        updatedObj.statusId = 8
+        var updatedObj = new TransactionDbClose(result)
 
         updateTransaction(updatedObj, req.body.id, true, (err, result) => {
             if (err) {
