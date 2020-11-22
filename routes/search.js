@@ -157,20 +157,20 @@ function bookResults(id, terms, callback){
                                  FROM UserBooks
                                  INNER JOIN Books ON Books.id = UserBooks.bookId
                                  INNER JOIN Users ON Users.id = UserBooks.userId
-                                 WHERE UserBooks.userId != ? AND UserBooks.available = 1 AND Users.worldwide = 1 AND (Books.title = ? OR Books.author = ? OR Books.genre = ?)
+                                 WHERE UserBooks.userId != ? AND UserBooks.available = 1 AND Users.worldwide = 1 AND (title LIKE ? OR author LIKE ? OR genre LIKE ?)
                                  UNION
                                  SELECT UserBooks.id AS id, title AS title, author AS author, imgUrl AS imgUrl, isbn13 AS isbn, Users.country
                                  FROM UserBooks
                                  INNER JOIN Books ON Books.id = UserBooks.bookId
                                  INNER JOIN Users ON Users.id = UserBooks.userId
-                                 WHERE UserBooks.userId != ? AND UserBooks.available = 1 AND Users.country = ? AND (Books.title = ? OR Books.author = ? OR Books.genre = ?)`;
+                                 WHERE UserBooks.userId != ? AND UserBooks.available = 1 AND Users.country = ? AND (title LIKE ? OR author LIKE ? OR genre LIKE ?)`;
 
     var selectUserCountry = `SELECT Users.country AS country, Users.points AS userPoints
                             FROM Users
                             WHERE Users.id = ?`
     const userId = id;
 
-   
+    var terms = "%" + terms + "%";
     var payload = { title: 'Available Books'};
     var books = [];
     db.pool.query(selectUserCountry, [userId], (err,result) =>{
@@ -180,7 +180,8 @@ function bookResults(id, terms, callback){
         }
         var country = result[0].country;
         var userPoints = result[0].userPoints;
-        var terms = terms;
+        
+       
         db.pool.query(selectBooks, [userId, terms, terms, terms, userId, country, terms, terms, terms], (err, result) => {
             if (err) {
                 // update error handling
@@ -219,10 +220,11 @@ function bookResults(id, terms, callback){
 // @route   GET /results
 // @desc    Get all books that match search terms
 router.get('/results/', common.isAuthenticated, (req, res, next) => {
-   
+
     bookResults(req.session.userId, req.query.terms, function(result){
         
         var payload = result;
+        
         res.render('search', payload);
     })
 })

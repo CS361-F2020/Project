@@ -7,7 +7,7 @@ function requestBook(bookId, pointCost, title, userPoints){
     }
     else{
         
-        modalBody.innerHTML = `Are you sure you want this book?: <br> <b>"${title}"</b>`
+        $("#requestTitle").text(title)
         var confirmButton = document.getElementById('confirmButton');
         //title was previously surrounded in single quotes
         confirmButton.setAttribute("onclick", `request(${bookId}, ${pointCost}, "${title}")`);
