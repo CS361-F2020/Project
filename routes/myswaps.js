@@ -110,14 +110,11 @@ router.post('/updateStatus', (req, res, next) => {
                             if (err) {
                                 return res.send({ error: 'Error occurred when trying to make book available. Please contact support at bookswaphelpdesk@gmail.com' })
                             }
-
-                            res.send({ success: 'success' })
                         })
                     }
-
-                    res.send({ success: 'success' })
                 })
         })
+        return res.send({ success: 'success'})
 })
 
 router.post('/close', (req, res, next) => {
