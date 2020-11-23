@@ -28,9 +28,9 @@
                 <div class="card-body px-0 pt-1 pb-1 text-center">
                     <p class="card-text mb-0 card-title">{{title}}</p>
                     <p class="card-text mb-0 card-author">{{author}}</p>
-                    <p class="card-text mb-0 card-genre" hidden>{{genre}}</p>
-                    <p class="card-text mb-0 card-rating" hidden>{{rating}}</p>
-                    <p class="card-text mb-0 card-pubdate" hidden>{{pubDate}}</p>
+                    <div class="card-genre" hidden>{{genre}}</div>
+                    <div class="card-rating" hidden>{{rating}}</div>
+                    <div class="card-pubdate" hidden>{{pubDate}}</div>
                 </div>
                 <button class="btn btn-small small btn-info-bs mb-1" onclick = "bookDetails('{{isbn}}', {{pointcost}})">View Details</button>
                 <button class="btn btn-primary-bs btn-small small"
@@ -53,7 +53,7 @@
                 </button>
             </div>
             <div class="modal-body" id="modalBody">
-                Are you sure you want this book?: <br><b><p id="requestTitle"></p></b>
+                Are you sure you want this book?: <br><p id="requestTitle" class = "font-weight-bold"></p>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" data-dismiss="modal">Cancel</button>

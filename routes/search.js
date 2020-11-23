@@ -36,20 +36,16 @@ router.get('/', common.isAuthenticated, (req, res, next) => {
     })
 })
 
-router.get('/faq', common.isAuthenticated, (req,res,next) => {
-    res.render('faq');
-})
-
 // Get all avaialable books
 // ******** need to update this based on worldwide shippers
 function allBooks(id, callback){
-    var selectAllAvailableBooks = `SELECT UserBooks.id AS id, title AS title, author AS author, imgUrl AS imgUrl, isbn13 AS isbn, genre AS genre, rating AS rating, pubDate AS pubDate, Users.country
+    var selectAllAvailableBooks = `SELECT UserBooks.id AS id, title, author, imgUrl, isbn13 AS isbn, genre, rating, pubDate, Users.country
                                  FROM UserBooks
                                  INNER JOIN Books ON Books.id = UserBooks.bookId
                                  INNER JOIN Users ON Users.id = UserBooks.userId
                                  WHERE UserBooks.userId != ? AND UserBooks.available = 1 AND Users.worldwide = 1
                                  UNION
-                                 SELECT UserBooks.id AS id, title AS title, author AS author, imgUrl AS imgUrl, isbn13 AS isbn, genre AS genre, rating AS rating, pubDate AS pubDate, Users.country
+                                 SELECT UserBooks.id AS id, title, author, imgUrl, isbn13 AS isbn, genre, rating, pubDate, Users.country
                                  FROM UserBooks
                                  INNER JOIN Books ON Books.id = UserBooks.bookId
                                  INNER JOIN Users ON Users.id = UserBooks.userId

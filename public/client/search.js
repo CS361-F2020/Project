@@ -72,15 +72,15 @@ function searchResults() {
     cardContainer = document.getElementById("myItems");
     cards = cardContainer.getElementsByClassName("card");
   
-    genreText = ".card-body p.card-genre";
+    genreText = ".card-body div.card-genre";
 
     authorText = ".card-body p.card-author";
 
     titleText = ".card-body p.card-title";
     
-    ratingText = ".card-body p.card-rating";
+    ratingText = ".card-body div.card-rating";
 
-    pubDateText = ".card-body p.card-pubdate";
+    pubDateText = ".card-body div.card-pubdate";
            
     
     for (i = 0; i < cards.length; i++) {
