@@ -23,6 +23,7 @@ var selectUserinfo = `SELECT firstName, lastName, address, city, state, country,
 var getTransactionInfo = 'SELECT t.id, t.requestorId, ub.userId as sellerId\
                           FROM Transactions t INNER JOIN UserBooks ub ON t.userBookId = ub.id\
                           WHERE (t.requestorId = ? AND t.statusId = 4) OR (ub.userId = ? AND statusId IN (3, 4, 7))'
+var totalRequests = 'SELECT COUNT(id) AS totalRequests FROM Transactions WHERE requestorId = ?'
 var updateAboutMe = `UPDATE Users SET aboutMe=? WHERE id=?`;
 
 router.get('/', common.isAuthenticated, (req, res, next) => {
@@ -59,7 +60,19 @@ router.get('/', common.isAuthenticated, (req, res, next) => {
                         }
                         payload.sentBooks = sentBooks
                         payload.receivedBooks = receivedBooks
-                        res.render('myprofile', payload)
+
+                        db.pool.query(totalRequests, [userId], (err, result) => {
+                            if (err)
+                            {
+                                req.flash('error', err)
+                                res.render('myprofile', payload)
+                            }
+                            else
+                            {
+                                payload.totalRequests = result[0].totalRequests
+                                res.render('myprofile', payload)
+                            }
+                        })                      
                     }
                 })
             }
