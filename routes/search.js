@@ -140,6 +140,7 @@ router.post('/', common.isAuthenticated, (req, res, next) => {
                                 res.render('search', payload);
                             })
                         }
+                        var successMsg = req.body.title + ' has been requested!';
                         // database has been updated
                         // send an email to the seller that a book has been requested
                         // **** update text or maybe use html
@@ -149,8 +150,8 @@ router.post('/', common.isAuthenticated, (req, res, next) => {
                             text: 'You have a new request for ' + title
                         }
                         common.transport.sendMail(message);
-                
-                        res.send({success: true});
+                        req.flash('success', successMsg)
+                        res.send({success: 'success'});
                     });
                 }
             });

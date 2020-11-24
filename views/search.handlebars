@@ -11,9 +11,14 @@
             </div>
         </div>
         <div class = "row">
-                <div class = "col-auto pr-0">
-                    <input type="text" id="myFilter" class="form-control" onkeyup="searchResults()" placeholder="Enter terms">
-                </div>
+            <div class = "col-auto pr-0 mb-3">
+                <input type="text" id="myFilter" class="form-control" onkeyup="searchResults()" placeholder="Enter terms to start search.">
+                    
+            </div>
+            <div class="col text-left">
+                <i class="fas fa-info-circle text-info-bs" title="Any books that are displayed have these terms in either their title, author, genre, rating, or publication date."></i>
+                <br>
+            </div>
         </div>
         <div class="row" id = "myItems">
             {{#each books}}
@@ -37,27 +42,6 @@
     </div>
 </div>
 
-<!-- Modal -->
-<div class="modal fade" id="pageModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modalLabel">Request a Book</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body" id="modalBody">
-                Are you sure you want this book?: <br><p id="requestTitle" class = "font-weight-bold"></p>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                <button class="btn btn-primary-bs" id="confirmButton" onclick="">Confirm</button>
-            </div>
-        </div>
-    </div>
-</div>
-
 <div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -68,34 +52,22 @@
                 </button>
             </div>
             <div class="modal-body" id="modalBody">
-                <b>
-                    <h8>Title</h8>
-                </b><br>
-                <p id="detailTitle"></p>
-                <b>
-                    <h8>Author</h8>
-                </b><br>
-                <p id="detailAuthor"></p>
-                <b>
-                    <h8>Genre</h8>
-                </b><br>
-                <p id="detailGenre"></p>
-                <b>
-                    <h8>Language</h8>
-                </b><br>
-                <p id="detailLanguage"></p>
-                <b>
-                    <h8>Point Cost</h8>
-                </b><br>
-                <p id="detailPointCost"></p>
-                <b>
-                    <h8>Rating</h8>
-                </b><br>
-                <p id="detailRating"></p>
-                    <h8>Description</h8>
-                </b><br>
-                <p id="detailDescription"></p>
-                {{isbn}}
+                <div class = "col-12">
+                    <div class="font-weight-bold">Title</div>
+                        <div id="detailTitle" class="mb-1"></div>
+                    <div class="font-weight-bold">Author</div>
+                        <div id="detailAuthor" class="mb-1"></div>
+                    <div class="font-weight-bold">Genre</div>
+                        <div id="detailGenre" class="mb-1"></div>
+                    <div class="font-weight-bold">Language</div>
+                        <div id="detailLanguage" class="mb-1"></div>
+                    <div class="font-weight-bold">Point Cost</div>
+                        <div id="detailPointCost" class="mb-1"></div>
+                    <div class="font-weight-bold">Rating</div>
+                        <div id="detailRating"></div>
+                    <div class="font-weight-bold" class="mb-1">Description</div>
+                        <div id="detailDescription"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -105,13 +77,13 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header bg-med-bs text-center">
-                <h5 class="modal-title" id="modalLabel">Request a Book</h5>
+                <h5 class="modal-title" id="modalLabel">You do not have enough points.</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body" id="modalBody">
-                <div id="question">
+                <div id="question" class="col-12">
                     <div class="text-primary-bs-bold">How do I earn points?</div>
                     <div>
                         <ul>
@@ -130,75 +102,14 @@
                             </li>
                         </ul>
                     </div>
+                    <div class = "col text-center">
+                        <a href="/faq" class = "btn btn-info btn-primary-bs " role = "button">Learn more about the point system</a>
+                    </div>
+                    
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-<!-- Modal -->
-<div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modalLabel">Book Details</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body" id="modalBody">
-                <b><h8>Title</h8></b><br>
-                <p id = "detailTitle"></p>
-                <b><h8>Author</h8></b><br>
-                <p id = "detailAuthor"></p>
-                <b><h8>Genre</h8></b><br>
-                <p id = "detailGenre"></p>
-                <b><h8>Language</h8></b><br>
-                <p id = "detailLanguage"></p>
-                <b><h8>Point Cost</h8></b><br>
-                <p id = "detailPointCost"></p>
-                <b><h8>Rating</h8></b><br>
-                <p id = "detailRating"></p>
-                <b><h8>Description</h8></b><br>
-                <p id = "detailDescription"></p>
-                
-            </div>
-            </div>
-            <div class="modal-footer">
-
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Modal -->
-<div class="modal fade" id="pointsModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="modalLabel">Request a Book</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body" id="modalBody">
-                <b>You do not have enough points.</b><br>
-                    <ul>
-                        <li>You earn 1 point when you post a book.</li>
-                        <li>You earn points when you respond to a request and ship a book successfully.</li>
-                            <ul>
-                                <li>2 points are earned if sent to your current country.</li>
-                                <li>4 points are earned if sent to another country.</li>  
-                            </ul>     
-                    </ul>
-                <a href="/faq" class = "btn btn-info" role = "button">Learn more about the point system</a>
-            </div>
-            <div class="modal-footer">
-            </div>
-        </div>
-    </div>
-</div>
-
-
 
 <script src="/client/search.js"></script>
