@@ -1,71 +1,67 @@
-<!-- fields to add: First name, last name, city, state, country. Books received/Books Shipped. About Me, Library, Wishlist. -->
-
-<div class="container-fluid h-100 d-flex justify-content-center"
-  style="background-image:url(/images/my-account-background.jpg);background-repeat:no-repeat;background-size:cover;">
-  <div class="col-xl-8 col-lg-10 col-md-12 col-sm-12 col-12 pt-4">
-    <div class="mt-4 border rounded p-3 bg-light-bs">
-      <div class="row">
-        <div class="col-auto pr-0">
-          <h3 class="pb-3 header-text">{{user.firstName}} {{user.lastName}}</h3>
-        </div>
-      </div>
-      <div class="row pb-4">
-           <div class="col-sm-2 col-3 pr-2">
-          <h5>Location: </h5>
-        </div>
-        <div class="w-50 border rounded border-dark p-2 bg-white">
-          {{user.city}}, {{user.state}}
-          </br>
-          {{user.country}}
-        </div>
-      </div>
-      <div class="row pb-4">
-        <div class="col-sm-2 col-3 pr-2">
-          <h5>About Me: </h5>
-        </div>
-        <div class="w-50 border rounded border-dark p-2 bg-white">
-          <div>
-            {{user.aboutMe}}
-          </div>
-        </div>
-      </div>
-      <div class="row w-100 pb-4">
-        <div class="col-xl-3 col-lg-3 col-md-3 col-sm-5 col-6 pb-2">
-          <div class="card border-primary-bs h-100">
-            <div class="card-body text-center">
-              <h5 class="card-title">Books Shipped</h5>
-              <p class="card-text">
-              <h2 class="text-center">{{sentBooks}}</h2>
-              </p>
-            </div>
-          </div>
-        </div>
-        <div class="col-xl-3 col-lg-3 col-md-3 col-sm-5 col-6 pb-2">
-          <div class="card border-primary-bs h-100">
-            <div class="card-body text-center">
-              <h5 class="card-title">Books Received</h5>
-              <p class="card-text">
-              <h2 class="text-center">{{receivedBooks}}</h2>
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="collapse show" id="collapsRCVDShelf">
-    <h5 class="card-title">{{user.firstName}} {{user.lastName}}'s Library</h5>
-    <br>
-    <div class="row row-cols-2 row-cols-md-4">
-        {{#each library}}
-        <div class="col-6 col-sm-4 col-md-3 col-lg-2 col-xl-2">
-            <div class="card h-100 cards">
-                <img src="{{imgUrl}}" class="card-img-top" alt="...">
-                <div class="card-body">
-                    <p class="card-text">{{title}}</p>
+<div class="container-fluid h-100 d-flex justify-content-center">
+    <div class="col-xl-10 col-lg-12 col-md-12 col-sm-12 col-12 pt-4">
+        <div class="mt-4 border rounded p-3 bg-light-bs">
+            <div class="row">
+                <div class="col-auto pr-0">
+                    <h3 class="pb-3 header-text">{{user.firstName}} {{user.lastName}}</h3>
                 </div>
             </div>
+            <div class="row pb-4">
+                <div class="col-sm-2 col-3 pr-2">
+                    <h5>Location: </h5>
+                </div>
+                <div class="w-50 border rounded border-dark p-2 bg-white">
+                    {{user.city}}, {{user.state}}
+                    </br>
+                    {{user.country}}
+                </div>
+            </div>
+            <div class="row pb-4">
+                <div class="col-sm-2 col-3 pr-2">
+                    <h5>About Me: </h5>
+                </div>
+                <div class="w-50 border rounded border-dark p-2 bg-white">
+                    <div>
+                        {{user.aboutMe}}
+                    </div>
+                </div>
+            </div>
+            <div class="row w-100 pb-4">
+                <div class="col-xl-3 col-lg-3 col-md-3 col-sm-5 col-6 pb-2">
+                    <div class="card border-primary-bs h-100">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Books Shipped</h5>
+                            <p class="card-text">
+                            <h2 class="text-center">{{sentBooks}}</h2>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-lg-3 col-md-3 col-sm-5 col-6 pb-2">
+                    <div class="card border-primary-bs h-100">
+                        <div class="card-body text-center">
+                            <h5 class="card-title">Books Received</h5>
+                            <p class="card-text">
+                            <h2 class="text-center">{{receivedBooks}}</h2>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <h5 class="card-title">{{user.firstName}} {{user.lastName}}'s Available Books</h5>
+            <div class="row">             
+                {{#each library}}
+                <div id="{{id}}"
+                    class="card cards border rounded bg-light p-3 col-xl-2 col-lg-3 col-md-3 col-sm-4 col-5 mr-3 mb-3">
+                    <img src="{{imgUrl}}" class="card-img-top cover-art pb-1">
+                    <div class="card-body px-0 pt-1 pb-1 text-center">
+                        <p class="card-text mb-0">{{title}}</p>
+                        <p class="card-text">{{author}}</p>
+                    </div>
+                    <button class="btn btn-small small btn-info-bs mb-1">View Details</button>
+                </div>
+                {{/each}}
+            </div>
         </div>
-        {{/each}}
     </div>
 </div>
-  <script src="/client/profile.js"></script>

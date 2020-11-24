@@ -445,4 +445,5 @@ router.get('/profile/:userId', common.isAuthenticated, (req, res, next) => {
         })
     })
 })
+
 module.exports = router

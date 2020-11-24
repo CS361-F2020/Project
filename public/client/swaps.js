@@ -24,9 +24,7 @@ $(document).ready(function () {
     $('#swapTabs a[href="' + hash + '"]').tab('show');
 })
 
-function viewHistory(id) {
-    console.log(id)
-    
+function viewHistory(id) {    
     var table = $('#historyTable').DataTable({
         destroy: true,
         order: [[1, "asc"]],
@@ -41,8 +39,8 @@ function viewHistory(id) {
             { "data": "date" }
         ]
     });
-    table.ajax.url( 'myswaps/history/' + id ).load();
 
+    table.ajax.url( 'myswaps/history/' + id ).load();
     $('#historyModal').modal('show')
 }
 
