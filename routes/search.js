@@ -11,8 +11,21 @@ function Book(data) {
     this.imgUrl = data.imgUrl;
     this.pointcost = data.pointcost;
     this.isbn = data.isbn;
+    this.genre = data.genre;
+    this.rating = data.rating;
+    this.pubDate = data.pubDate;
     this.userPoints = data.userPoints;
 }
+
+//Glenn: I was testing out character removal with this function. 
+//I think it works a little better than the one from the stack overflow post provided the other day
+//maybe a good candidate for handling characters?
+function replaceCharacters(userText) {
+    var regExpr = /[^a-zA-Z0-9-. ]/g;
+    
+    return userText.replace(regExpr, "");
+}
+
         
 // @route   GET /allBooks
 // @desc    Get all available books that don't belong to the user and are not undergoing transactions
@@ -26,13 +39,13 @@ router.get('/', common.isAuthenticated, (req, res, next) => {
 // Get all avaialable books
 // ******** need to update this based on worldwide shippers
 function allBooks(id, callback){
-    var selectAllAvailableBooks = `SELECT UserBooks.id AS id, title AS title, author AS author, imgUrl AS imgUrl, isbn13 AS isbn, Users.country
+    var selectAllAvailableBooks = `SELECT UserBooks.id AS id, title, author, imgUrl, isbn13 AS isbn, genre, rating, pubDate, Users.country
                                  FROM UserBooks
                                  INNER JOIN Books ON Books.id = UserBooks.bookId
                                  INNER JOIN Users ON Users.id = UserBooks.userId
                                  WHERE UserBooks.userId != ? AND UserBooks.available = 1 AND Users.worldwide = 1
                                  UNION
-                                 SELECT UserBooks.id AS id, title AS title, author AS author, imgUrl AS imgUrl, isbn13 AS isbn, Users.country
+                                 SELECT UserBooks.id AS id, title, author, imgUrl, isbn13 AS isbn, genre, rating, pubDate, Users.country
                                  FROM UserBooks
                                  INNER JOIN Books ON Books.id = UserBooks.bookId
                                  INNER JOIN Users ON Users.id = UserBooks.userId
@@ -76,6 +89,9 @@ function allBooks(id, callback){
                     imgUrl: result[i].imgUrl,
                     pointcost: points,
                     isbn: result[i].isbn,
+                    genre: result[i].genre,
+                    rating: result[i].rating,
+                    pubDate: result[i].pubDate,
                     userPoints: userPoints
                 }
                 payload.books.push(new Book(data));           
@@ -124,6 +140,7 @@ router.post('/', common.isAuthenticated, (req, res, next) => {
                                 res.render('search', payload);
                             })
                         }
+                        var successMsg = req.body.title + ' has been requested!';
                         // database has been updated
                         // send an email to the seller that a book has been requested
                         // **** update text or maybe use html
@@ -133,13 +150,16 @@ router.post('/', common.isAuthenticated, (req, res, next) => {
                             text: 'You have a new request for ' + title
                         }
                         common.transport.sendMail(message);
-                
-                        res.send({success: true});
+                        req.flash('success', successMsg)
+                        res.send({success: 'success'});
                     });
                 }
             });
         }
     });
 });
+
+
+
 
 module.exports = router;
