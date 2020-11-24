@@ -219,9 +219,11 @@
                                 <th>Book</th>
                                 <th>Requested</th>
                                 <th>Modified</th>
+                                <th>Status Type</th>
                                 <th>Status</th>
                                 <th>Points</th>
                                 <th class="no-sort col-auto">Actions</th>
+                                <th class="no-show">Search</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -229,16 +231,17 @@
                             <tr>
                                 <td>{{id}}</td>
                                 {{#ifEquals category "S"}}
-                                <td>Incoming</td>
+                                <td>My Requests</td>
                                 {{/ifEquals}}
 
                                 {{#ifEquals category "R"}}
-                                <td>Outgoing</td>
+                                <td>Received</td>
                                 {{/ifEquals}}
 
                                 <td>{{title}} - {{author}}</td>
                                 <td>{{created}}</td>
                                 <td>{{modified}}</td>
+                                <td>{{statusType}}</td>
                                 <td>{{status}}</td>
 
                                 {{#ifEquals category "S"}}
@@ -267,6 +270,7 @@
                                     {{/ifEquals}}
                                     {{/ifEquals}}
                                 </td>
+                                <td>{{firstName}} {{lastName}}</td>
                             </tr>
                             {{/each}}
                         </tbody>

@@ -14,7 +14,7 @@ $(document).ready(function () {
         },
         {
             visible: false,
-            targets: [0]
+            targets: [0, "no-show"]
         }]
 
     });

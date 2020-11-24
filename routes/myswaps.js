@@ -58,7 +58,8 @@ function TransactionDbClose(data) {
     }
     this.rcvdOnTime = data.rcvdOnTime
     this.conditionMatched = data.conditionMatched
-    this.statusId = 8
+    this.statusId = data.statusId
+    this.closed = 1
 }
 
 function getSellerEmail(t_id, callback) {
@@ -184,7 +185,7 @@ router.get('/', common.isAuthenticated, (req, res) => {
 
     var swaps =
         'SELECT "R" AS category, t.id, u.id AS userId, u.email, u.firstName, u.lastName, b.title, REPLACE(b.title, "\'", "") AS jsTitle, b.author, t.created, t.modified, t.statusId,\
-        s.description AS status, CASE WHEN t.statusId = 8 THEN t.sellerPoints ELSE "Pending" END AS points, IFNULL(t.lost, 0) AS lost, c.description AS cond, CASE WHEN t.rating is NULL THEN 0 ELSE 1 END AS hasSurvey\
+        s.description AS status, t.sellerPoints AS points, CASE WHEN t.closed = 1 THEN "Closed" ELSE "Open" END AS statusType, IFNULL(t.lost, 0) AS lost, c.description AS cond, CASE WHEN t.rating is NULL THEN 0 ELSE 1 END AS hasSurvey\
         FROM Transactions t\
             INNER JOIN Users u ON t.requestorId = u.id\
             INNER JOIN Statuses s ON t.statusId = s.id\
@@ -194,7 +195,7 @@ router.get('/', common.isAuthenticated, (req, res) => {
         WHERE ub.userId = ?\
         UNION\
         SELECT "S" AS category, t.id, u.id AS userid, u.email, u.firstName, u.lastName, b.title, REPLACE(b.title, "\'", "") AS jsTitle, b.author, t.created, t.modified, t.statusId,\
-        s.description AS status, CASE WHEN t.statusId = 8 THEN t.buyerPoints ELSE "Pending" END AS points, IFNULL(t.lost, 0) AS lost, c.description AS cond, CASE WHEN t.rating is NULL THEN 0 ELSE 1 END AS hasSurvey\
+        s.description AS status, t.buyerPoints AS points, CASE WHEN t.closed = 1 THEN "Closed" ELSE "Open" END AS statusType, IFNULL(t.lost, 0) AS lost, c.description AS cond, CASE WHEN t.rating is NULL THEN 0 ELSE 1 END AS hasSurvey\
         FROM Transactions t\
             INNER JOIN Statuses s ON t.statusId = s.Id\
             INNER JOIN UserBooks ub ON t.userBookId = ub.id\
@@ -206,11 +207,10 @@ router.get('/', common.isAuthenticated, (req, res) => {
     sql.pool.query(swaps, [req.session.userId, req.session.userId], (err, results) => {
         if (err) {
             req.flash('error', err)
-            res.render('myswaps', data)
         }
         else if (results.length > 0) {
             for (var i = 0; i < results.length; i++) {
-                if (results[i].statusId != 8) {
+                if (results[i].statusType != "Closed") {
                     results[i].category == 'S' ? data.sent.push(results[i]) : data.received.push(results[i])
                 }
             }
@@ -219,6 +219,7 @@ router.get('/', common.isAuthenticated, (req, res) => {
             data.history = results
             data.historyCount = results.length
         }
+
         res.render('myswaps', data)
     })
 })
