@@ -294,7 +294,7 @@ router.post('/close', (req, res) => {
         var originalObj = result
         var updatedObj = new TransactionDbClose(result)
 
-        updateTransaction(updatedObj, req.body.id, true, (err, result) => {
+        updateTransaction(updatedObj, req.body.id, false, (err, result) => {
             if (err) {
                 console.log(err)
                 return res.send({ error: errorMsg })
