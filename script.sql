@@ -42,8 +42,7 @@ INSERT INTO `Statuses` (`id`, `description`) VALUES
 (4, 'Received'),
 (5, 'Rejected'),
 (6, 'Canceled'),
-(7, 'Lost'),
-(8, 'Closed');
+(7, 'Lost');
 -- --------------------------------------------------------
 --
 -- Table structure for table TransactionStatusDates
@@ -110,7 +109,8 @@ CREATE TABLE Transactions (
     rating int(11) DEFAULT NULL,
     created date NOT NULL,
     modified date DEFAULT NULL,
-    lost bit DEFAULT NULL,
+    lost bit DEFAULT 0,
+    closed bit DEFAULT 0,
     FOREIGN KEY (userBookId) REFERENCES UserBooks (id),
     FOREIGN KEY (requestorId) REFERENCES Users (id),
     FOREIGN KEY (statusId) REFERENCES Statuses (id)

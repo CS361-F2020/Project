@@ -17,14 +17,14 @@ function User(data) {
 }
 
 //database queries
-const selectUserinfo = `SELECT firstName, lastName, address, city, state, country, aboutMe,  points
+var selectUserinfo = `SELECT firstName, lastName, address, city, state, country, aboutMe,  points
                         FROM Users
                         WHERE Users.id = ?`;
-const getTransactionInfo = `SELECT  userBookId AS sentBook, requestorId AS receivedBook, rating AS rating
-                            FROM Transactions
-                            WHERE Transactions.userBookId = ?
-                            OR Transactions.requestorId = ?`;
-const updateAboutMe = `UPDATE Users SET aboutMe=? WHERE id=?`;
+var getTransactionInfo = 'SELECT t.id, t.requestorId, ub.userId as sellerId\
+                          FROM Transactions t INNER JOIN UserBooks ub ON t.userBookId = ub.id\
+                          WHERE (t.requestorId = ? AND t.statusId = 4) OR (ub.userId = ? AND statusId IN (3, 4, 7))'
+var totalRequests = 'SELECT COUNT(id) AS totalRequests FROM Transactions WHERE requestorId = ?'
+var updateAboutMe = `UPDATE Users SET aboutMe=? WHERE id=?`;
 
 router.get('/', common.isAuthenticated, (req, res, next) => {
     const userId = req.session.userId
@@ -55,12 +55,24 @@ router.get('/', common.isAuthenticated, (req, res, next) => {
                         res.render('myprofile', payload)
                     } else {
                         for (let i = 0; i < result.length; i++) {
-                            if (result[i].sentBook == userId) { sentBooks++ }
-                            else if (result[i].receivedBook == userId) { receivedBooks++ }
+                            if (result[i].sellerId == userId) { sentBooks++ }
+                            else if (result[i].requestorId == userId) { receivedBooks++ }
                         }
                         payload.sentBooks = sentBooks
                         payload.receivedBooks = receivedBooks
-                        res.render('myprofile', payload)
+
+                        db.pool.query(totalRequests, [userId], (err, result) => {
+                            if (err)
+                            {
+                                req.flash('error', err)
+                                res.render('myprofile', payload)
+                            }
+                            else
+                            {
+                                payload.totalRequests = result[0].totalRequests
+                                res.render('myprofile', payload)
+                            }
+                        })                      
                     }
                 })
             }
