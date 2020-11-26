@@ -26,21 +26,6 @@ function Book(userBookId, bookId, swap, title, imgUrl) {
     this.imgUrl = imgUrl;
 }
 
-//MOVE THIS BEFORE PR, PROBABLY 
-const selectUserinfo = `SELECT firstName AS firstName, lastName AS lastName, city AS city, state AS state, country AS country, aboutMe AS aboutMe,  points AS points
-                        FROM Users
-                        WHERE Users.id = ?`;
-const getTransactionInfo = `SELECT  userBookId AS sentBook, requestorId AS receivedBook, rating AS rating
-                            FROM Transactions
-                            WHERE Transactions.userBookId = ?
-                            OR Transactions.requestorId = ?`;
-
-//might need to consult andrew on grabbing titles from this, not sure if one query is sufficient
-const selectAllBooks = `SELECT UserBooks.id AS userBookId, Books.id AS bookId, available AS swap, listingDate AS date, Books.title AS title, Books.imgUrl AS imgUrl
-                        FROM UserBooks
-                        INNER JOIN Books ON Books.id = UserBooks.bookId
-                        WHERE UserBooks.userId = ?`;
-
 router.get('/', (req, res, next) =>{
     res.redirect('/search')
 })
@@ -399,6 +384,18 @@ router.get('/getAddress/(:id)', common.isAuthenticated, (req, res, next) => {
 })
 
 router.get('/profile/:userId', common.isAuthenticated, (req, res, next) => {
+    var selectUserinfo = `SELECT firstName, lastName, city, state, country, aboutMe
+                        FROM Users
+                        WHERE Users.id = ?`;
+    var getTransactionInfo = 'SELECT t.id, t.requestorId, ub.userId as sellerId\
+                        FROM Transactions t INNER JOIN UserBooks ub ON t.userBookId = ub.id\
+                        WHERE (t.requestorId = ? AND t.statusId = 4) OR (ub.userId = ? AND t.statusId IN (3, 4, 7))'
+
+    var selectAllBooks = `SELECT UserBooks.id AS userBookId, Books.id AS bookId, available AS swap, listingDate AS date, Books.title AS title, Books.imgUrl AS imgUrl
+                        FROM UserBooks
+                        INNER JOIN Books ON Books.id = UserBooks.bookId
+                        WHERE UserBooks.userId = ?`;
+
     var userId = req.params.userId;
     var payload = {};
     payload.user;
@@ -414,14 +411,14 @@ router.get('/profile/:userId', common.isAuthenticated, (req, res, next) => {
             payload.user = new Account(result[0].firstName, result[0].lastName, "", "", result[0].city, result[0].state, "", result[0].country, "", result[0].aboutMe);        
         }
         // get transaction record
-        sql.pool.query(getTransactionInfo, [userId, userId], (err, tranResult) => {
+        sql.pool.query(getTransactionInfo, [userId, userId], (err, result) => {
             if (err) {
                 next(err);
                 return;
             } else {
-                for(let i = 0; i < tranResult.length; i++) {
-                    if (tranResult[i].sentBook == userId) { sentBooks++; }
-                    else if (tranResult[i].receivedBook == userId) { receivedBooks++; }  
+                for (let i = 0; i < result.length; i++) {
+                    if (result[i].sellerId == userId) { sentBooks++ }
+                    else if (result[i].requestorId == userId) { receivedBooks++ }
                 }
                 payload.sentBooks = sentBooks;
                 payload.receivedBooks = receivedBooks;
@@ -441,7 +438,6 @@ router.get('/profile/:userId', common.isAuthenticated, (req, res, next) => {
                 payload.library = library;
                 res.render('profile', payload);
             })
-            //get wishlist if implemented. 
         })
     })
 })

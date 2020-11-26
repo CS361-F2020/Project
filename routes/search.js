@@ -104,12 +104,13 @@ function allBooks(id, callback){
 
 // @route   POST /home
 // @desc    Request a book
-router.post('/', common.isAuthenticated, (req, res, next) => {
-    const errMsg = 'Error requesting book, please try again.';
-    const id = req.body.bookId;
-    const title = req.body.title;
-    const userId = req.session.userId;
-    var date = new Date().toISOString().slice(0, 10);
+router.post('/request', common.isAuthenticated, (req, res, next) => {
+    const errMsg = 'Error requesting book, please try again.'
+    var id = req.body.bookId
+    var title = req.body.title
+    var userId = req.session.userId
+    var pointCost = req.body.pointCost
+    var date = new Date()
     
     // set the UserBooks.available to 0 for not available for swaps
     // need to update this to check for worldwide shippers
@@ -122,7 +123,7 @@ router.post('/', common.isAuthenticated, (req, res, next) => {
             })
         }else {
             // add a new transaction record
-            db.pool.query('INSERT INTO Transactions (userBookId, requestorId, statusId, sellerPoints, buyerPoints, created, modified) VALUES (?, ?, ?, ?, ?, ?, ?)', [id, userId, 1, 4, 4, date, date], (err,result) => {
+            db.pool.query('INSERT INTO Transactions (userBookId, requestorId, statusId, sellerPoints, buyerPoints, created, modified) VALUES (?, ?, ?, ?, ?, ?, ?)', [id, userId, 1, pointCost, pointCost * -1, date, date], (err,result) => {
                 if (err) {
                     allBooks( userId, function(result){
                         var  payload = result;

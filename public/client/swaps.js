@@ -4,7 +4,7 @@ $(document).ready(function () {
     });
 
     $('table.table-swap').DataTable({
-        scrollY: 200,
+        scrollY: 600,
         scrollCollapse: true,
         paging: false,
         order: [[4, "desc"]],
@@ -14,7 +14,7 @@ $(document).ready(function () {
         },
         {
             visible: false,
-            targets: [0]
+            targets: [0, "no-show"]
         }]
 
     });
