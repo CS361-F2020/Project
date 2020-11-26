@@ -22,7 +22,7 @@
                 </div>
                 <button class="btn btn-small small btn-info-bs mb-1">View Details</button>
                 <button class="btn btn-primary-bs btn-small small"
-                    onclick="requestBook({{id}}, {{pointcost}}, '{{title}}')">Request A Copy</button>
+                    onclick="requestBook([{{id}}], {{pointcost}}, '{{title}}', {{userPoints}}, '{{condition}}', '{{date}}')">Request A Copy {{#if copies}}({{copies}}){{/if}}</button>
             </div>
             {{/each}}
         </div>
@@ -36,7 +36,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="modalLabel">Request a Book</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="removeOptions()">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -44,7 +44,7 @@
 
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button class="btn btn-secondary" data-dismiss="modal" onclick="removeOptions()">Cancel</button>
                 <button class="btn btn-primary-bs" id="confirmButton" onclick="">Confirm</button>
             </div>
         </div>

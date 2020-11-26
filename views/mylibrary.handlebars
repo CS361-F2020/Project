@@ -20,26 +20,21 @@
                 </a>
             </button>
         </div>
-        <div class="collapse show pb-3" id="collapsSwapShelf">
-            <div class="row row-cols-2">
-                {{#each library}}
-                {{#if swap}}
-                <div class="col-6 col-sm-4 col-md-3 col-lg-2 col-xl-2" id="{{userBookId}}">
-                    <div class="card h-100 cards">
-                        <img src="{{imgUrl}}" class="card-img-top" alt="...">
-                        <button type="button" class="btn btn-outline-light delete-btn"
-                            onclick="clickRemove({{userBookId}}, '{{title}}')" data-toggle="tooltip"
-                            data-placement="bottom" data-html="true" title='click here to<br>remove this book'>
-                            <i class="far fa-trash-alt"></i>
-                        </button>
-                        <div class="card-body px-0 pt-1 pb-0 text-center">
-                            <p class="card-text">{{title}}</p>
-                        </div>
-                    </div>
+        <div class="row">
+            {{#each library}}
+            {{#if swap}}
+            <div id="{{id}}"
+                class="card cards border rounded bg-light p-3 col-xl-2 col-lg-3 col-md-3 col-sm-4 col-5 mr-3 mb-3">
+                <img src="{{imgUrl}}" class="card-img-top cover-art pb-1">
+                <div class="card-body px-0 pt-1 pb-1 text-center">
+                    <p class="card-text mb-0">{{title}}</p>
+                    <p class="card-text">{{author}}</p>
                 </div>
-                {{/if}}
-                {{/each}}
+                <button class="btn btn-danger btn-small small"
+                    onclick="clickRemove([{{id}}], {{pointcost}}, '{{title}}', {{userPoints}}, '{{condition}}', '{{date}}')">Remove Book {{#if copies}}({{copies}}){{/if}}</button>
             </div>
+            {{/if}}
+            {{/each}}
         </div>
 
         <div class="shelf bg-med-bs mb-3">
@@ -52,26 +47,21 @@
                 </a>
             </button>
         </div>
-        <div class="collapse show pb-3" id="collapsRCVDShelf">
-            <div class="row row-cols-2 row-cols-md-4">
-                {{#each library}}
-                {{#unless swap}}
-                <div class="col-6 col-sm-4 col-md-3 col-lg-2 col-xl-2">
-                    <div class="card h-100 cards">
-                        <img src="{{imgUrl}}" class="card-img-top" alt="...">
-                        <button type="button" class="btn btn-outline-light delete-btn"
-                            onclick="clickRemove({{userBookId}}, '{{title}}')" data-toggle="tooltip"
-                            data-placement="bottom" data-html="true" title='click here to<br>remove this book'>
-                            <i class="far fa-trash-alt"></i>
-                        </button>
-                        <div class="px-0 pt-1 pb-0 text-center">
-                            <p class="card-text">{{title}}</p>
-                        </div>
-                    </div>
+        <div class="row">
+            {{#each library}}
+            {{#unless swap}}
+            <div id="{{id}}"
+                class="card cards border rounded bg-light p-3 col-xl-2 col-lg-3 col-md-3 col-sm-4 col-5 mr-3 mb-3">
+                <img src="{{imgUrl}}" class="card-img-top cover-art pb-1">
+                <div class="card-body px-0 pt-1 pb-1 text-center">
+                    <p class="card-text mb-0">{{title}}</p>
+                    <p class="card-text">{{author}}</p>
                 </div>
-                {{/unless}}
-                {{/each}}
+                <button class="btn btn-danger btn-small small"
+                    onclick="clickRemove([{{id}}], {{pointcost}}, '{{title}}', {{userPoints}}, '{{condition}}', '{{date}}')">Remove Book {{#if copies}}({{copies}}){{/if}}</button>
             </div>
+            {{/unless}}
+            {{/each}}
         </div>
     </div>
 </div>
