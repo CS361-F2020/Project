@@ -24,15 +24,66 @@ function toggleToolTips(tipId) {
 }
 
 // toggle modal dispay
-function clickRemove(userBookId, title) {
+function clickRemove(userBookId, title, condition, date) {
     var modalLabel = document.getElementById('modalLabel');
     modalLabel.innerHTML = "Confirm Book Removal";
     var modalBody = document.getElementById('modalBody');
-    modalBody.innerHTML = `Are you sure you want to remove <b>"${title}"</b> from your library?`
+    if(userBookId.length > 1){
+        var condition = condition.split(',');
+        var date = date.split(',');
+        modalBody.innerHTML = `Are you sure you want this book?: <br> <b>"${title}"</b><br>`
+        var div1 = document.createElement("div");
+        div1.id = "div1";
+        div1.setAttribute("class", "form-row")
+        var div2 = document.createElement("div");
+        div2.setAttribute("class", "form-group col-12");
+        var selector = document.createElement("select");
+        selector.id = "selector";
+        selector.setAttribute("class", "form-control");
+        selector.setAttribute("required", "required");
+        selector.setAttribute("onchange", 'activateButton()');
+        // set a placeholder option
+        var option = document.createElement("option");
+        option.innerHTML="Please Select a Copy";
+        option.setAttribute("disabled", "disabled");
+        option.setAttribute("selected", "selected");
+        selector.appendChild(option);
+        div2.appendChild(selector);
+        div1.appendChild(div2);
+        // set all available options
+        for (var i = 0; i < userBookId.length; i++){
+            var option2 = document.createElement("option");
+            option2.value = userBookId[i];
+            option2.innerHTML = `Listing date: ${date[i]}, Condition : ${condition[i]}`;
+            selector.appendChild(option2);
+        }
+        var br = document.createElement("br")
+        modalBody.appendChild(br)
+        modalBody.appendChild(div1);
+        // // toogle modal
+        $("#pageModal").modal("toggle");
+    }
+    else{
+        modalBody.innerHTML = `Are you sure you want to remove <b>"${title}"</b> from your library?`
+        var confirmButton = document.getElementById('confirmButton');
+        confirmButton.setAttribute("onclick", `remove(${userBookId})`);
+        $("#pageModal").modal("toggle")
+    }
+};
+
+// Remove confirm button functionality
+function removeOptions(){
+    var confirmButton = document.getElementById('confirmButton');
+    confirmButton.removeAttribute("onclick");
+}
+
+// Button is active only if an option is selected
+function activateButton(){
+    var selector = document.getElementById('selector');
+    var userBookId = selector.value;
     var confirmButton = document.getElementById('confirmButton');
     confirmButton.setAttribute("onclick", `remove(${userBookId})`);
-    $("#pageModal").modal("toggle")
-};
+}
 
 // remove a book from user mylibrary
 function remove(userBookId) {

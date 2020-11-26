@@ -4,7 +4,7 @@ $(document).ready(function () {
     });
 
     $('table.table-swap').DataTable({
-        scrollY: 200,
+        scrollY: 600,
         scrollCollapse: true,
         paging: false,
         order: [[4, "desc"]],
@@ -14,7 +14,7 @@ $(document).ready(function () {
         },
         {
             visible: false,
-            targets: [0]
+            targets: [0, "no-show"]
         }]
 
     });
@@ -24,9 +24,7 @@ $(document).ready(function () {
     $('#swapTabs a[href="' + hash + '"]').tab('show');
 })
 
-function viewHistory(id) {
-    console.log(id)
-    
+function viewHistory(id) {    
     var table = $('#historyTable').DataTable({
         destroy: true,
         order: [[1, "asc"]],
@@ -41,8 +39,8 @@ function viewHistory(id) {
             { "data": "date" }
         ]
     });
-    table.ajax.url( 'myswaps/history/' + id ).load();
 
+    table.ajax.url( 'myswaps/history/' + id ).load();
     $('#historyModal').modal('show')
 }
 

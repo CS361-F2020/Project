@@ -35,7 +35,7 @@
           </div>
         </div>
       </div>
-      <div class="row w-100 pb-4">
+      <div class="row w-100 pb-1">
         <div class="col-xl-3 col-lg-3 col-md-3 col-sm-5 col-6 pb-2">
           <div class="card border-primary-bs h-100">
             <div class="card-body text-center">
@@ -59,6 +59,18 @@
         <div class="col-xl-3 col-lg-3 col-md-3 col-sm-5 col-6 pb-2">
           <div class="card border-primary-bs h-100">
             <div class="card-body text-center">
+              <h5 class="card-title">Books Requested</h5>
+              <p class="card-text">
+              <h2 class="text-center">{{totalRequests}}</h2>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row w-100 pb-4">
+        <div class="col-xl-3 col-lg-3 col-md-3 col-sm-5 col-6 pb-2">
+          <div class="card border-primary-bs h-100">
+            <div class="card-body text-center">
               <h5 class="card-title">Available Points</h5>
               <p class="card-text">
               <h2 class="text-center">{{user.points}}</h2>
@@ -79,30 +91,30 @@
       </div>
     </div>
   </div>
+</div>
 
-  <!-- update form -->
-  <div class="modal fade" id="updateAboutMe" tabindex="-1" role="dialog" aria-labelledby="modaltitle"
-    aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header bg-med-bs text-center">
-          <h5 class="modal-title">Update About Me</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
+<!-- update form -->
+<div class="modal fade" id="updateAboutMe" tabindex="-1" role="dialog" aria-labelledby="modaltitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-med-bs text-center">
+        <h5 class="modal-title">Update About Me</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body" id="modalBody">
+        <div class="md-form">
+          <textarea type="text" name="newAboutMe" id="newAboutMe" class="md-textarea form-control" rows="4"
+            value="{{aboutMe}}"></textarea>
         </div>
-        <div class="modal-body" id="modalBody">
-          <div class="md-form">
-            <textarea type="text" name="newAboutMe" id="newAboutMe" class="md-textarea form-control" rows="4"
-              value="{{aboutMe}}"></textarea>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary-bs" onclick="newupdateAboutMe()">Confirm Changes</button>
-        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary-bs" onclick="newupdateAboutMe()">Confirm Changes</button>
       </div>
     </div>
   </div>
+</div>
 
-  <script src="/client/profile.js"></script>
+<script src="/client/profile.js"></script>

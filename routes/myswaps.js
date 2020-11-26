@@ -5,7 +5,178 @@ const common = require('../common')
 
 var today = new Date()
 
-router.get('/', common.isAuthenticated, (req, res, next) => {
+function Transaction(data) {
+    this.userBookId = data.userBookId,
+        this.buyerId = data.requestorId,
+        this.sellerId = data.userId,
+        this.buyerPoints = data.buyerPoints,
+        this.sellerPoints = data.sellerPoints,
+        this.rcvdOnTime = data.rcvdOnTime,
+        this.conditionMatched = data.conditionMatched,
+        this.statusId = data.statusId,
+        this.lost = data.lost
+}
+
+function TransactionDb(data) {
+    this.buyerPoints = data.buyerPoints,
+        this.sellerPoints = data.sellerPoints,
+        this.rcvdOnTime = data.rcvdOnTime,
+        this.conditionMatched = data.conditionMatched,
+        this.statusId = data.statusId,
+        this.lost = data.lost
+}
+
+function TransactionDbClose(data) {
+    if (data.statusId == 5 || data.statusId == 6)
+    {
+        this.buyerPoints = 0
+        this.sellerPoints = 0
+    }
+    else if (data.statusId == 7)
+    {
+        this.buyerPoints = data.buyerPoints / 2
+        this.sellerPoints = 0
+    }
+    else if (data.statusId == 4)
+    {
+        this.lost = false
+        if (data.rcvdOnTime == 0 && data.conditionMatched == 0)
+        {
+            this.buyerPoints = 0
+            this.sellerPoints = 0
+        }
+        else if (data.rcvdOnTime == 0 || data.conditionMatched == 0)
+        {
+            this.buyerPoints = data.buyerPoints / 2
+            this.sellerPoints = data.sellerPoints / 2
+        }
+        else
+        {
+            this.buyerPoints = data.buyerPoints
+            this.sellerPoints = data.buyerPoints
+        }
+    }
+    this.rcvdOnTime = data.rcvdOnTime
+    this.conditionMatched = data.conditionMatched
+    this.statusId = data.statusId
+    this.closed = 1
+}
+
+function getSellerEmail(t_id, callback) {
+    var query = 'SELECT u.email, b.title FROM Transactions t\
+                INNER JOIN UserBooks ub ON userBookId = ub.id\
+                INNER JOIN Users u ON ub.userId = u.id\
+                INNER JOIN Books b ON ub.bookId = b.id\
+                WHERE t.id = ?'
+
+    sql.pool.query(query, [t_id], (err, result) => {
+        if (err) {
+            return callback(err, '')
+        }
+        else if (result.length == 0) {
+            return callback('No result found with id = ' + t_id, '')
+        }
+        else {
+            return callback('', result[0])
+        }
+    })
+}
+
+function getTransaction(t_id, callback) {
+    var query = 'SELECT t.*, ub.* FROM Transactions t INNER JOIN UserBooks ub ON t.userBookId = ub.Id WHERE t.id = ?'
+    sql.pool.query(query, [t_id], (err, result) => {
+        if (err) {
+            return callback(err)
+        }
+        else if (result.length == 0) {
+            return callback('No transaction was found with id = ' + t_id)
+        }
+        var object = new Transaction(result[0])
+        return callback(null, object)
+    })
+}
+
+function updateTransaction(t_obj, t_id, statusChange, callback) {
+    var query = 'UPDATE Transactions SET ? WHERE id = ?'
+
+    sql.pool.query(query, [t_obj, t_id], (err, result) => {
+        if (err) {
+            return callback(err)
+        }
+
+        if (statusChange == true) {
+            addTransactionStatusRecord(t_id, t_obj.statusId, (err, result) => {
+                if (err) {
+                    return callback(err)
+                }
+            })
+        }
+    })
+    return callback(null, 'success')
+}
+
+function addTransactionStatusRecord(t_id, s_id, callback) {
+    var query = 'INSERT INTO TransactionStatusDates (transactionid, statusId, date) VALUES (?, ?, ?)'
+    sql.pool.query(query, [t_id, s_id, today], (err, result) => {
+        if (err) {
+            return callback(err)
+        }
+
+        return callback(null, true)
+    })
+}
+
+function updateBookAvailability(userBookId, available, callback) {
+    var query = 'UPDATE UserBooks SET available = ? WHERE id = ?'
+    sql.pool.query(query, [available, userBookId], (err, result) => {
+        if (err) {
+            return callback(err)
+        }
+        return callback(null, 'success')
+    })
+}
+
+function updateBookAvailabilityByTransaction(transactionId, available, callback)
+{
+    var query = 'UPDATE UserBooks SET available = ? WHERE id = (SELECT userBookId FROM Transactions WHERE id = ?)'
+    sql.pool.query(query, [available, transactionId], (err, result) => {
+        if (err) {
+            return callback(err)
+        }
+    })
+
+    return callback(null, 'success')
+}
+
+function updateBuyerPoints(t_id, buyer_id, callback) {
+    var query = 'UPDATE Users SET points = (SELECT SUM(t.points) FROM (SELECT points FROM Users WHERE id = ?\
+        UNION ALL\
+        SELECT buyerPoints AS points FROM Transactions WHERE id = ?) t) WHERE id = ?'
+
+    sql.pool.query(query, [buyer_id, t_id, buyer_id], (err, result) => {
+        if (err) {
+            return callback(err)
+        }
+        return callback(null, 'success')
+    })
+}
+
+function updateSellerPoints(t_id, seller_id, callback) {
+    var query = 'UPDATE Users SET points = (SELECT SUM(t.points) FROM (SELECT points FROM Users WHERE id = ?\
+    UNION ALL\
+    SELECT sellerPoints AS points FROM Transactions WHERE id = ?) t) WHERE id = ?'
+
+    sql.pool.query(query, [seller_id, t_id, seller_id], (err, result) => {
+        if (err) {
+            return callback(err)
+        }
+
+        return callback(null, 'success')
+    })
+}
+
+
+router.get('/', common.isAuthenticated, (req, res) => {
     var data = {
         title: 'My Swaps',
         sent: [],
@@ -14,33 +185,32 @@ router.get('/', common.isAuthenticated, (req, res, next) => {
 
     var swaps =
         'SELECT "R" AS category, t.id, u.id AS userId, u.email, u.firstName, u.lastName, b.title, REPLACE(b.title, "\'", "") AS jsTitle, b.author, t.created, t.modified, t.statusId,\
-    s.description AS status, CASE WHEN t.statusId = 8 THEN t.sellerPoints ELSE "Pending" END AS points, t.lost, c.description AS cond, CASE WHEN t.rating is NULL THEN 0 ELSE 1 END AS hasSurvey\
-    FROM Transactions t\
-        INNER JOIN Users u ON t.requestorId = u.id\
-        INNER JOIN Statuses s ON t.statusId = s.id\
-        INNER JOIN UserBooks ub ON t.userBookId = ub.id\
-        INNER JOIN Conditions c ON ub.conditionId = c.id\
-        INNER JOIN Books b ON ub.bookId = b.id\
-    WHERE ub.userId = ?\
-    UNION\
-    SELECT "S" AS category, t.id, u.id AS userid, u.email, u.firstName, u.lastName, b.title, REPLACE(b.title, "\'", "") AS jsTitle, b.author, t.created, t.modified, t.statusId,\
-    s.description AS status, CASE WHEN t.statusId = 8 THEN t.buyerPoints ELSE "Pending" END AS points, t.lost, c.description AS cond, CASE WHEN t.rating is NULL THEN 0 ELSE 1 END AS hasSurvey\
-    FROM Transactions t\
-        INNER JOIN Statuses s ON t.statusId = s.Id\
-        INNER JOIN UserBooks ub ON t.userBookId = ub.id\
-        INNER JOIN Users u ON ub.userId = u.id\
-        INNER JOIN Conditions c ON ub.conditionId = c.id\
-        INNER JOIN Books b ON ub.bookId = b.id\
-    WHERE t.requestorId = ?'
+        s.description AS status, t.sellerPoints AS points, CASE WHEN t.closed = 1 THEN "Closed" ELSE "Open" END AS statusType, IFNULL(t.lost, 0) AS lost, c.description AS cond, CASE WHEN t.rating is NULL THEN 0 ELSE 1 END AS hasSurvey\
+        FROM Transactions t\
+            INNER JOIN Users u ON t.requestorId = u.id\
+            INNER JOIN Statuses s ON t.statusId = s.id\
+            INNER JOIN UserBooks ub ON t.userBookId = ub.id\
+            INNER JOIN Conditions c ON ub.conditionId = c.id\
+            INNER JOIN Books b ON ub.bookId = b.id\
+        WHERE ub.userId = ?\
+        UNION\
+        SELECT "S" AS category, t.id, u.id AS userid, u.email, u.firstName, u.lastName, b.title, REPLACE(b.title, "\'", "") AS jsTitle, b.author, t.created, t.modified, t.statusId,\
+        s.description AS status, t.buyerPoints AS points, CASE WHEN t.closed = 1 THEN "Closed" ELSE "Open" END AS statusType, IFNULL(t.lost, 0) AS lost, c.description AS cond, CASE WHEN t.rating is NULL THEN 0 ELSE 1 END AS hasSurvey\
+        FROM Transactions t\
+            INNER JOIN Statuses s ON t.statusId = s.Id\
+            INNER JOIN UserBooks ub ON t.userBookId = ub.id\
+            INNER JOIN Users u ON ub.userId = u.id\
+            INNER JOIN Conditions c ON ub.conditionId = c.id\
+            INNER JOIN Books b ON ub.bookId = b.id\
+        WHERE t.requestorId = ?'
 
     sql.pool.query(swaps, [req.session.userId, req.session.userId], (err, results) => {
         if (err) {
             req.flash('error', err)
-            res.render('myswaps', data)
         }
         else if (results.length > 0) {
             for (var i = 0; i < results.length; i++) {
-                if (results[i].statusId != 8) {
+                if (results[i].statusType != "Closed") {
                     results[i].category == 'S' ? data.sent.push(results[i]) : data.received.push(results[i])
                 }
             }
@@ -49,219 +219,152 @@ router.get('/', common.isAuthenticated, (req, res, next) => {
             data.history = results
             data.historyCount = results.length
         }
+
         res.render('myswaps', data)
     })
 })
 
-router.post('/notReceived', (req, res, next) => {
-    var updateLostFlag = 'UPDATE Transactions SET lost = 1, modified = ? WHERE id = ?'
-    var getSeller = 'SELECT u.Email, t.title FROM Transactions t\
-                        INNER JOIN UserBooks ub ON t.userBookId = ub.id\
-                        INNER JOIN Users u ON ub.userId = u.id\
-                        WHERE t.id = ?'
+router.post('/notReceived', (req, res) => {
+    var errorMsg = 'Error occurred while updating book status. Please try again or contact support at bookswaphelpdesk@gmail.com'
 
-    sql.pool.query(updateLostFlag, [today, req.body.id], (err, results) => {
+    var t_obj = {
+        lost: 1
+    }
+
+    updateTransaction(t_obj, req.body.id, false, (err) => {
         if (err) {
-            return res.send({ error: 'Error occurred when trying to mark book as not received. Please try again.' })
+            console.log(err)
+            return res.send({ error: errorMsg })
         }
 
-        sql.pool.query(getSeller, [req.body.id], (err, results) => {
+        getSellerEmail(req.body.id, (err, result) => {
             if (err) {
-                return res.send({ error: 'Error occurred while sending email to the seller. Please try to manually send an email.' })
+                console.log(err)
+                return res.send({ error: errorMsg })
             }
-            else if (results.length > 0) {
-                var message = {
-                    from: 'bookswap@gmail.com',
-                    to: results[0].email,
-                    subject: 'BookSwap: A Book You Sent Has Been Flagged as Not Received',
-                    text: results[0].title + ' has been flagged as not received by the buyer. Please login to book swap and update the status or contact the user directly.'
-                }
-                common.transport.sendMail(message)
+
+            var message = {
+                from: 'bookswap@gmail.com',
+                to: result.email,
+                subject: 'BookSwap: A Book You Sent Has Been Flagged as Not Received',
+                text: result.title + ' has been flagged as not received by the buyer. Please login to book swap and update the status or contact the user directly.'
             }
+
+            common.transport.sendMail(message)
             res.send({ success: 'success' })
         })
     })
 })
 
-router.post('/updateStatus', (req, res, next) => {
-    var updateTransaction = 'UPDATE Transactions SET statusId = ?, modified = ? WHERE id = ?'
-    var transactionStatuses = 'INSERT INTO TransactionStatusDates (transactionId, statusId, date) VALUES (?, ?, ?)'
-    var updateAvailable = 'UPDATE UserBooks SET available = 1 WHERE id = (SELECT userBookId FROM Transactions WHERE id = ?)'
+router.post('/updateStatus', (req, res) => {
+    var errorMsg = 'Error occurred while trying to update status. Please try again or contact support at bookswaphelpdesk@gmail.com'
 
-    var formData = req.body
+    var t_obj = {
+        statusId: req.body.statusId,
+        modified: today
+    }
 
-    // update transaction record status and modified date
-    sql.pool.query(updateTransaction, [formData.statusId, today, formData.id],
-        (err, results) => {
-            if (err) {
-                return res.send({ error: 'Error occurred when trying to update status. Please try again.' })
-            }
+    updateTransaction(t_obj, req.body.id, true, (err) => {
+        if (err) {
+            console.log(err)
+            return res.send({ error: errorMsg })
+        }
 
-            // add record to transaction status history
-            sql.pool.query(transactionStatuses, [formData.id, formData.statusId, today],
-                (err, results) => {
-                    if (err) {
-                        return res.send({ error: 'Error occured when trying to update status history.' })
-                    }
+        if (req.body.statusId == 5 || req.body.statusId == 6) {
+            updateBookAvailabilityByTransaction(req.body.id, 1, (err) => {
+                if (err) {
+                    console.log(err)
+                    return res.send({ error: errorMsg })
+                }
+            })
+        }
+    })
 
-                    // if status is cancelled or rejected, make available immediately
-                    if (formData.statusId == 5 || formData.statusId == 6) {
-                        sql.pool.query(updateAvailable, [formData.id], (err, results) => {
-                            if (err) {
-                                return res.send({ error: 'Error occurred when trying to make book available. Please contact support at bookswaphelpdesk@gmail.com' })
-                            }
-
-                            res.send({ success: 'success' })
-                        })
-                    }
-
-                    res.send({ success: 'success' })
-                })
-        })
+    return res.send({ success: 'success' })
 })
 
-router.post('/close', (req, res, next) => {
-    var getTransaction = 'SELECT t.requestorId AS buyer, ub.userId AS seller, t.buyerPoints, t.sellerPoints, t.rcvdOnTime, t.conditionMatched\
-                            FROM Transactions t\
-                                INNER JOIN UserBooks ub ON t.userBookId = ub.Id\
-                            WHERE t.id = ?'
-    var updateTransaction = 'UPDATE Transactions SET sellerPoints = ?, buyerPoints = ?, statusId = 8, lost = ? WHERE id = ?'
-    var transactionStatuses = 'INSERT INTO TransactionStatusDates (transactionId, statusId, date) VALUES (?, 8, ?)'
-    var updateUserPoints = 'UPDATE Users SET points = points + ? WHERE id = ?'
-    var updateAvailable = 'UPDATE UserBooks SET available = ? WHERE id = (SELECT userBookId FROM Transactions WHERE id = ?)'
-    var errorMessage = 'Error occurred when trying to close the transaction. Pleae try again.'
-
-    var formData = req.body
-
-    // if status on close is lost, make sure lost flag is set
-    var lostFlag = req.body.statusId == 7 ? true : false;
-
-    // set avialable based on status
-    var available = req.body.statusId == 4 || req.body.statusId == 7 ? false : true;
-
-    sql.pool.query(getTransaction, [formData.id], (err, results) => {
+router.post('/close', (req, res) => {
+    var errorMsg = 'Error occurred while trying to close the transaction. Please try again or contact support at bookswaphelpdesk@gmail.com'
+    var available = req.body.statusId == 5 || req.body.statusId == 6 ? true : false
+    getTransaction(req.body.id, (err, result) => {
         if (err) {
-            return res.send({ error: errorMessage })
+            console.log(err)
+            return res.send({ error: errorMsg })
         }
+        var originalObj = result
+        var updatedObj = new TransactionDbClose(result)
 
-        var transaction = results[0]
-        var sellerPointGain = transaction.sellerPoints
-        var buyerPointLoss = transaction.buyerPoints
-
-        // update point variables
-        if (transaction.statusId == 4) {
-            // if late and bad condition, complete loss
-            if (transaction.rcvdOnTime == 0 && t.conditionMatched == 0) {
-                sellerPointGain = 0
-                buyerPointLoss = 0
-            }
-            // if late or bad condition, cut cost/gain in half
-            else if (transaction.rcvdOnTime == 0 || t.conditionMatched == 0) {
-                sellerPointGain = transaction.points / 2
-                buyerPointLoss = transaction.points / 2
-            }
-        }
-        // ir received or rejected, set to 0
-        else if (transaction.statusId == 5 || transaction.statusId == 6) {
-            sellerPointGain = 0
-            buyerPointLoss = 0
-        }
-        // if lost, seller gets half points and it costs buyer nothing
-        else if (transaction.statusId == 7) {
-            sellerPointGain = transaction.points / 2
-            buyerPointLoss = 0
-        }
-
-        // update transaction
-        sql.pool.query(updateTransaction, [sellerPointGain, buyerPointLoss, lostFlag, formData.id], (err, resuts) => {
+        updateTransaction(updatedObj, req.body.id, false, (err, result) => {
             if (err) {
-                return res.send({ error: errorMessage })
+                console.log(err)
+                return res.send({ error: errorMsg })
             }
-
-            // add transaction status record
-            sql.pool.query(transactionStatuses, [formData.id, today], (err, results) => {
-                if (err) {
-                    return res.send({ error: errorMessage })
-                }
-
-                // update book availability
-                sql.pool.query(updateAvailable, [available, formData.id], (err, results) => {
+            else if (result == 'success') {
+                updateBookAvailability(originalObj.userBookId, available, (err, result) => {
                     if (err) {
-                        return res.send({ error: errorMessage })
+                        console.log(err)
+                        return res.send({ error: errorMsg })
                     }
-
-                    // update seller points
-                    sql.pool.query(updateUserPoints, [sellerPointGain, transaction.seller], (err, results) => {
-                        if (err) {
-                            return res.send({ error: errorMessage })
-                        }
-
-                        // update buyer points
-                        sql.pool.query(updateUserPoints, [buyerPointLoss, transaction.buyer], (err, results) => {
+                    else if (result == 'success') {
+                        updateSellerPoints(req.body.id, originalObj.sellerId, (err, result) => {
                             if (err) {
-                                return res.send({ error: errorMessage })
+                                console.log(err)
+                                return res.send({ error: errorMsg })
                             }
-                            
-                            res.send({ success: 'success' })
+                            else if (result == 'success') {
+                                updateBuyerPoints(req.body.id, originalObj.buyerId, (err, result) => {
+                                    if (err) {
+                                        console.log(err)
+                                        return res.send({ error: errorMsg })
+                                    }                      
+                                })
+                            }
                         })
-                    })
+                    }
                 })
-            })
+            }
         })
     })
+
+    res.send({ success: 'success' })
 })
 
-router.post('/survey/submit', (req, res, next) => {
-    var errorMessage = 'Error occurred while saving survey. Please try again later.'
-    var updateTransaction = 'UPDATE Transactions SET ? WHERE id = ?'
-    var transactionStatuses = 'INSERT INTO TransactionStatusDates (transactionId, statusId, date) VALUES (?, 4, ?)'
-    console.log(req.body)
-    var data = {
+router.post('/survey/submit', (req, res) => {
+    var errorMsg = 'Error occurred while saving survey. Please try again or contact support at bookswaphelpdesk@gmail.com'
+    var successMsg = req.body.isNew == 'true' ? 'Thank you for submitting our swap survey!' : 'Your survey has been updated! Remember, once the swap is closed you cannot update your survey'
+
+    var t_obj = {
         statusId: '4',
         rcvdOnTime: req.body.rcvdOnTime == '1' ? true : false,
         conditionMatched: req.body.conditionMatched == '1' ? true : false,
         rating: req.body.star,
-        modified: today,
         lost: false
     }
 
-    // update transaction and point cost
-    sql.pool.query(updateTransaction, [data, req.body.id], (err, results) => {
+    var updateStatus = req.body.isNew == 'true' ? true : false;
+
+    updateTransaction(t_obj, req.body.id, updateStatus, (err) => {
         if (err) {
-            return res.send({ error: errorMessage })
+            console.log(err)
+            return res.send({ error: errorMsg })
         }
-
-        if (req.body.isNew == 'true') {
-            // add to transaction status
-            sql.pool.query(transactionStatuses, [req.body.id, today], (err, results) => {
-                if (err) {
-                    return res.send({ error: errorMessage })
-                }
-
-                req.flash('success', 'Thank you for submitting our swap survey!')
-                res.send({ success: 'Success' })
-            })
-        }
-        else
-        {
-            req.flash('success', 'Your survey has been updated! Remember, once the swap is closed you cannot update your survey')
-            res.send({ success: 'Success' })
-        }
-
-
     })
+
+    req.flash('success', successMsg)
+    return res.send({ success: 'success' })
 })
 
-router.get('/survey/(:id)', common.isAuthenticated, (req, res, next) => {
+router.get('/survey/(:id)', common.isAuthenticated, (req, res) => {
     var getSurvey = 'SELECT t.rcvdOnTime, t.conditionMatched, t.rating, t.created, c.description as cond\
-    FROM Transactions t\
-    INNER JOIN UserBooks ub ON t.userBookId = ub.id\
-    INNER JOIN Conditions c ON ub.conditionId = c.id\
-    WHERE t.id = ?'
-    console.log(req.params.id)
+                     FROM Transactions t\
+                        INNER JOIN UserBooks ub ON t.userBookId = ub.id\
+                        INNER JOIN Conditions c ON ub.conditionId = c.id\
+                     WHERE t.id = ?'
+    var errorMsg = 'Error occurred while retrieving survey. Please try again or contact support at bookswaphelpdesk@gmail.com'
+
     sql.pool.query(getSurvey, [req.params.id], (err, results) => {
         if (err || results.length == 0) {
-            return res.send({ error: 'Error occurred while getting survey' })
+            return res.send({ error: errorMsg })
         }
 
         var data = {
@@ -272,18 +375,18 @@ router.get('/survey/(:id)', common.isAuthenticated, (req, res, next) => {
             condition: results[0].cond
         }
 
-        res.send(data)
+        return res.send(data)
     })
 })
 
-router.get('/history/(:id)', (req, res, next) => {
-    var data = { title: 'Swap History' }
+router.get('/history/(:id)', (req, res) => {
     var getHistory = 'SELECT s.description AS status, tsd.date \
-                        FROM TransactionStatusDates tsd \
+                      FROM TransactionStatusDates tsd \
                         INNER JOIN Statuses s ON tsd.statusId = s.id \
-                        WHERE tsd.transactionId = ?'
+                      WHERE tsd.transactionId = ?'
+
     sql.pool.query(getHistory, [req.params.id], (err, results) => {
-        res.send({ data: results })
+        return res.send({ data: results })
     })
 })
 

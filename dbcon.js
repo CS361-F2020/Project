@@ -7,11 +7,11 @@ var pool = mysql.createPool({
     dateStrings: 'true',
     typeCast: function castField(field, useDefaultTypeCasting) {
         if (field.type === "BIT" && field.length === 1) {
-            var bytes = field.buffer();
-            return (bytes[0] === 1);
+            var bytes = field.buffer()
+            return (bytes === null) ? null : (bytes[0] === 1)
         }
-        return useDefaultTypeCasting();
+        return useDefaultTypeCasting()
     }
 });
 
-module.exports.pool = pool; 
+module.exports.pool = pool

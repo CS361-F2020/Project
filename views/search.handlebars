@@ -7,20 +7,32 @@
             <div class="col text-left">
                 <a href="/faq" target="_blank"><i class="fas fa-info-circle text-info-bs"
                         title="Learn about our point system"></i></a>
+                <br>
             </div>
         </div>
-
-        <div class="card-columns"></div>
-        <div class="row">
+        <div class = "row">
+            <div class = "col-auto pr-0 mb-3">
+                <input type="text" id="myFilter" class="form-control" onkeyup="searchResults()" placeholder="Enter terms to start search.">
+                    
+            </div>
+            <div class="col text-left">
+                <i class="fas fa-info-circle text-info-bs" title="Any books that are displayed have these terms in either their title, author, genre, rating, or publication date."></i>
+                <br>
+            </div>
+        </div>
+        <div class="row" id = "myItems">
             {{#each books}}
             <div id="{{id}}"
                 class="card cards border rounded bg-light p-3 col-xl-2 col-lg-3 col-md-3 col-sm-4 col-5 mr-3 mb-3">
                 <img src="{{imgUrl}}" class="card-img-top cover-art pb-1">
                 <div class="card-body px-0 pt-1 pb-1 text-center">
-                    <p class="card-text mb-0">{{title}}</p>
-                    <p class="card-text">{{author}}</p>
+                    <p class="card-text mb-0 card-title">{{title}}</p>
+                    <p class="card-text mb-0 card-author">{{author}}</p>
+                    <div class="card-genre" hidden>{{genre}}</div>
+                    <div class="card-rating" hidden>{{rating}}</div>
+                    <div class="card-pubdate" hidden>{{pubDate}}</div>
                 </div>
-                <button class="btn btn-small small btn-info-bs mb-1">View Details</button>
+                <button class="btn btn-small small btn-info-bs mb-1" onclick = "bookDetails('{{isbn}}', {{pointcost}})">View Details</button>
                 <button class="btn btn-primary-bs btn-small small"
                     onclick="requestBook([{{id}}], {{pointcost}}, '{{title}}', {{userPoints}}, '{{condition}}', '{{date}}')">Request A Copy {{#if copies}}({{copies}}){{/if}}</button>
             </div>
@@ -61,39 +73,22 @@
                 </button>
             </div>
             <div class="modal-body" id="modalBody">
-                <b>
-                    <h8>Title</h8>
-                </b><br>
-                <p id="detailTitle"></p>
-                <b>
-                    <h8>Author</h8>
-                </b><br>
-                <p id="detailAuthor"></p>
-                <b>
-                    <h8>Genre</h8>
-                </b><br>
-                <p id="detailGenre"></p>
-                <b>
-                    <h8>Language</h8>
-                </b><br>
-                <p id="detailLanguage"></p>
-                <b>
-                    <h8>Point Cost</h8>
-                </b><br>
-                <p id="detailPointCost"></p>
-                <b>
-                    <h8>Rating</h8>
-                </b><br>
-                <p id="detailRating"></p>
-                <!-- need to add this in later
-                <b><h8>Google Link</h8></b><br>
-                <p id = "detailGoogleLink"></p>
-                -->
-                <b>
-                    <h8>Description</h8>
-                </b><br>
-                <p id="detailDescription"></p>
-                {{isbn}}
+                <div class = "col-12">
+                    <div class="font-weight-bold">Title</div>
+                        <div id="detailTitle" class="mb-1"></div>
+                    <div class="font-weight-bold">Author</div>
+                        <div id="detailAuthor" class="mb-1"></div>
+                    <div class="font-weight-bold">Genre</div>
+                        <div id="detailGenre" class="mb-1"></div>
+                    <div class="font-weight-bold">Language</div>
+                        <div id="detailLanguage" class="mb-1"></div>
+                    <div class="font-weight-bold">Point Cost</div>
+                        <div id="detailPointCost" class="mb-1"></div>
+                    <div class="font-weight-bold">Rating</div>
+                        <div id="detailRating"></div>
+                    <div class="font-weight-bold" class="mb-1">Description</div>
+                        <div id="detailDescription"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -103,13 +98,13 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header bg-med-bs text-center">
-                <h5 class="modal-title" id="modalLabel">Request a Book</h5>
+                <h5 class="modal-title" id="modalLabel">You do not have enough points.</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body" id="modalBody">
-                <div id="question">
+                <div id="question" class="col-12">
                     <div class="text-primary-bs-bold">How do I earn points?</div>
                     <div>
                         <ul>
@@ -128,11 +123,14 @@
                             </li>
                         </ul>
                     </div>
+                    <div class = "col text-center">
+                        <a href="/faq" class = "btn btn-info btn-primary-bs " role = "button">Learn more about the point system</a>
+                    </div>
+                    
                 </div>
             </div>
         </div>
     </div>
 </div>
-
 
 <script src="/client/search.js"></script>
