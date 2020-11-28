@@ -16,7 +16,7 @@
                     
             </div>
             <div class="col text-left">
-                <i class="fas fa-info-circle text-info-bs" title="Any books that are displayed have these terms in either their title, author, genre, rating, or publication date."></i>
+                <i class="fas fa-info-circle text-info-bs" title="Any books that are displayed have these terms in either their title, author, condition, genre, rating, or publication date."></i>
                 <br>
             </div>
         </div>
@@ -29,10 +29,11 @@
                     <p class="card-text mb-0 card-title">{{title}}</p>
                     <p class="card-text mb-0 card-author">{{author}}</p>
                     <div class="card-genre" hidden>{{genre}}</div>
-                    <div class="card-rating" hidden>{{rating}}</div>
-                    <div class="card-pubdate" hidden>{{pubDate}}</div>
+                    <div id = "rating" class="card-rating" hidden>{{rating}}</div>
+                    <div id = "pubdate" class="card-pubdate" hidden>{{pubDate}}</div>
+                    <div id = "pubdate" class="card-condition" hidden>{{condition}}</div>
                 </div>
-                <button class="btn btn-small small btn-info-bs mb-1" onclick = "bookDetails('{{isbn}}', {{pointcost}})">View Details</button>
+                <button class="btn btn-small small btn-info-bs mb-1" onclick = "bookDetails('{{isbn}}', {{pointcost}}, '{{pubDate}}', '{{rating}}', '{{condition}}')">View Details</button>
                 <button class="btn btn-primary-bs btn-small small"
                     onclick="requestBook({{id}}, {{pointcost}}, `{{title}}`, {{userPoints}})">Request A Copy</button>
             </div>
@@ -57,6 +58,10 @@
                         <div id="detailTitle" class="mb-1"></div>
                     <div class="font-weight-bold">Author</div>
                         <div id="detailAuthor" class="mb-1"></div>
+                    <div class="font-weight-bold">Condition</div>
+                        <div id="detailCondition" class="mb-1"></div>
+                    <div class="font-weight-bold">Publication Date</div>
+                        <div id="detailPubDate" class="mb-1"></div>
                     <div class="font-weight-bold">Genre</div>
                         <div id="detailGenre" class="mb-1"></div>
                     <div class="font-weight-bold">Language</div>
