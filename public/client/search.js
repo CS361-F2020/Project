@@ -14,7 +14,7 @@ function requestBook(bookId, pointCost, title, userPoints){
 // AJAX request a book
 function request(bookId, pointCost, title){
     $.ajax({
-        url: '/search',
+        url: '/search/request',
         method: 'POST',
         dataType: 'json',
         data: {'bookId': bookId, 'title': title, 'pointCost': pointCost},
