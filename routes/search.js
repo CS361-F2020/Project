@@ -164,7 +164,4 @@ router.post('/request', common.isAuthenticated, (req, res, next) => {
     });
 });
 
-
-
-
 module.exports = router;
