@@ -11,8 +11,22 @@ function Book(data) {
     this.imgUrl = data.imgUrl;
     this.pointcost = data.pointcost;
     this.isbn = data.isbn;
+    this.genre = data.genre;
+    this.rating = data.rating;
+    this.pubDate = data.pubDate;
+    this.condition = data.condition;
     this.userPoints = data.userPoints;
 }
+
+//Glenn: I was testing out character removal with this function. 
+//I think it works a little better than the one from the stack overflow post provided the other day
+//maybe a good candidate for handling characters?
+function replaceCharacters(userText) {
+    var regExpr = /[^a-zA-Z0-9-. ]/g;
+    
+    return userText.replace(regExpr, "");
+}
+
         
 // @route   GET /allBooks
 // @desc    Get all available books that don't belong to the user and are not undergoing transactions
@@ -26,16 +40,18 @@ router.get('/', common.isAuthenticated, (req, res, next) => {
 // Get all avaialable books
 // ******** need to update this based on worldwide shippers
 function allBooks(id, callback){
-    var selectAllAvailableBooks = `SELECT UserBooks.id AS id, title AS title, author AS author, imgUrl AS imgUrl, isbn13 AS isbn, Users.country
+    var selectAllAvailableBooks = `SELECT UserBooks.id AS id, title, author, imgUrl, isbn13 AS isbn, genre, rating, pubDate, Users.country, Conditions.description AS description
                                  FROM UserBooks
                                  INNER JOIN Books ON Books.id = UserBooks.bookId
                                  INNER JOIN Users ON Users.id = UserBooks.userId
+                                 INNER JOIN Conditions ON Conditions.id = UserBooks.conditionId
                                  WHERE UserBooks.userId != ? AND UserBooks.available = 1 AND Users.worldwide = 1
                                  UNION
-                                 SELECT UserBooks.id AS id, title AS title, author AS author, imgUrl AS imgUrl, isbn13 AS isbn, Users.country
+                                 SELECT UserBooks.id AS id, title, author, imgUrl, isbn13 AS isbn, genre, rating, pubDate, Users.country, Conditions.description AS description
                                  FROM UserBooks
                                  INNER JOIN Books ON Books.id = UserBooks.bookId
                                  INNER JOIN Users ON Users.id = UserBooks.userId
+                                 INNER JOIN Conditions ON Conditions.id = UserBooks.conditionId
                                  WHERE UserBooks.userId != ? AND UserBooks.available = 1 AND Users.country = ?`;
 
     var selectUserCountry = `SELECT Users.country AS country, Users.points AS userPoints
@@ -76,6 +92,10 @@ function allBooks(id, callback){
                     imgUrl: result[i].imgUrl,
                     pointcost: points,
                     isbn: result[i].isbn,
+                    genre: result[i].genre,
+                    rating: result[i].rating,
+                    pubDate: result[i].pubDate,
+                    condition: result[i].description,
                     userPoints: userPoints
                 }
                 payload.books.push(new Book(data));           
@@ -88,12 +108,13 @@ function allBooks(id, callback){
 
 // @route   POST /home
 // @desc    Request a book
-router.post('/', common.isAuthenticated, (req, res, next) => {
-    const errMsg = 'Error requesting book, please try again.';
-    const id = req.body.bookId;
-    const title = req.body.title;
-    const userId = req.session.userId;
-    var date = new Date().toISOString().slice(0, 10);
+router.post('/request', common.isAuthenticated, (req, res, next) => {
+    const errMsg = 'Error requesting book, please try again.'
+    var id = req.body.bookId
+    var title = req.body.title
+    var userId = req.session.userId
+    var pointCost = req.body.pointCost
+    var date = new Date()
     
     // set the UserBooks.available to 0 for not available for swaps
     // need to update this to check for worldwide shippers
@@ -106,7 +127,7 @@ router.post('/', common.isAuthenticated, (req, res, next) => {
             })
         }else {
             // add a new transaction record
-            db.pool.query('INSERT INTO Transactions (userBookId, requestorId, statusId, sellerPoints, buyerPoints, created, modified) VALUES (?, ?, ?, ?, ?, ?, ?)', [id, userId, 1, 4, 4, date, date], (err,result) => {
+            db.pool.query('INSERT INTO Transactions (userBookId, requestorId, statusId, sellerPoints, buyerPoints, created, modified) VALUES (?, ?, ?, ?, ?, ?, ?)', [id, userId, 1, pointCost, pointCost * -1, date, date], (err,result) => {
                 if (err) {
                     allBooks( userId, function(result){
                         var  payload = result;
@@ -124,6 +145,7 @@ router.post('/', common.isAuthenticated, (req, res, next) => {
                                 res.render('search', payload);
                             })
                         }
+                        var successMsg = req.body.title + ' has been requested!';
                         // database has been updated
                         // send an email to the seller that a book has been requested
                         // **** update text or maybe use html
@@ -133,13 +155,16 @@ router.post('/', common.isAuthenticated, (req, res, next) => {
                             text: 'You have a new request for ' + title
                         }
                         common.transport.sendMail(message);
-                
-                        res.send({success: true});
+                        req.flash('success', successMsg)
+                        res.send({success: 'success'});
                     });
                 }
             });
         }
     });
 });
+
+
+
 
 module.exports = router;

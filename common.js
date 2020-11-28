@@ -1,15 +1,14 @@
 const nodemailer = require('nodemailer')
 const sql = require('./dbcon.js');
 
-
-
+var today = new Date()
 var transport = nodemailer.createTransport({
     host: 'smtp.gmail.com',
     port: 465,
     secure: true,
     auth: {
         user: 'bookswaphelpdesk@gmail.com',
-        pass: 'bookSwapFirst!361'
+        pass: 'havKo9-xostef-gymnuc'
     }
 })
 
@@ -38,7 +37,7 @@ function getPoints(userId, callback) {
 }
 
 function getPendingPoints(userId, callback) {
-    var outgoing = `SELECT SUM(u.points) AS totalPoints
+    var query = `SELECT SUM(u.points) AS totalPoints
     FROM 
     (SELECT SUM(t.buyerPoints) AS points 
     FROM Transactions t
@@ -49,7 +48,7 @@ function getPendingPoints(userId, callback) {
         INNER JOIN UserBooks ub on ub.id = t.userBookId 
     WHERE ub.userId = ? AND statusId <> 8) AS u`
 
-    sql.pool.query(outgoing, [userId, userId], (err, results) => {
+    sql.pool.query(query, [userId, userId], (err, results) => {
         if (err) {
             throw err
         }
@@ -61,11 +60,11 @@ function getPendingPoints(userId, callback) {
 // Update a user's point total
 function updateUserPoints(userId, pointAdj, callback) {
     var query = 'UPDATE Users SET points = points + ? WHERE id = ?'
-    sql.pool.query(query, [pointAdj, userId], (err) => {
+    sql.pool.query(query, [pointAdj, userId], (err, result) => {
         if (err) {
-            return callback(err, false)
+            return callback(err)
         }
-        return callback('', true)
+        return callback(null, result)
     })
 }
 
@@ -74,13 +73,13 @@ function bookExists(isbn, callback) {
     var query = 'SELECT id FROM Books WHERE isbn10 = ? OR isbn13 = ?'
     sql.pool.query(query, [isbn, isbn], (err, result) => {
         if (err) {
-            return callback(err, '', 0)
+            return callback(err)
         }
         else if (result.length == 0) {
-            return callback('', false, 0)
+            return callback(null, false, 0)
         }
         else {
-            return callback('', true, result[0].id)
+            return callback(null, true, result[0].id)
         }
     })
 }
@@ -93,4 +92,3 @@ module.exports = {
     updateUserPoints,
     bookExists
 }
-
