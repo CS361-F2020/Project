@@ -33,7 +33,7 @@ function request(bookId, pointCost, title){
     })
 }
 
-function bookDetails(isbn, pointCost){
+function bookDetails(isbn, pointCost, pubDate, rating, condition){
         $.ajax({
             url: '/googleapi/isbn/' + isbn,
             method: 'GET',
@@ -41,10 +41,12 @@ function bookDetails(isbn, pointCost){
             success: function (res) {
                 $("#detailTitle").text(res.title)
                 $("#detailAuthor").text(res.author)
+                $("#detailCondition").text(condition)
+                $("#detailPubDate").text(pubDate);
                 $("#detailGenre").text(res.genre)
                 $("#detailLanguage").text(res.language)
                 $("#detailPointCost").text(pointCost)
-                $("#detailRating").text(res.rating)
+                $("#detailRating").text(rating)
                 $("#detailDescription").text(res.description)
                 $("#detailModal").modal("show");
             },
@@ -68,12 +70,14 @@ function searchResults() {
         title = cards[i].querySelector(".card-body p.card-title");
         rating = cards[i].querySelector(".card-body div.card-rating");
         pubDate = cards[i].querySelector(".card-body div.card-pubdate");
+        condition = cards[i].querySelector(".card-body div.card-condition");
 
         if ((genre.innerText.toUpperCase().indexOf(filter)   > -1) ||
             (author.innerText.toUpperCase().indexOf(filter)  > -1) ||
             (title.innerText.toUpperCase().indexOf(filter)   > -1) ||
             (rating.innerText.toUpperCase().indexOf(filter)  > -1) ||
-            (pubDate.innerText.toUpperCase().indexOf(filter) > -1)) 
+            (pubDate.innerText.toUpperCase().indexOf(filter) > -1) ||
+            (condition.innerText.toUpperCase().indexOf(filter) > -1)) 
         {
             cards[i].style.display = "";
         } else {
