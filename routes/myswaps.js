@@ -53,7 +53,7 @@ function TransactionDbClose(data) {
         else
         {
             this.buyerPoints = data.buyerPoints
-            this.sellerPoints = data.buyerPoints
+            this.sellerPoints = data.sellerPoints
         }
     }
     this.rcvdOnTime = data.rcvdOnTime
