@@ -73,7 +73,7 @@
             <div class="card-body text-center">
               <h5 class="card-title">Available Points</h5>
               <p class="card-text">
-              <h2 class="text-center">{{user.points}}</h2>
+              <h2 class="text-center">{{availablePoints}}</h2>
               </p>
             </div>
           </div>
@@ -81,9 +81,19 @@
         <div class="col-xl-3 col-lg-3 col-md-3 col-sm-5 col-6 pb-2">
           <div class="card border-primary-bs h-100">
             <div class="card-body text-center">
-              <h5 class="card-title">Pending Points</h5>
+              <h5 class="card-title">Pending Purch Points</h5>
               <p class="card-text">
-              <h2 class="text-center">{{pendingPoints}}</h2>
+              <h2 class="text-center">{{pendingPointsPurchase}}</h2>
+              </p>
+            </div>
+          </div>
+        </div>
+                <div class="col-xl-3 col-lg-3 col-md-3 col-sm-5 col-6 pb-2">
+          <div class="card border-primary-bs h-100">
+            <div class="card-body text-center">
+              <h5 class="card-title">Pending Sale Points</h5>
+              <p class="card-text">
+              <h2 class="text-center">{{pendingPointsSale}}</h2>
               </p>
             </div>
           </div>

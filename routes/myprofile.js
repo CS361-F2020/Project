@@ -28,15 +28,24 @@ var updateAboutMe = `UPDATE Users SET aboutMe=? WHERE id=?`;
 
 router.get('/', common.isAuthenticated, (req, res, next) => {
     const userId = req.session.userId
-    var payload = {}
+    var payload = { title: 'My Profile' }
     payload.pendingPoints = 0
-    payload.user
-    var sentBooks = 0
-    var receivedBooks = 0
+    payload.availablePoints = 0
+    payload.totalPoints = 0
+    payload.sentBooks = 0
+    payload.receivedBooks = 0
 
     // get users pending points
-    common.getPendingPoints(userId, function (result) {
-        payload.pendingPoints = result
+    common.getUserPoints(userId, function (err, result) {
+        if (err)
+        {
+            req.flash('error', err)
+            return res.render('myprofile', payload)
+        }
+        payload.pendingPointsPurchase = result.pendingPointsPurchase
+        payload.pendingPointsSale = result.pendingPointsSale
+        payload.availablePoints = result.availablePoints
+        payload.totalPoints = result.totalPoints
 
         // get user info
         db.pool.query(selectUserinfo, [userId], (err, results) => {
@@ -55,11 +64,9 @@ router.get('/', common.isAuthenticated, (req, res, next) => {
                         res.render('myprofile', payload)
                     } else {
                         for (let i = 0; i < result.length; i++) {
-                            if (result[i].sellerId == userId) { sentBooks++ }
-                            else if (result[i].requestorId == userId) { receivedBooks++ }
+                            if (result[i].sellerId == userId) { payload.sentBooks++ }
+                            else if (result[i].requestorId == userId) { payload.receivedBooks++ }
                         }
-                        payload.sentBooks = sentBooks
-                        payload.receivedBooks = receivedBooks
 
                         db.pool.query(totalRequests, [userId], (err, result) => {
                             if (err)

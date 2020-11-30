@@ -23,37 +23,36 @@ function isAuthenticated(req, res, next) {
     }
 }
 
-function getPoints(userId, callback) {
-    const id = userId
-    sql.pool.query('SELECT points FROM Users WHERE id = ?', [id], (err, result) => {
-        if (err) {
-            // do some error handling
-            next(err)
-            return
-        }
-        var points = result[0].points
-        return callback(points)
-    })
-}
+function getUserPoints(userId, callback)
+{
+    var pendingPoints = `SELECT SUM(u.points) AS pendingPoints, SUM(u.pendingPurchase) AS pendingPurchase, SUM(u.pendingSale) AS pendingSale FROM
+                        (SELECT SUM(t.buyerPoints) AS points, SUM(t.buyerPoints) AS pendingPurchase, 0 AS pendingSale FROM Transactions t WHERE requestorId = ? AND closed <> 1
+                        UNION
+                        SELECT SUM(t.sellerPoints) AS points, 0 AS pendingPurchase, SUM(t.sellerPoints) AS pendingSale FROM Transactions t
+                            INNER JOIN UserBooks ub on ub.id = t.userBookId WHERE ub.userId = ? AND closed <> 1) AS u`
 
-function getPendingPoints(userId, callback) {
-    var query = `SELECT SUM(u.points) AS totalPoints
-    FROM 
-    (SELECT SUM(t.buyerPoints) AS points 
-    FROM Transactions t
-    WHERE requestorId = ? AND statusId <> 8 
-    UNION 
-    SELECT SUM(t.sellerPoints) AS points 
-    FROM Transactions t 
-        INNER JOIN UserBooks ub on ub.id = t.userBookId 
-    WHERE ub.userId = ? AND statusId <> 8) AS u`
+    var userPoints = 'SELECT points FROM Users WHERE id = ?'
+    sql.pool.query(userPoints, [userId], (err, result) => {
+        var data = { }
 
-    sql.pool.query(query, [userId, userId], (err, results) => {
-        if (err) {
-            throw err
+        if (err)
+        {
+            return callback(err, '');
         }
-        var totalPoints = results[0].totalPoints
-        return callback(totalPoints)
+        var userPoints = result[0].points
+        data.userPoints = userPoints
+
+        sql.pool.query(pendingPoints, [userId, userId], (err, result) => {
+            if (err)
+            {
+                return callback(err, '')
+            }
+            data.pendingPointsTotal = result[0].pendingPoints
+            data.pendingPointsPurchase = result[0].pendingPurchase
+            data.pendingPointsSale = result[0].pendingSale
+            data.availablePoints = userPoints + result[0].pendingPurchase
+            return callback('', data)
+        })
     })
 }
 
@@ -88,8 +87,7 @@ function bookExists(isbn, callback) {
 module.exports = {
     isAuthenticated,
     transport,
-    getPoints,
-    getPendingPoints,
     updateUserPoints,
-    bookExists
+    bookExists,
+    getUserPoints
 }

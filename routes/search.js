@@ -1,6 +1,6 @@
-const express = require('express');
-const router = express.Router();
-const db = require('../dbcon.js');
+const express = require('express')
+const router = express.Router()
+const db = require('../dbcon.js')
 const common = require('../common')
 
 // Book object
@@ -30,8 +30,13 @@ function replaceCharacters(userText) {
         
 // @route   GET /allBooks
 // @desc    Get all available books that don't belong to the user and are not undergoing transactions
-router.get('/', common.isAuthenticated, (req, res, next) => {
-    allBooks(req.session.userId, function(result) {
+router.get('/', common.isAuthenticated, (req, res) => {
+    allBooks(req.session.userId, function(err, result) {
+        if (err)
+        {
+            return res.render('search', { title: 'Available Books' })
+        }
+
         var payload = result;
         res.render('search', payload);
     })
@@ -54,7 +59,7 @@ function allBooks(id, callback){
                                  INNER JOIN Conditions ON Conditions.id = UserBooks.conditionId
                                  WHERE UserBooks.userId != ? AND UserBooks.available = 1 AND Users.country = ?`;
 
-    var selectUserCountry = `SELECT Users.country AS country, Users.points AS userPoints
+    var selectUserCountry = `SELECT Users.country AS country
                             FROM Users
                             WHERE Users.id = ?`
     const userId = id;
@@ -62,46 +67,53 @@ function allBooks(id, callback){
         title: 'Available Books',
         books: [],
     };
-    
-    db.pool.query(selectUserCountry, [userId], (err,result) =>{
-        if(err){
-            next(err);
-            return
+
+    common.getUserPoints(userId, function (err, result) {
+        if (err)
+        {
+            return callback(err, '')
         }
-        var country = result[0].country;
-        var userPoints = result[0].userPoints;
-        
-        db.pool.query(selectAllAvailableBooks, [userId, userId, country], (err, result) => {
-            if (err) {
-                // update error handling
-                next(err);
-                return;
+        var userPoints = result.availablePoints
+
+        db.pool.query(selectUserCountry, [userId], (err, result) => {
+            if (err)
+            {
+                return callback(err, '')
             }
-            var number = result.length;
-            // ********* need to update the point value
-            var points; 
-            for (let i = 0; i < number; i++) {
-                points = 2;
-                if(country != result[i].country){
-                    points = 4;
+            var country = result[0].country
+
+            db.pool.query(selectAllAvailableBooks, [userId, userId, country], (err, result) => {
+                if (err)
+                {
+                    return callback(err, '')
                 }
-                var data = {
-                    id: result[i].id,
-                    title: result[i].title,
-                    author: result[i].author,
-                    imgUrl: result[i].imgUrl,
-                    pointcost: points,
-                    isbn: result[i].isbn,
-                    genre: result[i].genre,
-                    rating: result[i].rating,
-                    pubDate: result[i].pubDate,
-                    condition: result[i].description,
-                    userPoints: userPoints
-                }
-                payload.books.push(new Book(data));           
-            }     
-            return callback(payload);
-        })
+                var number = result.length
+                var points; 
+                for (let i = 0; i < number; i++) {
+                    points = 2;
+                    if(country != result[i].country){
+                        points = 4;
+                    }
+                    var data = {
+                        id: result[i].id,
+                        title: result[i].title,
+                        author: result[i].author,
+                        imgUrl: result[i].imgUrl,
+                        pointcost: points,
+                        isbn: result[i].isbn,
+                        genre: result[i].genre,
+                        rating: result[i].rating,
+                        pubDate: result[i].pubDate,
+                        condition: result[i].description,
+                        userPoints: userPoints
+                    }
+                    payload.books.push(new Book(data));           
+                } 
+
+                return callback('', payload)
+
+            })
+        })       
     })
 }
 
